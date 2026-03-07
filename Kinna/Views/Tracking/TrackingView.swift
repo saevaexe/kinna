@@ -2,8 +2,10 @@ import SwiftUI
 import SwiftData
 
 struct TrackingView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
     @Query private var babies: [Baby]
+    @State private var showAddSheet = false
 
     private var baby: Baby? { babies.first }
 
@@ -74,7 +76,7 @@ struct TrackingView: View {
 
                 // Add log button
                 Button {
-                    // TODO: Add log sheet
+                    showAddSheet = true
                 } label: {
                     Text("+ Kayıt ekle")
                         .font(.kinnaBodyMedium(14))
@@ -107,6 +109,10 @@ struct TrackingView: View {
         }
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showAddSheet) {
+            AddLogSheet()
+                .presentationDetents([.medium])
+        }
     }
 
     // MARK: - Tracking Tile
@@ -209,6 +215,199 @@ struct TrackingView: View {
         case .diaper:
             return "Bez değişimi"
         }
+    }
+}
+
+// MARK: - Add Log Sheet
+
+struct AddLogSheet: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var selectedType: DailyLog.LogType = .feeding
+    @State private var feedingType: DailyLog.FeedingType = .breast
+    @State private var sleepMinutes: Double = 30
+    @State private var diaperType: DailyLog.DiaperType = .wet
+    @State private var note = ""
+    @State private var logDate = Date()
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Type selector
+                    HStack(spacing: 8) {
+                        typeButton("Beslenme", type: .feeding, emoji: "🍼")
+                        typeButton("Uyku", type: .sleep, emoji: "😴")
+                        typeButton("Bez", type: .diaper, emoji: "🧷")
+                    }
+                    .padding(.top, 8)
+
+                    // Type-specific fields
+                    VStack(alignment: .leading, spacing: 12) {
+                        switch selectedType {
+                        case .feeding:
+                            fieldLabel("TUR")
+                            HStack(spacing: 8) {
+                                feedingButton("Anne sutu", type: .breast)
+                                feedingButton("Biberon", type: .bottle)
+                                feedingButton("Ek gida", type: .solid)
+                            }
+
+                        case .sleep:
+                            fieldLabel("SURE")
+                            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                Text("\(Int(sleepMinutes))")
+                                    .font(.kinnaDisplay(32))
+                                    .foregroundStyle(.kChar)
+                                Text("dk")
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kMid)
+                            }
+                            Slider(value: $sleepMinutes, in: 5...240, step: 5)
+                                .tint(.kSage)
+
+                        case .diaper:
+                            fieldLabel("TUR")
+                            HStack(spacing: 8) {
+                                diaperButton("Islak", type: .wet)
+                                diaperButton("Kirli", type: .dirty)
+                                diaperButton("Ikisi de", type: .both)
+                            }
+                        }
+                    }
+
+                    // Time
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel("SAAT")
+                        DatePicker("", selection: $logDate, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    // Note
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel("NOT (istege bagli)")
+                        TextField("Ek bilgi...", text: $note)
+                            .font(.kinnaBody(14))
+                            .padding(12)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.kPale, lineWidth: 1.5)
+                            )
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
+            }
+            .background(Color.kCream.ignoresSafeArea())
+            .navigationTitle("Kayit Ekle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Vazgec") { dismiss() }
+                        .foregroundStyle(.kMid)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Kaydet") { saveLog() }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.kTerra)
+                }
+            }
+        }
+    }
+
+    // MARK: - Save
+
+    private func saveLog() {
+        let log = DailyLog(date: logDate, type: selectedType, note: note)
+
+        switch selectedType {
+        case .feeding:
+            log.feedingType = feedingType
+        case .sleep:
+            log.sleepDuration = sleepMinutes * 60
+        case .diaper:
+            log.diaperType = diaperType
+        }
+
+        modelContext.insert(log)
+        dismiss()
+    }
+
+    // MARK: - Components
+
+    private func fieldLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.kinnaBodyMedium(10))
+            .foregroundStyle(.kLight)
+            .tracking(1)
+    }
+
+    private func typeButton(_ title: String, type: DailyLog.LogType, emoji: String) -> some View {
+        let isSelected = selectedType == type
+        return Button {
+            withAnimation(.easeInOut(duration: 0.15)) { selectedType = type }
+        } label: {
+            VStack(spacing: 6) {
+                Text(emoji)
+                    .font(.system(size: 22))
+                Text(title)
+                    .font(.kinnaBody(12))
+                    .fontWeight(isSelected ? .medium : .regular)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(isSelected ? Color.kTerraLight.opacity(0.5) : .white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(isSelected ? Color.kTerra : Color.kPale, lineWidth: 1.5)
+            )
+        }
+        .foregroundStyle(isSelected ? .kTerra : .kMid)
+    }
+
+    private func feedingButton(_ title: String, type: DailyLog.FeedingType) -> some View {
+        let isSelected = feedingType == type
+        return Button {
+            feedingType = type
+        } label: {
+            Text(title)
+                .font(.kinnaBody(12))
+                .fontWeight(isSelected ? .medium : .regular)
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(isSelected ? Color.kSage.opacity(0.15) : .white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(isSelected ? Color.kSage : Color.kPale, lineWidth: 1.5)
+                )
+        }
+        .foregroundStyle(isSelected ? .kSageDark : .kMid)
+    }
+
+    private func diaperButton(_ title: String, type: DailyLog.DiaperType) -> some View {
+        let isSelected = diaperType == type
+        return Button {
+            diaperType = type
+        } label: {
+            Text(title)
+                .font(.kinnaBody(12))
+                .fontWeight(isSelected ? .medium : .regular)
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(isSelected ? Color.kTerraLight.opacity(0.5) : .white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(isSelected ? Color.kTerra : Color.kPale, lineWidth: 1.5)
+                )
+        }
+        .foregroundStyle(isSelected ? .kTerra : .kMid)
     }
 }
 

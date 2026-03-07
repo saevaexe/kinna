@@ -2,15 +2,23 @@ import SwiftUI
 import SwiftData
 
 struct MilestonesView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var babies: [Baby]
+    @Query private var progressRecords: [MilestoneProgress]
     @State private var selectedMonth = 0
-    @State private var completedIDs: Set<String> = []
-    @State private var attentionIDs: Set<String> = []
 
     private var baby: Baby? { babies.first }
 
     private var milestones: [Milestone] {
         MilestoneEngine.milestonesForAge(selectedMonth)
+    }
+
+    private var completedIDs: Set<String> {
+        Set(progressRecords.filter { $0.status == .completed }.map(\.milestoneID))
+    }
+
+    private var attentionIDs: Set<String> {
+        Set(progressRecords.filter { $0.status == .attention }.map(\.milestoneID))
     }
 
     private var completedCount: Int {
@@ -174,11 +182,11 @@ struct MilestonesView: View {
 
     private func toggleMilestone(_ id: String) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            if completedIDs.contains(id) {
-                completedIDs.remove(id)
+            if let existing = progressRecords.first(where: { $0.milestoneID == id }) {
+                modelContext.delete(existing)
             } else {
-                completedIDs.insert(id)
-                attentionIDs.remove(id)
+                let progress = MilestoneProgress(milestoneID: id, status: .completed)
+                modelContext.insert(progress)
             }
         }
     }
@@ -188,5 +196,5 @@ struct MilestonesView: View {
     NavigationStack {
         MilestonesView()
     }
-    .modelContainer(for: Baby.self, inMemory: true)
+    .modelContainer(for: [Baby.self, MilestoneProgress.self], inMemory: true)
 }

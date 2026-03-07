@@ -18,7 +18,8 @@ struct KinnaApp: App {
             Baby.self,
             DailyLog.self,
             VaccinationRecord.self,
-            AllergyLog.self
+            AllergyLog.self,
+            MilestoneProgress.self
         ])
     }
 }

@@ -2,8 +2,10 @@ import SwiftUI
 import SwiftData
 
 struct AllergyView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \AllergyLog.introducedDate, order: .reverse) private var logs: [AllergyLog]
     @Query private var babies: [Baby]
+    @State private var showAddSheet = false
 
     private var baby: Baby? { babies.first }
 
@@ -64,7 +66,7 @@ struct AllergyView: View {
 
                 // Add food button
                 Button {
-                    // TODO: Add food sheet
+                    showAddSheet = true
                 } label: {
                     Text("+ Yeni besin ekle")
                         .font(.kinnaBody(13))
@@ -83,6 +85,10 @@ struct AllergyView: View {
         }
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showAddSheet) {
+            AddFoodSheet()
+                .presentationDetents([.medium])
+        }
     }
 
     // MARK: - Stat Card
@@ -188,6 +194,183 @@ struct AllergyView: View {
         if lowered.contains("çilek") { return "🍓" }
         if lowered.contains("portakal") { return "🍊" }
         return "🥄"
+    }
+}
+
+// MARK: - Add Food Sheet
+
+struct AddFoodSheet: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var foodName = ""
+    @State private var introducedDate = Date()
+    @State private var reaction: AllergyLog.ReactionType = .none
+    @State private var reactionNote = ""
+
+    private let commonFoods = [
+        "Havuc", "Muz", "Elma", "Patates", "Avokado", "Kabak",
+        "Yumurta", "Yogurt", "Pirinc", "Brokoli", "Armut", "Cilek"
+    ]
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Food name
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel("BESIN ADI")
+                        TextField("ornek: Havuc puresi", text: $foodName)
+                            .font(.kinnaBody(14))
+                            .padding(12)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.kPale, lineWidth: 1.5)
+                            )
+                    }
+
+                    // Quick picks
+                    VStack(alignment: .leading, spacing: 8) {
+                        fieldLabel("HIZLI SECIM")
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()), GridItem(.flexible()),
+                            GridItem(.flexible()), GridItem(.flexible())
+                        ], spacing: 8) {
+                            ForEach(commonFoods, id: \.self) { food in
+                                Button {
+                                    foodName = food
+                                } label: {
+                                    Text(food)
+                                        .font(.kinnaBody(11))
+                                        .foregroundStyle(foodName == food ? .kTerra : .kMid)
+                                        .fontWeight(foodName == food ? .medium : .regular)
+                                        .padding(.vertical, 8)
+                                        .frame(maxWidth: .infinity)
+                                        .background(foodName == food ? Color.kTerraLight.opacity(0.5) : .white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(foodName == food ? Color.kTerra : Color.kPale, lineWidth: 1)
+                                        )
+                                }
+                            }
+                        }
+                    }
+
+                    // Date
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel("TANITIM TARIHI")
+                        DatePicker("", selection: $introducedDate, in: ...Date(), displayedComponents: .date)
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    // Reaction
+                    VStack(alignment: .leading, spacing: 8) {
+                        fieldLabel("REAKSIYON")
+                        HStack(spacing: 8) {
+                            reactionButton("Yok", type: .none, color: .kSage)
+                            reactionButton("Hafif", type: .mild, color: Color(hex: 0xD4A643))
+                            reactionButton("Orta", type: .moderate, color: .kTerra)
+                            reactionButton("Ciddi", type: .severe, color: Color(hex: 0xC44A4A))
+                        }
+                    }
+
+                    // Reaction note
+                    if reaction != .none {
+                        VStack(alignment: .leading, spacing: 6) {
+                            fieldLabel("REAKSIYON NOTU")
+                            TextField("Kizariklik, kusma, gaz...", text: $reactionNote)
+                                .font(.kinnaBody(14))
+                                .padding(12)
+                                .background(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.kPale, lineWidth: 1.5)
+                                )
+                        }
+                    }
+
+                    // Tip
+                    HStack(alignment: .top, spacing: 8) {
+                        Text("📌")
+                            .font(.system(size: 12))
+                        Text("Yeni besinleri tek tek ve 3 gun arayla deneyin.")
+                            .font(.kinnaBody(11))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+                    }
+                    .padding(12)
+                    .background(Color.kWarm)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(Color.kPale, style: StrokeStyle(lineWidth: 1, dash: [5, 3]))
+                    )
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
+            }
+            .background(Color.kCream.ignoresSafeArea())
+            .navigationTitle("Yeni Besin")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Vazgec") { dismiss() }
+                        .foregroundStyle(.kMid)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Kaydet") { saveFood() }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.kTerra)
+                        .disabled(foodName.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+        }
+    }
+
+    private func saveFood() {
+        let name = foodName.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty else { return }
+
+        let log = AllergyLog(
+            foodName: name,
+            introducedDate: introducedDate,
+            reaction: reaction,
+            reactionNote: reactionNote
+        )
+        modelContext.insert(log)
+        dismiss()
+    }
+
+    private func fieldLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.kinnaBodyMedium(10))
+            .foregroundStyle(.kLight)
+            .tracking(1)
+    }
+
+    private func reactionButton(_ title: String, type: AllergyLog.ReactionType, color: Color) -> some View {
+        let isSelected = reaction == type
+        return Button {
+            withAnimation(.easeInOut(duration: 0.15)) { reaction = type }
+        } label: {
+            Text(title)
+                .font(.kinnaBody(12))
+                .fontWeight(isSelected ? .medium : .regular)
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(isSelected ? color.opacity(0.15) : .white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(isSelected ? color : Color.kPale, lineWidth: 1.5)
+                )
+        }
+        .foregroundStyle(isSelected ? color : .kMid)
     }
 }
 
