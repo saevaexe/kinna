@@ -9,124 +9,268 @@ struct PaywallView: View {
     @State private var isPurchasing = false
     @State private var errorMessage: String?
 
+    private var monthlyPackage: Package? {
+        offering?.availablePackages.first { $0.packageType == .monthly }
+    }
+
+    private var yearlyPackage: Package? {
+        offering?.availablePackages.first { $0.packageType == .annual }
+    }
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                VStack(spacing: 12) {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 50))
-                        .foregroundStyle(.kTerra)
-
-                    Text(String(localized: "paywall_title", defaultValue: "Unlock Kinna Pro"))
-                        .font(.title.bold())
-
-                    Text(String(localized: "paywall_subtitle", defaultValue: "Everything you need for your baby's journey"))
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+            VStack(spacing: 0) {
+                // Trial badge
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(Color(hex: 0x4CAF50))
+                        .frame(width: 7, height: 7)
+                    Text("3 gun ucretsiz dene")
+                        .font(.kinnaBodyMedium(11))
+                        .foregroundStyle(.white)
                 }
-                .padding(.top, 40)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .background(Color.kChar.opacity(0.75))
+                .clipShape(Capsule())
+                .padding(.top, 16)
+                .padding(.bottom, 20)
+
+                // Headline
+                Text("KINNA PREMIUM")
+                    .font(.kinnaBodyMedium(10))
+                    .foregroundStyle(.kTerra)
+                    .tracking(2)
+                    .padding(.bottom, 8)
+
+                Text("Ela'nin her anini\n")
+                    .font(.kinnaDisplay(26))
+                    .foregroundStyle(.kChar)
+                +
+                Text("kacirma.")
+                    .font(.kinnaDisplayItalic(26))
+                    .foregroundStyle(.kTerra)
+
+                Text("3 gun boyunca her sey ucretsiz.\nSonra istersen devam et.")
+                    .font(.kinnaBody(12, weight: .light))
+                    .foregroundStyle(.kMid)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(3)
+                    .padding(.top, 6)
+                    .padding(.bottom, 20)
+
+                // Plan cards
+                HStack(spacing: 8) {
+                    planCard(
+                        title: "AYLIK",
+                        price: monthlyPackage?.localizedPriceString ?? "₺169",
+                        unit: "/ ay",
+                        saving: nil,
+                        badge: nil,
+                        isSelected: selectedPlan?.packageType == .monthly
+                    ) {
+                        selectedPlan = monthlyPackage
+                    }
+
+                    planCard(
+                        title: "YILLIK",
+                        price: yearlyPackage?.localizedPriceString ?? "₺999",
+                        unit: "/ yil",
+                        saving: "ayda ₺83",
+                        badge: "%34 indirim",
+                        isSelected: selectedPlan?.packageType != .monthly
+                    ) {
+                        selectedPlan = yearlyPackage
+                    }
+                }
+                .padding(.horizontal, 4)
+                .padding(.bottom, 14)
+
+                // Per-day reframe
+                HStack(spacing: 10) {
+                    Text("☕")
+                        .font(.system(size: 18))
+                    Text("Gunde 2,7₺.")
+                        .font(.kinnaBody(12, weight: .medium))
+                        .foregroundStyle(.kChar)
+                    +
+                    Text(" Bir kahveden az.")
+                        .font(.kinnaBody(12))
+                        .foregroundStyle(.kMid)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    LinearGradient(colors: [.kBlush, Color.kTerraLight.opacity(0.3)], startPoint: .leading, endPoint: .trailing)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.kTerra.opacity(0.15), lineWidth: 1)
+                )
+                .padding(.bottom, 16)
 
                 // Features
-                VStack(alignment: .leading, spacing: 16) {
-                    featureRow(icon: "chart.bar.fill", title: String(localized: "paywall_feature_growth", defaultValue: "Growth Charts"), subtitle: String(localized: "paywall_feature_growth_desc", defaultValue: "WHO percentile tracking"))
-                    featureRow(icon: "brain.head.profile", title: String(localized: "paywall_feature_brain", defaultValue: "Brain Development"), subtitle: String(localized: "paywall_feature_brain_desc", defaultValue: "Science-backed insights"))
-                    featureRow(icon: "doc.text.fill", title: String(localized: "paywall_feature_report", defaultValue: "Doctor Reports"), subtitle: String(localized: "paywall_feature_report_desc", defaultValue: "PDF export for pediatrician"))
-                    featureRow(icon: "questionmark.circle.fill", title: String(localized: "paywall_feature_ai", defaultValue: "AI Q&A"), subtitle: String(localized: "paywall_feature_ai_desc", defaultValue: "Ask anything about your baby"))
+                VStack(spacing: 8) {
+                    featureRow("Sinirsiz gelisim takibi", sub: "0-5 yas")
+                    featureRow("Kisisellestirilmis gunluk rehberlik", sub: nil)
+                    featureRow("Asi takvimi + hatirlatmalar", sub: nil)
+                    featureRow("Besin gunlugu ve gecis rehberi", sub: nil)
+                    featureRow("Tum veriler cihazinda", sub: "gizli & guvenli")
                 }
-                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
 
-                // Plans
-                if let offering {
-                    VStack(spacing: 12) {
-                        ForEach(offering.availablePackages, id: \.identifier) { package in
-                            planCard(package: package, isSelected: selectedPlan?.identifier == package.identifier)
-                                .onTapGesture { selectedPlan = package }
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                }
-
-                // Purchase button
+                // CTA
                 Button {
                     Task { await purchase() }
                 } label: {
                     if isPurchasing {
                         ProgressView()
                             .tint(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
                     } else {
-                        Text(String(localized: "paywall_subscribe", defaultValue: "Start Free Trial"))
+                        Text("3 gun ucretsiz basla")
+                            .font(.kinnaBodyMedium(15))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
                     }
                 }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(.kTerra)
-                .foregroundStyle(.white)
+                .background(Color.kTerra)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
-                .disabled(selectedPlan == nil || isPurchasing)
-                .padding(.horizontal, 24)
+                .shadow(color: .kTerra.opacity(0.4), radius: 14, y: 6)
+                .disabled(isPurchasing)
+                .padding(.bottom, 8)
 
-                // Restore
+                Text("Istedigin zaman iptal edebilirsin.")
+                    .font(.kinnaBody(10))
+                    .foregroundStyle(.kLight)
+                    .padding(.bottom, 6)
+
                 Button {
                     Task { await subscriptionManager.restorePurchases() }
                 } label: {
-                    Text(String(localized: "paywall_restore", defaultValue: "Restore Purchases"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    Text("Satin almayi geri yukle")
+                        .font(.kinnaBody(11))
+                        .foregroundStyle(.kLight)
+                        .underline()
                 }
+                .padding(.bottom, 8)
 
                 if let errorMessage {
                     Text(errorMessage)
-                        .font(.caption)
+                        .font(.kinnaBody(11))
                         .foregroundStyle(.red)
+                        .padding(.top, 4)
                 }
             }
+            .padding(.horizontal, 24)
             .padding(.bottom, 32)
         }
+        .background(Color.kCream.ignoresSafeArea())
         .task { await loadOffering() }
         .onChange(of: subscriptionManager.hasFullAccess) { _, hasAccess in
             if hasAccess { dismiss() }
         }
-    }
-
-    private func featureRow(icon: String, title: String, subtitle: String) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(.kTerra)
-                .frame(width: 32)
-            VStack(alignment: .leading) {
-                Text(title).font(.subheadline.bold())
-                Text(subtitle).font(.caption).foregroundStyle(.secondary)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.kMid)
+                }
             }
         }
     }
 
-    private func planCard(package: Package, isSelected: Bool) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(package.storeProduct.localizedTitle)
-                    .font(.headline)
-                Text(package.localizedPriceString)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+    // MARK: - Plan Card
+
+    private func planCard(
+        title: String, price: String, unit: String,
+        saving: String?, badge: String?,
+        isSelected: Bool, action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(title)
+                    .font(.kinnaBodyMedium(10))
+                    .foregroundStyle(isSelected ? .kTerra : .kLight)
+                    .tracking(1)
+
+                Text(price)
+                    .font(.kinnaDisplay(22))
+                    .foregroundStyle(.kChar)
+
+                Text(unit)
+                    .font(.kinnaBody(10))
+                    .foregroundStyle(.kLight)
+
+                if let saving {
+                    Text(saving)
+                        .font(.kinnaBodyMedium(10))
+                        .foregroundStyle(.kSageDark)
+                        .padding(.top, 2)
+                }
             }
-            Spacer()
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isSelected ? .kTerra : .kMid)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(isSelected ? Color.kTerraLight.opacity(0.3) : .white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isSelected ? Color.kTerra : Color.kPale, lineWidth: 1.5)
+            )
+            .overlay(alignment: .top) {
+                if let badge {
+                    Text(badge)
+                        .font(.kinnaBodyMedium(9))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 3)
+                        .background(Color.kTerra)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .offset(y: -9)
+                }
+            }
         }
-        .padding()
-        .background(isSelected ? Color.kTerraPale : Color.kPale)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
+
+    // MARK: - Feature Row
+
+    private func featureRow(_ text: String, sub: String?) -> some View {
+        HStack(spacing: 10) {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.kSage)
+                .frame(width: 18, height: 18)
+                .overlay {
+                    Text("✓")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+
+            Text(text)
+                .font(.kinnaBody(12))
+                .foregroundStyle(.kChar)
+
+            if let sub {
+                Text(sub)
+                    .font(.kinnaBody(11))
+                    .foregroundStyle(.kLight)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Network
 
     private func loadOffering() async {
         do {
             let offerings = try await Purchases.shared.offerings()
             offering = offerings.current
-            selectedPlan = offering?.availablePackages.first
+            selectedPlan = yearlyPackage ?? monthlyPackage ?? offering?.availablePackages.first
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -149,6 +293,8 @@ struct PaywallView: View {
 }
 
 #Preview {
-    PaywallView()
-        .environment(SubscriptionManager.shared)
+    NavigationStack {
+        PaywallView()
+    }
+    .environment(SubscriptionManager.shared)
 }
