@@ -28,17 +28,17 @@ struct VaccinationView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("T.C. SAGLIK BAKANLIGI PROTOKOLU")
+                    Text("T.C. SAĞLIK BAKANLIĞI PROTOKOLÜ")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .tracking(1.5)
 
                     (
-                        Text("Asi ")
+                        Text("Aşı ")
                             .font(.kinnaDisplay(26))
                             .foregroundStyle(.kChar)
                         +
-                        Text("plani")
+                        Text("planı")
                             .font(.kinnaDisplayItalic(26))
                             .foregroundStyle(.kTerra)
                     )

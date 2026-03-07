@@ -18,7 +18,7 @@ struct AllergyView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("EK GIDA GUNLUGU")
+                    Text("EK GIDA GÜNLÜĞÜ")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .tracking(1.5)
@@ -33,7 +33,7 @@ struct AllergyView: View {
                             .foregroundStyle(.kTerra)
                     )
 
-                    Text("Reaksiyonlari ilk 24 saatte not al.")
+                    Text("Reaksiyonları ilk 24 saatte not al.")
                         .font(.kinnaBody(12, weight: .light))
                         .foregroundStyle(.kMid)
                 }
@@ -77,7 +77,7 @@ struct AllergyView: View {
                 HStack(alignment: .top, spacing: 8) {
                     Text("📌")
                         .font(.system(size: 12))
-                    Text("Yeni besinleri tek tek ve 3 gun arayla dene. Belirgin reaksiyon durumunda doktoruna danis.")
+                    Text("Yeni besinleri tek tek ve 3 gün arayla dene. Belirgin reaksiyon durumunda doktoruna danış.")
                         .font(.kinnaBody(10))
                         .foregroundStyle(.kMid)
                         .lineSpacing(2)
@@ -186,11 +186,11 @@ struct AllergyView: View {
         let (bg, fg, label): (Color, Color, String) = {
             switch reaction {
             case .none:
-                return (Color(hex: 0xEAF3EF), .kSageDark, "Iyi")
+                return (Color(hex: 0xEAF3EF), .kSageDark, "İyi")
             case .mild:
                 return (Color(hex: 0xFFF8ED), Color(hex: 0x8B7030), "Hafif")
             case .moderate:
-                return (Color(hex: 0xFFF3ED), Color(hex: 0xA85E42), "Kizariklik")
+                return (Color(hex: 0xFFF3ED), Color(hex: 0xA85E42), "Kızarıklık")
             case .severe:
                 return (Color(hex: 0xFFF3ED), Color(hex: 0xC4644A), "Ciddi")
             }
@@ -249,7 +249,7 @@ struct AddFoodSheet: View {
                     // Food name
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel("BESIN ADI")
-                        TextField("ornek: Havuc puresi", text: $foodName)
+                        TextField("örnek: Havuç püresi", text: $foodName)
                             .font(.kinnaBody(14))
                             .padding(12)
                             .background(.white)
@@ -311,7 +311,7 @@ struct AddFoodSheet: View {
                     if reaction != .none {
                         VStack(alignment: .leading, spacing: 6) {
                             fieldLabel("REAKSIYON NOTU")
-                            TextField("Kizariklik, kusma, gaz...", text: $reactionNote)
+                            TextField("Kızarıklık, kusma, gaz...", text: $reactionNote)
                                 .font(.kinnaBody(14))
                                 .padding(12)
                                 .background(.white)
@@ -348,7 +348,7 @@ struct AddFoodSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Vazgec") { dismiss() }
+                    Button("Vazgeç") { dismiss() }
                         .foregroundStyle(.kMid)
                 }
                 ToolbarItem(placement: .confirmationAction) {

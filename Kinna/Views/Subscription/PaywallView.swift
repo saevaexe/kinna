@@ -25,7 +25,7 @@ struct PaywallView: View {
                     Circle()
                         .fill(Color(hex: 0x4CAF50))
                         .frame(width: 7, height: 7)
-                    Text("3 gun ucretsiz dene")
+                    Text("3 gün ücretsiz dene")
                         .font(.kinnaBodyMedium(11))
                         .foregroundStyle(.white)
                 }
@@ -43,15 +43,15 @@ struct PaywallView: View {
                     .tracking(2)
                     .padding(.bottom, 8)
 
-                Text("Ela'nin her anini\n")
+                Text("Ela'nın her anını\n")
                     .font(.kinnaDisplay(26))
                     .foregroundStyle(.kChar)
                 +
-                Text("kacirma.")
+                Text("kaçırma.")
                     .font(.kinnaDisplayItalic(26))
                     .foregroundStyle(.kTerra)
 
-                Text("3 gun boyunca her sey ucretsiz.\nSonra istersen devam et.")
+                Text("3 gün boyunca her şey ücretsiz.\nSonra istersen devam et.")
                     .font(.kinnaBody(12, weight: .light))
                     .foregroundStyle(.kMid)
                     .multilineTextAlignment(.center)
@@ -75,7 +75,7 @@ struct PaywallView: View {
                     planCard(
                         title: "YILLIK",
                         price: yearlyPackage?.localizedPriceString ?? "₺999",
-                        unit: "/ yil",
+                        unit: "/ yıl",
                         saving: "ayda ₺83",
                         badge: "%34 indirim",
                         isSelected: selectedPlan?.packageType != .monthly
@@ -90,7 +90,7 @@ struct PaywallView: View {
                 HStack(spacing: 10) {
                     Text("☕")
                         .font(.system(size: 18))
-                    Text("Gunde 2,7₺.")
+                    Text("Günde 2,7₺.")
                         .font(.kinnaBody(12, weight: .medium))
                         .foregroundStyle(.kChar)
                     +
@@ -112,11 +112,11 @@ struct PaywallView: View {
 
                 // Features
                 VStack(spacing: 8) {
-                    featureRow("Sinirsiz gelisim takibi", sub: "0-5 yas")
-                    featureRow("Kisisellestirilmis gunluk rehberlik", sub: nil)
-                    featureRow("Asi takvimi + hatirlatmalar", sub: nil)
-                    featureRow("Besin gunlugu ve gecis rehberi", sub: nil)
-                    featureRow("Tum veriler cihazinda", sub: "gizli & guvenli")
+                    featureRow("Sınırsız gelişim takibi", sub: "0-5 yaş")
+                    featureRow("Kişiselleştirilmiş günlük rehberlik", sub: nil)
+                    featureRow("Aşı takvimi + hatırlatmalar", sub: nil)
+                    featureRow("Besin günlüğü ve geçiş rehberi", sub: nil)
+                    featureRow("Tüm veriler cihazında", sub: "gizli & güvenli")
                 }
                 .padding(.bottom, 20)
 
@@ -130,7 +130,7 @@ struct PaywallView: View {
                             .frame(maxWidth: .infinity)
                             .padding(16)
                     } else {
-                        Text("3 gun ucretsiz basla")
+                        Text("3 gün ücretsiz başla")
                             .font(.kinnaBodyMedium(15))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
@@ -143,7 +143,7 @@ struct PaywallView: View {
                 .disabled(isPurchasing)
                 .padding(.bottom, 8)
 
-                Text("Istedigin zaman iptal edebilirsin.")
+                Text("İstediğin zaman iptal edebilirsin.")
                     .font(.kinnaBody(10))
                     .foregroundStyle(.kLight)
                     .padding(.bottom, 6)
@@ -151,7 +151,7 @@ struct PaywallView: View {
                 Button {
                     Task { await subscriptionManager.restorePurchases() }
                 } label: {
-                    Text("Satin almayi geri yukle")
+                    Text("Satın almayı geri yükle")
                         .font(.kinnaBody(11))
                         .foregroundStyle(.kLight)
                         .underline()

@@ -27,21 +27,21 @@ struct MilestonesView: View {
 
     private var ringContextTitle: String {
         switch selectedMonth {
-        case 0...2: return "Baglanma kaliplari destekleniyor"
-        case 3...5: return "Motor beceriler gelisiyor"
-        case 6...9: return "Iletisim temelleri kuruluyor"
-        case 10...12: return "Kesfetme donemi basliyor"
-        default: return "Gelisim ilerlemeye devam ediyor"
+        case 0...2: return "Bağlanma kalıpları destekleniyor"
+        case 3...5: return "Motor beceriler gelişiyor"
+        case 6...9: return "İletişim temelleri kuruluyor"
+        case 10...12: return "Keşfetme dönemi başlıyor"
+        default: return "Gelişim ilerlemeye devam ediyor"
         }
     }
 
     private var ringContextDescription: String {
         switch selectedMonth {
-        case 0...2: return "Ses, gulumseme ve goz temasiyla etkilesimler bu ay kritik."
-        case 3...5: return "Nesneleri kavrama ve yuvarlanma gibi hareketler basliyor."
-        case 6...9: return "Ilk heceler ve isaret etme gibi iletisim becerileri gelisiyor."
-        case 10...12: return "Bagimsiz hareket ve cevre kesfetme yogunlasiyor."
-        default: return "Her ay yeni gelisim asamalari bebeginizi bekliyor."
+        case 0...2: return "Ses, gülümseme ve göz temasıyla etkileşimler bu ay kritik."
+        case 3...5: return "Nesneleri kavrama ve yuvarlanma gibi hareketler başlıyor."
+        case 6...9: return "İlk heceler ve işaret etme gibi iletişim becerileri gelişiyor."
+        case 10...12: return "Bağımsız hareket ve çevre keşfetme yoğunlaşıyor."
+        default: return "Her ay yeni gelişim aşamaları bebeğinizi bekliyor."
         }
     }
 

@@ -130,7 +130,7 @@ struct HomeDashboardView: View {
                     dailyCards(baby: baby)
 
                     // WHO reference
-                    Text("Iceriklerimiz WHO rehberleri ve T.C. Saglik Bakanligi protokolleri temel alinarak hazirlanmistir.")
+                    Text("İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .lineSpacing(2)

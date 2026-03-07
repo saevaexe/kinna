@@ -66,7 +66,7 @@ struct OnboardingView: View {
 
             // Headline
             (
-                Text("Bebegine en iyi\nbaslangici ver, ")
+                Text("Bebeğine en iyi\nbaşlangıcı ver, ")
                     .font(.kinnaDisplay(30))
                     .foregroundStyle(.kChar)
                 +
@@ -78,7 +78,7 @@ struct OnboardingView: View {
             .lineSpacing(2)
             .padding(.bottom, 10)
 
-            Text("Turkiye'nin ilk duygusal bebek rehberi.\nBilimsel, guvenli, sana ozel.")
+            Text("Türkiye'nin ilk duygusal bebek rehberi.\nBilimsel, güvenli, sana özel.")
                 .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .multilineTextAlignment(.center)
@@ -87,7 +87,7 @@ struct OnboardingView: View {
 
             // Trust chips
             HStack(spacing: 6) {
-                trustChip("🔬", "WHO onayili")
+                trustChip("🔬", "WHO onaylı")
                 trustChip("🔒", "Veriler sende")
                 trustChip("🇹🇷", "T.C. takvimi")
             }
@@ -98,7 +98,7 @@ struct OnboardingView: View {
             Button {
                 withAnimation { currentStep = 1 }
             } label: {
-                Text("Hadi baslayalim →")
+                Text("Hadi başlayalım →")
                     .font(.kinnaBodyMedium(14))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -117,7 +117,7 @@ struct OnboardingView: View {
             Button {
                 // Future: restore / sign in
             } label: {
-                Text("Hesabim var, giris yap")
+                Text("Hesabım var, giriş yap")
                     .font(.kinnaBody(13))
                     .foregroundStyle(.kMid)
                     .padding(.vertical, 10)
@@ -138,10 +138,10 @@ struct OnboardingView: View {
     private var roleStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 1)
-            stepLabel("Adim 1 / 5")
+            stepLabel("Adım 1 / 5")
 
             (
-                Text("Sen bebegin\n")
+                Text("Sen bebeğin\n")
                     .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
                 +
@@ -149,7 +149,7 @@ struct OnboardingView: View {
                     .font(.kinnaDisplayItalic(28))
                     .foregroundStyle(.kTerra)
                 +
-                Text("babasi mi?")
+                Text("babası mı?")
                     .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
             )
@@ -157,7 +157,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 4)
 
-            Text("Sana ozel icerikler ve dil hazirlayalim.")
+            Text("Sana özel içerikler ve dil hazırlayalım.")
                 .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -165,19 +165,19 @@ struct OnboardingView: View {
 
             optionCard(
                 emoji: "👩", emojiBg: Color(hex: 0xFEF0F5),
-                title: "Anneyim", subtitle: "Anne perspektifinden icerik",
+                title: "Anneyim", subtitle: "Anne perspektifinden içerik",
                 isSelected: selectedRole == .mother
             ) { selectedRole = .mother }
 
             optionCard(
                 emoji: "👨", emojiBg: Color(hex: 0xE8F0F6),
-                title: "Babayim", subtitle: "Baba perspektifinden icerik",
+                title: "Babayım", subtitle: "Baba perspektifinden içerik",
                 isSelected: selectedRole == .father
             ) { selectedRole = .father }
 
             optionCard(
                 emoji: "🧑", emojiBg: Color.kSage.opacity(0.15),
-                title: "Bakim veren", subtitle: "Bakici, buyukanne vb.",
+                title: "Bakım veren", subtitle: "Bakıcı, büyükanne vb.",
                 isSelected: selectedRole == .caregiver
             ) { selectedRole = .caregiver }
 
@@ -194,10 +194,10 @@ struct OnboardingView: View {
     private var userNameStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 2)
-            stepLabel("Adim 2 / 5")
+            stepLabel("Adım 2 / 5")
 
             (
-                Text("Sana nasil\n")
+                Text("Sana nasıl\n")
                     .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
                 +
@@ -209,7 +209,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 4)
 
-            Text("Kinna sana her sabah adinla seslenecek.")
+            Text("Kinna sana her sabah adınla seslenecek.")
                 .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -233,13 +233,13 @@ struct OnboardingView: View {
 
             // Name field
             fieldGroup(label: "ADIN") {
-                TextField("Ayse", text: $nameInput)
+                TextField("Ayşe", text: $nameInput)
                     .font(.kinnaBody(14))
                     .foregroundStyle(.kChar)
             }
             .padding(.bottom, 4)
 
-            Text("Sadece sen goreceksin 🔒")
+            Text("Sadece sen göreceksin 🔒")
                 .font(.kinnaBody(9))
                 .foregroundStyle(.kMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -265,14 +265,14 @@ struct OnboardingView: View {
         ScrollView {
             VStack(spacing: 0) {
                 progressBar(current: 3)
-                stepLabel("Adim 3 / 5")
+                stepLabel("Adım 3 / 5")
 
                 (
-                    Text("Bebeginle\n")
+                    Text("Bebeğinle\n")
                         .font(.kinnaDisplay(28))
                         .foregroundStyle(.kChar)
                     +
-                    Text("tanisalim.")
+                    Text("tanışalım.")
                         .font(.kinnaDisplayItalic(28))
                         .foregroundStyle(.kTerra)
                 )
@@ -280,7 +280,7 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 4)
 
-                Text("Kinna'yi bebegin icin kisisel hale getirelim.")
+                Text("Kinna'yı bebeğin için kişisel hale getirelim.")
                     .font(.kinnaBody(12, weight: .light))
                     .foregroundStyle(.kMid)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -319,7 +319,7 @@ struct OnboardingView: View {
                 .padding(.bottom, 16)
 
                 // Baby name
-                fieldGroup(label: "BEBEGININ ADI") {
+                fieldGroup(label: "BEBEĞİNİN ADI") {
                     TextField("Ela", text: $babyName)
                         .font(.kinnaBody(14))
                         .foregroundStyle(.kChar)
@@ -327,7 +327,7 @@ struct OnboardingView: View {
                 .padding(.bottom, 14)
 
                 // Birth date segments
-                Text("DOGUM TARIHI")
+                Text("DOĞUM TARİHİ")
                     .font(.kinnaBodyMedium(9))
                     .foregroundStyle(.kMuted)
                     .tracking(1.2)
@@ -336,7 +336,7 @@ struct OnboardingView: View {
                     .padding(.bottom, 6)
 
                 HStack(spacing: 8) {
-                    dateSegment(label: "GUN", value: "\(birthDay)", isActive: true)
+                    dateSegment(label: "GÜN", value: "\(birthDay)", isActive: true)
                     dateSegment(label: "AY", value: monthAbbreviation(birthMonth), isActive: true)
                     dateSegment(label: "YIL", value: "\(birthYear)", isActive: true)
                 }
@@ -350,7 +350,7 @@ struct OnboardingView: View {
                     .padding(.bottom, 14)
 
                 // Gender
-                Text("CINSIYET")
+                Text("CİNSİYET")
                     .font(.kinnaBodyMedium(9))
                     .foregroundStyle(.kMuted)
                     .tracking(1.2)
@@ -359,7 +359,7 @@ struct OnboardingView: View {
                     .padding(.bottom, 6)
 
                 HStack(spacing: 8) {
-                    genderPill("Kiz", gender: .female)
+                    genderPill("Kız", gender: .female)
                     genderPill("Erkek", gender: .male)
                     genderPill("Belirtme", gender: .other)
                 }
@@ -373,7 +373,7 @@ struct OnboardingView: View {
                         Text("Veriler sadece sende")
                             .font(.kinnaBodyMedium(10))
                             .foregroundStyle(.kSageDark)
-                        Text("Hicbir sunucuya gonderilmez. Tamamen cihazinda.")
+                        Text("Hiçbir sunucuya gönderilmez. Tamamen cihazında.")
                             .font(.kinnaBody(10))
                             .foregroundStyle(.kMid)
                     }
@@ -406,15 +406,15 @@ struct OnboardingView: View {
     private var childOrderStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 4)
-            stepLabel("Adim 4 / 5")
+            stepLabel("Adım 4 / 5")
 
             let name = babyName.isEmpty ? "Bebek" : babyName
             (
-                Text("\(name) senin\nkacinci ")
+                Text("\(name) senin\nkaçıncı ")
                     .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
                 +
-                Text("cocugun?")
+                Text("çocuğun?")
                     .font(.kinnaDisplayItalic(28))
                     .foregroundStyle(.kTerra)
             )
@@ -422,7 +422,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 4)
 
-            Text("Ilk cocuk deneyimi cok farkli — sana gore icerik hazirlayalim.")
+            Text("İlk çocuk deneyimi çok farklı — sana göre içerik hazırlayalım.")
                 .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -439,24 +439,24 @@ struct OnboardingView: View {
 
             // Context info box
             infoBox(
-                title: childOrder == 1 ? "Ilk bebek 🎉" : "\(childOrder). cocuk",
+                title: childOrder == 1 ? "İlk bebek 🎉" : "\(childOrder). çocuk",
                 body: childOrder == 1
-                    ? "Her sey ilk kez. Adim adim seninle olacagiz — hicbir sorun aptalca degil."
-                    : "Deneyimin var ama her bebek farkli. Kinna sana guncel bilgi sunacak.",
+                    ? "Her şey ilk kez. Adım adım seninle olacağız — hiçbir sorun aptalca değil."
+                    : "Deneyimin var ama her bebek farklı. Kinna sana güncel bilgi sunacak.",
                 style: .terra
             )
             .padding(.bottom, 14)
 
             // Feature preview
             VStack(alignment: .leading, spacing: 6) {
-                Text("Kinna sana sunlari sunacak:")
+                Text("Kinna sana şunları sunacak:")
                     .font(.kinnaBodyMedium(10))
                     .foregroundStyle(.kChar)
                     .padding(.bottom, 2)
 
-                featurePreviewRow("📅", "Haftalik gelisim guncellemeleri", Color.kSage.opacity(0.15))
-                featurePreviewRow("💉", "Asi takvimi hatirlaticilari", Color.kTerraLight.opacity(0.4))
-                featurePreviewRow("🧠", "Bilimsel mikro-doz icerik", Color(hex: 0xE8F0F6))
+                featurePreviewRow("📅", "Haftalık gelişim güncellemeleri", Color.kSage.opacity(0.15))
+                featurePreviewRow("💉", "Aşı takvimi hatırlatıcıları", Color.kTerraLight.opacity(0.4))
+                featurePreviewRow("🧠", "Bilimsel mikro-doz içerik", Color(hex: 0xE8F0F6))
             }
             .padding(14)
             .background(.white)
@@ -479,7 +479,7 @@ struct OnboardingView: View {
     private var notificationStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 5)
-            stepLabel("Son adim")
+            stepLabel("Son adım")
 
             let name = babyName.isEmpty ? "Bebek" : babyName
             (
@@ -487,7 +487,7 @@ struct OnboardingView: View {
                     .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
                 +
-                Text("kacirma.")
+                Text("kaçırma.")
                     .font(.kinnaDisplayItalic(28))
                     .foregroundStyle(.kTerra)
             )
@@ -495,7 +495,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 4)
 
-            Text("Asi zamanlari, gelisim donumleri ve gunluk motivasyon notun icin.")
+            Text("Aşı zamanları, gelişim dönümleri ve günlük motivasyon notun için.")
                 .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -504,19 +504,19 @@ struct OnboardingView: View {
             // Notification previews
             VStack(spacing: 8) {
                 notificationCard(
-                    time: "simdi",
-                    title: "💉 Besli Asi — 3 gun sonra",
-                    body: "\(name)'nin Besli Asi vakti yaklastiriyor. Randevu aldin mi?"
+                    time: "şimdi",
+                    title: "💉 Beşli Aşı — 3 gün sonra",
+                    body: "\(name)'nin Beşli Aşı vakti yaklaşıyor. Randevu aldın mı?"
                 )
                 notificationCard(
                     time: "sabah 8",
-                    title: "🌱 \(name) bugun 2 aylik!",
-                    body: "\"Zor gunleri gectin. Bu hafta emzirme duzene giriyor.\""
+                    title: "🌱 \(name) bugün 2 aylık!",
+                    body: "\"Zor günleri geçtin. Bu hafta emzirme düzene giriyor.\""
                 )
                 notificationCard(
-                    time: "ogleden once",
-                    title: "📈 Bu hafta: Kontrast oyunu zamani",
-                    body: "Siyah-beyaz kart goster — 2. ayda noral baglar gucleniyor."
+                    time: "öğleden önce",
+                    title: "📈 Bu hafta: Kontrast oyunu zamanı",
+                    body: "Siyah-beyaz kart göster — 2. ayda nöral bağlar güçleniyor."
                 )
             }
             .padding(.bottom, 16)
@@ -550,7 +550,7 @@ struct OnboardingView: View {
             Button {
                 hasCompletedOnboarding = true
             } label: {
-                Text("Simdi degil")
+                Text("Şimdi değil")
                     .font(.kinnaBody(13))
                     .foregroundStyle(.kMid)
                     .padding(.vertical, 10)

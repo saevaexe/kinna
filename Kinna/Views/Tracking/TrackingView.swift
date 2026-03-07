@@ -46,7 +46,7 @@ struct TrackingView: View {
                         .foregroundStyle(.kChar)
 
                     if let baby {
-                        Text("\(baby.name)'nin \(baby.ageInDays). gunu")
+                        Text("\(baby.name)'nın \(baby.ageInDays). günü")
                             .font(.kinnaBody(10))
                             .foregroundStyle(.kMuted)
                     }
@@ -312,7 +312,7 @@ struct AddLogSheet: View {
 
                     // Note
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel("NOT (istege bagli)")
+                        fieldLabel("NOT (isteğe bağlı)")
                         TextField("Ek bilgi...", text: $note)
                             .font(.kinnaBody(14))
                             .padding(12)
@@ -329,11 +329,11 @@ struct AddLogSheet: View {
             }
             .background(Color.kCream.ignoresSafeArea())
             .onAppear { selectedType = initialType }
-            .navigationTitle("Kayit Ekle")
+            .navigationTitle("Kayıt Ekle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Vazgec") { dismiss() }
+                    Button("Vazgeç") { dismiss() }
                         .foregroundStyle(.kMid)
                 }
                 ToolbarItem(placement: .confirmationAction) {
