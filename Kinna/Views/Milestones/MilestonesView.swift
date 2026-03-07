@@ -25,6 +25,26 @@ struct MilestonesView: View {
         milestones.filter { completedIDs.contains($0.id) }.count
     }
 
+    private var ringContextTitle: String {
+        switch selectedMonth {
+        case 0...2: return "Baglanma kaliplari destekleniyor"
+        case 3...5: return "Motor beceriler gelisiyor"
+        case 6...9: return "Iletisim temelleri kuruluyor"
+        case 10...12: return "Kesfetme donemi basliyor"
+        default: return "Gelisim ilerlemeye devam ediyor"
+        }
+    }
+
+    private var ringContextDescription: String {
+        switch selectedMonth {
+        case 0...2: return "Ses, gulumseme ve goz temasiyla etkilesimler bu ay kritik."
+        case 3...5: return "Nesneleri kavrama ve yuvarlanma gibi hareketler basliyor."
+        case 6...9: return "Ilk heceler ve isaret etme gibi iletisim becerileri gelisiyor."
+        case 10...12: return "Bagimsiz hareket ve cevre kesfetme yogunlasiyor."
+        default: return "Her ay yeni gelisim asamalari bebeginizi bekliyor."
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -41,6 +61,46 @@ struct MilestonesView: View {
             .padding(.horizontal, 24)
             .padding(.top, 12)
             .padding(.bottom, 20)
+
+            // Ring progress + context
+            if !milestones.isEmpty {
+                HStack(spacing: 14) {
+                    // Conic ring
+                    ZStack {
+                        Circle()
+                            .stroke(Color.kPale, lineWidth: 6)
+                            .frame(width: 72, height: 72)
+                        Circle()
+                            .trim(from: 0, to: milestones.isEmpty ? 0 : CGFloat(completedCount) / CGFloat(milestones.count))
+                            .stroke(Color.kSage, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                            .frame(width: 72, height: 72)
+                            .rotationEffect(.degrees(-90))
+                        Text("\(milestones.isEmpty ? 0 : (completedCount * 100 / milestones.count))%")
+                            .font(.kinnaBodyMedium(14))
+                            .foregroundStyle(.kChar)
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(ringContextTitle)
+                            .font(.kinnaBodyMedium(12))
+                            .foregroundStyle(.kChar)
+                        Text(ringContextDescription)
+                            .font(.kinnaBody(10))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+                    }
+                }
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.kPale, lineWidth: 1)
+                )
+                .padding(.horizontal, 24)
+                .padding(.bottom, 12)
+            }
 
             // Month selector
             ScrollView(.horizontal, showsIndicators: false) {

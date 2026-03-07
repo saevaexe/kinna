@@ -129,6 +129,14 @@ struct HomeDashboardView: View {
                     // Daily cards
                     dailyCards(baby: baby)
 
+                    // WHO reference
+                    Text("Iceriklerimiz WHO rehberleri ve T.C. Saglik Bakanligi protokolleri temel alinarak hazirlanmistir.")
+                        .font(.kinnaBody(9))
+                        .foregroundStyle(.kMuted)
+                        .lineSpacing(2)
+                        .padding(.top, 8)
+                        .padding(.bottom, 4)
+
                 } else {
                     // No baby
                     VStack(spacing: 12) {

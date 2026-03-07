@@ -28,13 +28,20 @@ struct VaccinationView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Aşı Takvimi")
-                        .font(.kinnaDisplay(26))
-                        .foregroundStyle(.kChar)
+                    Text("T.C. SAGLIK BAKANLIGI PROTOKOLU")
+                        .font(.kinnaBody(9))
+                        .foregroundStyle(.kMuted)
+                        .tracking(1.5)
 
-                    Text("T.C. Sağlık Bakanlığı protokolü")
-                        .font(.kinnaBody(12))
-                        .foregroundStyle(.kLight)
+                    (
+                        Text("Asi ")
+                            .font(.kinnaDisplay(26))
+                            .foregroundStyle(.kChar)
+                        +
+                        Text("plani")
+                            .font(.kinnaDisplayItalic(26))
+                            .foregroundStyle(.kTerra)
+                    )
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 12)

@@ -3,30 +3,34 @@ import SwiftData
 
 struct OnboardingView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @AppStorage("parentName") private var parentName = ""
+    @AppStorage("childOrder") private var childOrder = 1
     @Environment(\.modelContext) private var modelContext
 
     @State private var currentStep = 0
-    @State private var babyName = ""
-    @State private var birthDate = Date()
-    @State private var selectedGender: Baby.Gender? = nil
     @State private var selectedRole: ParentRole = .mother
-    @State private var notificationRequested = false
+    @State private var nameInput = ""
+    @State private var babyName = ""
+    @State private var birthDay = 1
+    @State private var birthMonth = 1
+    @State private var birthYear = Calendar.current.component(.year, from: Date())
+    @State private var selectedGender: Baby.Gender? = nil
 
     private let totalSteps = 6
 
     enum ParentRole: String {
-        case mother, father, other
+        case mother, father, caregiver
     }
 
     var body: some View {
         VStack(spacing: 0) {
             TabView(selection: $currentStep) {
-                splashStep.tag(0)
+                welcomeStep.tag(0)
                 roleStep.tag(1)
-                profileStep.tag(2)
-                valueStep.tag(3)
-                notificationStep.tag(4)
-                readyStep.tag(5)
+                userNameStep.tag(2)
+                babyInfoStep.tag(3)
+                childOrderStep.tag(4)
+                notificationStep.tag(5)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .scrollDisabled(true)
@@ -35,92 +39,96 @@ struct OnboardingView: View {
         .background(Color.kCream.ignoresSafeArea())
     }
 
-    // MARK: - Step 0: Splash
+    // MARK: - Step 0: Welcome
 
-    private var splashStep: some View {
+    private var welcomeStep: some View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Logo
-            HStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 13)
-                    .fill(Color.kTerra)
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Text("K")
-                            .font(.kinnaDisplay(22))
-                            .foregroundStyle(.white)
-                            .italic()
-                    }
-                    .shadow(color: .kTerra.opacity(0.4), radius: 10, y: 4)
-
-                Text("Kinna")
-                    .font(.kinnaDisplay(26))
-                    .foregroundStyle(.kChar)
-            }
-            .padding(.bottom, 40)
+            // App icon
+            RoundedRectangle(cornerRadius: 22)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(hex: 0xD4896A), .kTerra, Color(hex: 0xA85E42)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 72, height: 72)
+                .overlay {
+                    Text("K")
+                        .font(.kinnaDisplay(36, weight: .light))
+                        .foregroundStyle(.white.opacity(0.95))
+                        .italic()
+                }
+                .shadow(color: .kTerra.opacity(0.4), radius: 16, y: 5)
+                .padding(.bottom, 22)
 
             // Headline
-            Text("Bebek buyutmek\nzor. Sen ")
-                .font(.kinnaDisplay(34))
-                .foregroundStyle(.kChar)
-            +
-            Text("yalniz\n")
-                .font(.kinnaDisplayItalic(34))
-                .foregroundStyle(.kTerra)
-            +
-            Text("degilsin.")
-                .font(.kinnaDisplay(34))
-                .foregroundStyle(.kChar)
+            (
+                Text("Bebegine en iyi\nbaslangici ver, ")
+                    .font(.kinnaDisplay(30))
+                    .foregroundStyle(.kChar)
+                +
+                Text("birlikte.")
+                    .font(.kinnaDisplayItalic(30))
+                    .foregroundStyle(.kTerra)
+            )
+            .multilineTextAlignment(.center)
+            .lineSpacing(2)
+            .padding(.bottom, 10)
 
-            Text("Yanlis bilgiden degil, bilimden beslenen.\nForum gurultusu degil, sana ozel rehberlik.")
-                .font(.kinnaBody(13, weight: .light))
+            Text("Turkiye'nin ilk duygusal bebek rehberi.\nBilimsel, guvenli, sana ozel.")
+                .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
-                .padding(.top, 12)
-                .padding(.bottom, 20)
+                .padding(.bottom, 24)
 
-            // Privacy promise
-            HStack(spacing: 8) {
-                Text("🔒")
-                    .font(.system(size: 14))
-                Text("Veriler sadece sende kalir.")
-                    .font(.kinnaBody(11))
-                    .foregroundStyle(.kMid)
-                +
-                Text(" Hicbir yere gonderilmez.")
-                    .font(.kinnaBody(11, weight: .medium))
-                    .foregroundStyle(.kChar)
+            // Trust chips
+            HStack(spacing: 6) {
+                trustChip("🔬", "WHO onayili")
+                trustChip("🔒", "Veriler sende")
+                trustChip("🇹🇷", "T.C. takvimi")
             }
-            .padding(12)
-            .background(Color.kSage.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .padding(.bottom, 20)
 
             Spacer()
 
+            // CTA
             Button {
                 withAnimation { currentStep = 1 }
             } label: {
-                Text("Baslayalim")
-                    .font(.kinnaBodyMedium(15))
+                Text("Hadi baslayalim →")
+                    .font(.kinnaBodyMedium(14))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(Color.kTerra)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .padding(14)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: 0xD4896A), Color(hex: 0xA85E42)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                     .shadow(color: .kTerra.opacity(0.35), radius: 12, y: 6)
             }
 
-            // Trust strip
-            HStack(spacing: 16) {
-                trustItem("WHO onayili")
-                trustItem("T.C. Asi takvimi")
-                trustItem("Ucretsiz dene")
+            Button {
+                // Future: restore / sign in
+            } label: {
+                Text("Hesabim var, giris yap")
+                    .font(.kinnaBody(13))
+                    .foregroundStyle(.kMid)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.kPale, lineWidth: 1.5)
+                    )
             }
-            .padding(.top, 14)
-            .padding(.bottom, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
         }
         .padding(.horizontal, 28)
     }
@@ -129,469 +137,433 @@ struct OnboardingView: View {
 
     private var roleStep: some View {
         VStack(spacing: 0) {
-            stepProgress(current: 1)
+            progressBar(current: 1)
+            stepLabel("Adim 1 / 5")
 
-            Text("Bu yolculukta\n")
-                .font(.kinnaDisplay(26))
-                .foregroundStyle(.kChar)
-            +
-            Text("kim olarak ")
-                .font(.kinnaDisplayItalic(26))
-                .foregroundStyle(.kTerra)
-            +
-            Text("geciyorsun?")
-                .font(.kinnaDisplay(26))
-                .foregroundStyle(.kChar)
+            (
+                Text("Sen bebegin\n")
+                    .font(.kinnaDisplay(28))
+                    .foregroundStyle(.kChar)
+                +
+                Text("annesi misin,\n")
+                    .font(.kinnaDisplayItalic(28))
+                    .foregroundStyle(.kTerra)
+                +
+                Text("babasi mi?")
+                    .font(.kinnaDisplay(28))
+                    .foregroundStyle(.kChar)
+            )
+            .lineSpacing(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 4)
 
-            Text("Kinna sana ozel bir deneyim hazirlasin.")
-                .font(.kinnaBody(13, weight: .light))
+            Text("Sana ozel icerikler ve dil hazirlayalim.")
+                .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
-                .padding(.top, 6)
-                .padding(.bottom, 24)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 20)
 
-            VStack(spacing: 10) {
-                roleCard(
-                    emoji: "🤱", title: "Annesiyim",
-                    feel: "\"Bugun ne kadar iyi gittigini gormek istiyorum.\"",
-                    desc: "Motivasyon, aktiviteler ve gunluk rehberlik",
-                    role: .mother, bg: Color.kTerraLight.opacity(0.3)
-                )
-                roleCard(
-                    emoji: "👨‍👧", title: "Babasiyim",
-                    feel: "\"Takip edip destek olmak istiyorum.\"",
-                    desc: "Saglik verileri, paylasim ve bilgi",
-                    role: .father, bg: Color.kSage.opacity(0.1)
-                )
-                roleCard(
-                    emoji: "🫶", title: "Yakin biriyim",
-                    feel: "\"Ona destek olmak istiyorum.\"",
-                    desc: "Buyukanne, buyukbaba veya bakici",
-                    role: .other, bg: Color.kPale.opacity(0.5)
-                )
-            }
+            optionCard(
+                emoji: "👩", emojiBg: Color(hex: 0xFEF0F5),
+                title: "Anneyim", subtitle: "Anne perspektifinden icerik",
+                isSelected: selectedRole == .mother
+            ) { selectedRole = .mother }
+
+            optionCard(
+                emoji: "👨", emojiBg: Color(hex: 0xE8F0F6),
+                title: "Babayim", subtitle: "Baba perspektifinden icerik",
+                isSelected: selectedRole == .father
+            ) { selectedRole = .father }
+
+            optionCard(
+                emoji: "🧑", emojiBg: Color.kSage.opacity(0.15),
+                title: "Bakim veren", subtitle: "Bakici, buyukanne vb.",
+                isSelected: selectedRole == .caregiver
+            ) { selectedRole = .caregiver }
 
             Spacer()
 
-            onboardingButton("Devam") { currentStep = 2 }
-                .padding(.bottom, 40)
+            darkButton("Devam →") { currentStep = 2 }
+                .padding(.bottom, 32)
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 24)
     }
 
-    // MARK: - Step 2: Baby Profile
+    // MARK: - Step 2: User Name
 
-    private var profileStep: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                stepProgress(current: 2)
+    private var userNameStep: some View {
+        VStack(spacing: 0) {
+            progressBar(current: 2)
+            stepLabel("Adim 2 / 5")
 
-                Text("Bebeginle\n")
-                    .font(.kinnaDisplay(26))
+            (
+                Text("Sana nasil\n")
+                    .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
                 +
-                Text("tanisalim.")
-                    .font(.kinnaDisplayItalic(26))
+                Text("seslenelim?")
+                    .font(.kinnaDisplayItalic(28))
                     .foregroundStyle(.kTerra)
+            )
+            .lineSpacing(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 4)
 
-                // Privacy note
-                HStack(spacing: 8) {
-                    Text("🔒")
-                        .font(.system(size: 14))
-                    Text("Sadece senin cihazinda.")
-                        .font(.kinnaBody(10, weight: .medium))
-                        .foregroundStyle(.kChar)
-                    +
-                    Text(" Hicbir sunucuya gonderilmez.")
-                        .font(.kinnaBody(10))
-                        .foregroundStyle(.kMid)
-                }
-                .padding(9)
-                .background(Color.kSage.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .padding(.top, 10)
+            Text("Kinna sana her sabah adinla seslenecek.")
+                .font(.kinnaBody(12, weight: .light))
+                .foregroundStyle(.kMid)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 20)
 
-                // Avatar
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.kBlush)
-                    .frame(width: 72, height: 72)
-                    .overlay {
-                        Text("👶")
-                            .font(.system(size: 32))
-                    }
-                    .padding(.bottom, 20)
-
-                // Form
-                VStack(spacing: 12) {
-                    formField(label: "BEBEK ADI") {
-                        TextField("Ela", text: $babyName)
-                            .font(.kinnaBody(15))
-                            .foregroundStyle(.kChar)
-                    }
-
-                    formField(label: "DOGUM TARIHI") {
-                        DatePicker("", selection: $birthDate, in: ...Date(), displayedComponents: .date)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("CINSIYET")
-                            .font(.kinnaBodyMedium(10))
-                            .foregroundStyle(.kLight)
-                            .tracking(1)
-
-                        HStack(spacing: 10) {
-                            genderButton("Kiz", gender: .female)
-                            genderButton("Erkek", gender: .male)
-                            genderButton("Belirtme", gender: .other)
-                        }
-                    }
-                }
-
-                // Warm moment
-                if !babyName.trimmingCharacters(in: .whitespaces).isEmpty {
-                    HStack(spacing: 12) {
-                        Text("🌸")
-                            .font(.system(size: 26))
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Merhaba, kucuk \(babyName.trimmingCharacters(in: .whitespaces)).")
-                                .font(.kinnaDisplay(16))
-                                .foregroundStyle(.kChar)
-                            Text("Seninle birlikte buyumek cok guzel olacak.")
-                                .font(.kinnaBody(12, weight: .light))
-                                .foregroundStyle(.kMid)
-                        }
-                    }
-                    .padding(14)
-                    .background(
-                        LinearGradient(colors: [.kBlush, Color.kTerraLight.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            // Illustration
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.kPale.opacity(0.5), Color.kTerraLight.opacity(0.4)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
-                    .padding(.top, 16)
+                )
+                .frame(height: 110)
+                .overlay {
+                    Text("🌸")
+                        .font(.system(size: 58))
                 }
+                .padding(.bottom, 20)
 
-                onboardingButton("Devam") {
+            // Name field
+            fieldGroup(label: "ADIN") {
+                TextField("Ayse", text: $nameInput)
+                    .font(.kinnaBody(14))
+                    .foregroundStyle(.kChar)
+            }
+            .padding(.bottom, 4)
+
+            Text("Sadece sen goreceksin 🔒")
+                .font(.kinnaBody(9))
+                .foregroundStyle(.kMuted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 2)
+
+            Spacer()
+
+            darkButton("Devam →") {
+                parentName = nameInput.trimmingCharacters(in: .whitespaces)
+                currentStep = 3
+            }
+            .disabled(nameInput.trimmingCharacters(in: .whitespaces).isEmpty)
+            .opacity(nameInput.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
+            .padding(.bottom, 32)
+        }
+        .padding(.horizontal, 24)
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    // MARK: - Step 3: Baby Info
+
+    private var babyInfoStep: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                progressBar(current: 3)
+                stepLabel("Adim 3 / 5")
+
+                (
+                    Text("Bebeginle\n")
+                        .font(.kinnaDisplay(28))
+                        .foregroundStyle(.kChar)
+                    +
+                    Text("tanisalim.")
+                        .font(.kinnaDisplayItalic(28))
+                        .foregroundStyle(.kTerra)
+                )
+                .lineSpacing(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 4)
+
+                Text("Kinna'yi bebegin icin kisisel hale getirelim.")
+                    .font(.kinnaBody(12, weight: .light))
+                    .foregroundStyle(.kMid)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 16)
+
+                // Baby avatar
+                ZStack(alignment: .bottomTrailing) {
+                    RoundedRectangle(cornerRadius: 22)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.kTerraLight.opacity(0.4), Color.kPale.opacity(0.5)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 72, height: 72)
+                        .overlay {
+                            Text("👶")
+                                .font(.system(size: 34))
+                        }
+                        .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+
+                    Circle()
+                        .fill(Color.kTerra)
+                        .frame(width: 22, height: 22)
+                        .overlay {
+                            Text("+")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                        .overlay(
+                            Circle().stroke(Color.kCream, lineWidth: 2.5)
+                        )
+                        .offset(x: 4, y: 4)
+                }
+                .padding(.bottom, 16)
+
+                // Baby name
+                fieldGroup(label: "BEBEGININ ADI") {
+                    TextField("Ela", text: $babyName)
+                        .font(.kinnaBody(14))
+                        .foregroundStyle(.kChar)
+                }
+                .padding(.bottom, 14)
+
+                // Birth date segments
+                Text("DOGUM TARIHI")
+                    .font(.kinnaBodyMedium(9))
+                    .foregroundStyle(.kMuted)
+                    .tracking(1.2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 2)
+                    .padding(.bottom, 6)
+
+                HStack(spacing: 8) {
+                    dateSegment(label: "GUN", value: "\(birthDay)", isActive: true)
+                    dateSegment(label: "AY", value: monthAbbreviation(birthMonth), isActive: true)
+                    dateSegment(label: "YIL", value: "\(birthYear)", isActive: true)
+                }
+                .padding(.bottom, 14)
+
+                // Hidden DatePicker for actual input
+                DatePicker("", selection: birthDateBinding, in: ...Date(), displayedComponents: .date)
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 14)
+
+                // Gender
+                Text("CINSIYET")
+                    .font(.kinnaBodyMedium(9))
+                    .foregroundStyle(.kMuted)
+                    .tracking(1.2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 2)
+                    .padding(.bottom, 6)
+
+                HStack(spacing: 8) {
+                    genderPill("Kiz", gender: .female)
+                    genderPill("Erkek", gender: .male)
+                    genderPill("Belirtme", gender: .other)
+                }
+                .padding(.bottom, 14)
+
+                // Privacy info box
+                HStack(alignment: .top, spacing: 10) {
+                    Text("🔒")
+                        .font(.system(size: 14))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Veriler sadece sende")
+                            .font(.kinnaBodyMedium(10))
+                            .foregroundStyle(.kSageDark)
+                        Text("Hicbir sunucuya gonderilmez. Tamamen cihazinda.")
+                            .font(.kinnaBody(10))
+                            .foregroundStyle(.kMid)
+                    }
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.kSage.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.kSage.opacity(0.2), lineWidth: 1)
+                )
+                .padding(.bottom, 20)
+
+                darkButton("Devam →") {
                     saveBaby()
-                    currentStep = 3
+                    currentStep = 4
                 }
                 .disabled(babyName.trimmingCharacters(in: .whitespaces).isEmpty)
                 .opacity(babyName.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
+                .padding(.bottom, 32)
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 24)
         }
         .scrollDismissesKeyboard(.interactively)
     }
 
-    // MARK: - Step 3: Value Moment (WOW)
+    // MARK: - Step 4: Child Order
 
-    private var valueStep: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                stepProgress(current: 3)
-
-                // Age hero card
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(babyName.isEmpty ? "Bebek" : babyName)
-                        .font(.kinnaBody(10))
-                        .foregroundStyle(.white.opacity(0.35))
-                        .tracking(1.5)
-                        .textCase(.uppercase)
-
-                    Text(ageDescription)
-                        .font(.kinnaDisplay(28))
-                        .foregroundStyle(.white)
-
-                    Text("\(ageInDays). gun")
-                        .font(.kinnaBody(12))
-                        .foregroundStyle(.white.opacity(0.4))
-
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(.white.opacity(0.08))
-                                .frame(height: 3)
-                            RoundedRectangle(cornerRadius: 1.5)
-                                .fill(Color.kTerra)
-                                .frame(width: geo.size.width * monthProgress, height: 3)
-                        }
-                    }
-                    .frame(height: 3)
-                    .padding(.top, 12)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(20)
-                .background(Color.kChar)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .padding(.bottom, 14)
-
-                // This week expectations
-                Text("BU HAFTA BEKLENENLER")
-                    .font(.kinnaBodyMedium(10))
-                    .foregroundStyle(.kTerra)
-                    .tracking(1.5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.bottom, 10)
-
-                let items = sampleMilestones
-                VStack(spacing: 8) {
-                    ForEach(items, id: \.title) { item in
-                        HStack(spacing: 10) {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(item.bg)
-                                .frame(width: 32, height: 32)
-                                .overlay {
-                                    Text(item.emoji)
-                                        .font(.system(size: 16))
-                                }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.title)
-                                    .font(.kinnaBodyMedium(13))
-                                    .foregroundStyle(.kChar)
-                                Text(item.desc)
-                                    .font(.kinnaBody(11))
-                                    .foregroundStyle(.kMid)
-                                    .lineSpacing(2)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .stroke(Color.kPale, lineWidth: 1)
-                        )
-                    }
-                }
-                .padding(.bottom, 14)
-
-                // Science badge
-                HStack(spacing: 8) {
-                    Text("🔬")
-                        .font(.system(size: 14))
-                    Text("WHO & Harvard kaynakli.")
-                        .font(.kinnaBody(11, weight: .medium))
-                        .foregroundStyle(.kChar)
-                    +
-                    Text(" Her bilgi bilimsel literature dayaniyor.")
-                        .font(.kinnaBody(11))
-                        .foregroundStyle(.kMid)
-                }
-                .padding(10)
-                .background(Color.kBlush)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .padding(.bottom, 16)
-
-                onboardingButton("Harika, devam et") { currentStep = 4 }
-                    .padding(.bottom, 40)
-            }
-            .padding(.horizontal, 28)
-        }
-    }
-
-    // MARK: - Step 4: Notification
-
-    private var notificationStep: some View {
+    private var childOrderStep: some View {
         VStack(spacing: 0) {
-            stepProgress(current: 4)
+            progressBar(current: 4)
+            stepLabel("Adim 4 / 5")
 
-            Text("Seni hic\n")
-                .font(.kinnaDisplay(26))
-                .foregroundStyle(.kChar)
-            +
-            Text("yalniz birakamayalim.")
-                .font(.kinnaDisplayItalic(26))
-                .foregroundStyle(.kTerra)
-
-            Text("Sabah uyandiginda seni bekleyen kucuk bir not olsun.")
-                .font(.kinnaBody(13, weight: .light))
-                .foregroundStyle(.kMid)
-                .padding(.top, 6)
-                .padding(.bottom, 20)
-
-            // Notification preview
-            VStack(spacing: 0) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(hex: 0x111111))
-                    .frame(width: 56, height: 15)
-                    .padding(.bottom, 12)
-
-                HStack(spacing: 7) {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.kTerra)
-                        .frame(width: 20, height: 20)
-                        .overlay {
-                            Text("K")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(.white)
-                        }
-                    Text("KINNA")
-                        .font(.kinnaBodyMedium(10))
-                        .foregroundStyle(.kMid)
-                        .tracking(0.5)
-                    Spacer()
-                    Text("simdi")
-                        .font(.kinnaBody(10))
-                        .foregroundStyle(.kLight)
-                }
-                .padding(.bottom, 7)
-
-                Text("\(babyName.isEmpty ? "Bebek" : babyName) bugun \(ageDescription). 🎉")
-                    .font(.kinnaBody(12, weight: .medium))
+            let name = babyName.isEmpty ? "Bebek" : babyName
+            (
+                Text("\(name) senin\nkacinci ")
+                    .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
                 +
-                Text("\nBu hafta ilk sosyal gulumsemesini gorebilirsin.")
-                    .font(.kinnaBody(12))
+                Text("cocugun?")
+                    .font(.kinnaDisplayItalic(28))
+                    .foregroundStyle(.kTerra)
+            )
+            .lineSpacing(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 4)
+
+            Text("Ilk cocuk deneyimi cok farkli — sana gore icerik hazirlayalim.")
+                .font(.kinnaBody(12, weight: .light))
+                .foregroundStyle(.kMid)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 24)
+
+            // Number picker
+            HStack(spacing: 8) {
+                numberButton(1)
+                numberButton(2)
+                numberButton(3)
+                numberButton(4, label: "4+")
+            }
+            .padding(.bottom, 14)
+
+            // Context info box
+            infoBox(
+                title: childOrder == 1 ? "Ilk bebek 🎉" : "\(childOrder). cocuk",
+                body: childOrder == 1
+                    ? "Her sey ilk kez. Adim adim seninle olacagiz — hicbir sorun aptalca degil."
+                    : "Deneyimin var ama her bebek farkli. Kinna sana guncel bilgi sunacak.",
+                style: .terra
+            )
+            .padding(.bottom, 14)
+
+            // Feature preview
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Kinna sana sunlari sunacak:")
+                    .font(.kinnaBodyMedium(10))
                     .foregroundStyle(.kChar)
+                    .padding(.bottom, 2)
+
+                featurePreviewRow("📅", "Haftalik gelisim guncellemeleri", Color.kSage.opacity(0.15))
+                featurePreviewRow("💉", "Asi takvimi hatirlaticilari", Color.kTerraLight.opacity(0.4))
+                featurePreviewRow("🧠", "Bilimsel mikro-doz icerik", Color(hex: 0xE8F0F6))
             }
             .padding(14)
             .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 14))
-            .padding(.horizontal, 4)
-            .padding(14)
-            .background(Color.kChar)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .padding(.bottom, 16)
-
-            // Example notifications
-            VStack(spacing: 7) {
-                notifExample(emoji: "💛", title: "Her sabah bir motivasyon", desc: "\"Sen iyi bir annesin. Mukemmel olmak zorunda degilsin.\"")
-                notifExample(emoji: "💉", title: "Asi hatirlatmasi", desc: "\"Besli Asi icin 5 gun kaldi. Randevu almayi unutma.\"")
-                notifExample(emoji: "🧠", title: "Gunluk aktivite onerisi", desc: "\"Bugun siyah-beyaz kartlar goster.\"")
-            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color.kPale, lineWidth: 1)
+            )
 
             Spacer()
 
+            darkButton("Devam →") { currentStep = 5 }
+                .padding(.bottom, 32)
+        }
+        .padding(.horizontal, 24)
+    }
+
+    // MARK: - Step 5: Notifications
+
+    private var notificationStep: some View {
+        VStack(spacing: 0) {
+            progressBar(current: 5)
+            stepLabel("Son adim")
+
+            let name = babyName.isEmpty ? "Bebek" : babyName
+            (
+                Text("\(name)'yi\n")
+                    .font(.kinnaDisplay(28))
+                    .foregroundStyle(.kChar)
+                +
+                Text("kacirma.")
+                    .font(.kinnaDisplayItalic(28))
+                    .foregroundStyle(.kTerra)
+            )
+            .lineSpacing(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 4)
+
+            Text("Asi zamanlari, gelisim donumleri ve gunluk motivasyon notun icin.")
+                .font(.kinnaBody(12, weight: .light))
+                .foregroundStyle(.kMid)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 18)
+
+            // Notification previews
+            VStack(spacing: 8) {
+                notificationCard(
+                    time: "simdi",
+                    title: "💉 Besli Asi — 3 gun sonra",
+                    body: "\(name)'nin Besli Asi vakti yaklastiriyor. Randevu aldin mi?"
+                )
+                notificationCard(
+                    time: "sabah 8",
+                    title: "🌱 \(name) bugun 2 aylik!",
+                    body: "\"Zor gunleri gectin. Bu hafta emzirme duzene giriyor.\""
+                )
+                notificationCard(
+                    time: "ogleden once",
+                    title: "📈 Bu hafta: Kontrast oyunu zamani",
+                    body: "Siyah-beyaz kart goster — 2. ayda noral baglar gucleniyor."
+                )
+            }
+            .padding(.bottom, 16)
+
+            Spacer()
+
+            // Permission button
             Button {
                 Task {
                     _ = await NotificationManager.shared.requestPermission()
-                    notificationRequested = true
                     NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
-                    withAnimation { currentStep = 5 }
+                    hasCompletedOnboarding = true
                 }
             } label: {
-                Text("Izin ver")
-                    .font(.kinnaBodyMedium(15))
+                Text("Bildirimlere izin ver 🔔")
+                    .font(.kinnaBodyMedium(14))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(Color.kTerra)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .padding(14)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: 0xD4896A), Color(hex: 0xA85E42)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                     .shadow(color: .kTerra.opacity(0.35), radius: 12, y: 6)
             }
-
-            Button {
-                withAnimation { currentStep = 5 }
-            } label: {
-                Text("Simdi degil")
-                    .font(.kinnaBody(13))
-                    .foregroundStyle(.kLight)
-                    .padding(.vertical, 10)
-            }
-            .padding(.bottom, 24)
-        }
-        .padding(.horizontal, 28)
-    }
-
-    // MARK: - Step 5: Ready
-
-    private var readyStep: some View {
-        VStack(spacing: 0) {
-            Spacer()
-
-            // Icon
-            RoundedRectangle(cornerRadius: 22)
-                .fill(Color.kTerra)
-                .frame(width: 68, height: 68)
-                .overlay {
-                    Text("🤍")
-                        .font(.system(size: 34))
-                }
-                .shadow(color: .kTerra.opacity(0.45), radius: 24, y: 8)
-                .padding(.bottom, 32)
-
-            Text("HER SEY HAZIR")
-                .font(.kinnaBodyMedium(10))
-                .foregroundStyle(.kTerra)
-                .tracking(2)
-                .padding(.bottom, 10)
-
-            let name = babyName.isEmpty ? "Bebek" : babyName
-            let roleText = selectedRole == .mother ? "\(name)'nin annesi" : (selectedRole == .father ? "\(name)'nin babasi" : "\(name)'nin yakini")
-
-            Text("Hos geldin,\n")
-                .font(.kinnaDisplay(28))
-                .foregroundStyle(.kChar)
-            +
-            Text("\(roleText).")
-                .font(.kinnaDisplayItalic(28))
-                .foregroundStyle(.kTerra)
-
-            Text("Bugunden itibaren her sabah seni bekleyen bir rehber var. Yalniz degilsin.")
-                .font(.kinnaBody(13, weight: .light))
-                .foregroundStyle(.kMid)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .padding(.top, 8)
-                .padding(.bottom, 20)
-
-            // Summary card
-            HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 13)
-                    .fill(Color.kBlush)
-                    .frame(width: 42, height: 42)
-                    .overlay {
-                        Text("👶")
-                            .font(.system(size: 20))
-                    }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(name) \u{00B7} \(ageDescription)")
-                        .font(.kinnaDisplay(14))
-                        .foregroundStyle(.kChar)
-                    Text(birthDate, format: .dateTime.day().month(.wide).year())
-                        .font(.kinnaBody(11))
-                        .foregroundStyle(.kLight)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color.kTerra.opacity(0.15), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
-
-            Spacer()
 
             Button {
                 hasCompletedOnboarding = true
             } label: {
-                Text("Kinna'ya git")
-                    .font(.kinnaBodyMedium(15))
-                    .foregroundStyle(.white)
+                Text("Simdi degil")
+                    .font(.kinnaBody(13))
+                    .foregroundStyle(.kMid)
+                    .padding(.vertical, 10)
                     .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(Color.kTerra)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: .kTerra.opacity(0.35), radius: 12, y: 6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.kPale, lineWidth: 1.5)
+                    )
             }
-
-            HStack(spacing: 16) {
-                Text("🔒 Veriler sende")
-                Text("🔬 Bilimsel")
-                Text("💛 3 gun ucretsiz")
-            }
-            .font(.kinnaBody(10))
-            .foregroundStyle(.kLight)
-            .padding(.top, 10)
+            .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 24)
     }
 
     // MARK: - Save Baby
@@ -599,6 +571,12 @@ struct OnboardingView: View {
     private func saveBaby() {
         let name = babyName.trimmingCharacters(in: .whitespaces)
         guard !name.isEmpty else { return }
+
+        var components = DateComponents()
+        components.day = birthDay
+        components.month = birthMonth
+        components.year = birthYear
+        let birthDate = Calendar.current.date(from: components) ?? Date()
 
         let baby = Baby(
             name: name,
@@ -617,208 +595,284 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Helpers
+    // MARK: - Date Helpers
 
-    private var ageInDays: Int {
-        Calendar.current.dateComponents([.day], from: birthDate, to: .now).day ?? 0
+    private var birthDateBinding: Binding<Date> {
+        Binding(
+            get: {
+                var components = DateComponents()
+                components.day = birthDay
+                components.month = birthMonth
+                components.year = birthYear
+                return Calendar.current.date(from: components) ?? Date()
+            },
+            set: { newDate in
+                let comps = Calendar.current.dateComponents([.day, .month, .year], from: newDate)
+                birthDay = comps.day ?? 1
+                birthMonth = comps.month ?? 1
+                birthYear = comps.year ?? 2025
+            }
+        )
     }
 
-    private var ageDescription: String {
-        let components = Calendar.current.dateComponents([.year, .month, .day], from: birthDate, to: .now)
-        let years = components.year ?? 0
-        let months = components.month ?? 0
-        let days = components.day ?? 0
-        if years > 0 { return "\(years) yil \(months) ay" }
-        else if months > 0 { return "\(months) ay \(days) gun" }
-        else { return "\(max(0, days)) gun" }
-    }
-
-    private var monthProgress: CGFloat {
-        let days = ageInDays
-        let currentMonthDay = days % 30
-        return min(CGFloat(currentMonthDay) / 30.0, 1.0)
-    }
-
-    private var sampleMilestones: [(emoji: String, bg: Color, title: String, desc: String)] {
-        let months = Calendar.current.dateComponents([.month], from: birthDate, to: .now).month ?? 0
-        if months <= 1 {
-            return [
-                ("👀", Color.kSage.opacity(0.15), "Yuzlere odaklanma", "Yakin mesafeden yuzleri incelemeye baslar."),
-                ("✊", Color.kTerraLight.opacity(0.3), "Refleks kavrama", "Parmaginizi avucuna koyun — siki tutar."),
-                ("👂", Color(hex: 0xEEE8F5), "Seslere tepki", "Yuksek seslere irkilme refleksi var."),
-            ]
-        } else if months <= 3 {
-            return [
-                ("😊", Color.kSage.opacity(0.15), "Sosyal gulumseme", "Yuzunuze bakarak gulumseyebilir."),
-                ("🗣️", Color.kTerraLight.opacity(0.3), "Aglama disi sesler", "Ilk \"aguu\" sesleri baslar."),
-                ("🏋️", Color(hex: 0xEEE8F5), "Basini 45° kaldirma", "Yuzustu pozisyonda kisa sure tasiyabilir."),
-            ]
-        } else {
-            return [
-                ("🤲", Color.kSage.opacity(0.15), "Nesneleri kavrama", "Oyuncaklari bilinçli olarak tutar."),
-                ("🔄", Color.kTerraLight.opacity(0.3), "Yuvarlanma", "Sirtustu → yuzustu donebilir."),
-                ("😂", Color(hex: 0xEEE8F5), "Kahkaha", "Komik seslere ve yuzlere guler."),
-            ]
-        }
+    private func monthAbbreviation(_ month: Int) -> String {
+        let symbols = Calendar.current.shortMonthSymbols
+        guard month >= 1, month <= symbols.count else { return "" }
+        return symbols[month - 1]
     }
 
     // MARK: - Components
 
-    private func stepProgress(current: Int) -> some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 4) {
-                ForEach(1..<5, id: \.self) { i in
-                    RoundedRectangle(cornerRadius: 1.5)
-                        .fill(i < current ? Color.kTerra : (i == current ? Color.kTerra.opacity(0.35) : Color.kPale))
-                        .frame(width: i < current ? 32 : 20, height: 3)
-                }
+    private func progressBar(current: Int) -> some View {
+        HStack(spacing: 4) {
+            ForEach(1...5, id: \.self) { i in
+                RoundedRectangle(cornerRadius: 1.5)
+                    .fill(
+                        i < current ? Color.kTerra :
+                        i == current ? Color.kTerra.opacity(0.4) :
+                        Color.kPale
+                    )
+                    .frame(height: 3)
             }
-            .padding(.top, 60)
-            .padding(.bottom, 8)
-
-            Text("Adim \(current) / 4")
-                .font(.kinnaBody(10))
-                .foregroundStyle(.kLight)
-                .tracking(1.5)
-                .textCase(.uppercase)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 12)
         }
+        .padding(.top, 56)
+        .padding(.bottom, 6)
     }
 
-    private func onboardingButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button {
-            withAnimation { action() }
-        } label: {
-            Text(title)
-                .font(.kinnaBodyMedium(15))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(16)
-                .background(Color.kChar)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-        }
+    private func stepLabel(_ text: String) -> some View {
+        Text(text.uppercased())
+            .font(.kinnaBody(9))
+            .foregroundStyle(.kMuted)
+            .tracking(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 10)
     }
 
-    private func trustItem(_ text: String) -> some View {
-        HStack(spacing: 5) {
-            Circle()
-                .fill(Color.kSage)
-                .frame(width: 5, height: 5)
+    private func trustChip(_ emoji: String, _ text: String) -> some View {
+        HStack(spacing: 4) {
+            Text(emoji)
+                .font(.system(size: 11))
             Text(text)
-                .font(.kinnaBody(10))
-                .foregroundStyle(.kLight)
+                .font(.kinnaBodyMedium(9))
+                .foregroundStyle(.kMid)
         }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 5)
+        .background(Color.kChar.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
-    private func roleCard(emoji: String, title: String, feel: String, desc: String, role: ParentRole, bg: Color) -> some View {
-        let isSelected = selectedRole == role
-        return Button {
-            withAnimation(.easeInOut(duration: 0.2)) { selectedRole = role }
+    private func optionCard(
+        emoji: String, emojiBg: Color,
+        title: String, subtitle: String,
+        isSelected: Bool, action: @escaping () -> Void
+    ) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) { action() }
         } label: {
-            HStack(alignment: .top, spacing: 14) {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(bg)
-                    .frame(width: 48, height: 48)
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(emojiBg)
+                    .frame(width: 34, height: 34)
                     .overlay {
                         Text(emoji)
-                            .font(.system(size: 24))
+                            .font(.system(size: 17))
                     }
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(title)
-                        .font(.kinnaBodyMedium(15))
+                        .font(.kinnaBodyMedium(13))
                         .foregroundStyle(.kChar)
-                    Text(feel)
-                        .font(.kinnaDisplayItalic(12))
-                        .foregroundStyle(.kTerra)
-                    Text(desc)
-                        .font(.kinnaBody(11))
-                        .foregroundStyle(.kLight)
+                    Text(subtitle)
+                        .font(.kinnaBody(10))
+                        .foregroundStyle(.kMid)
                 }
 
                 Spacer()
 
-                Circle()
+                RoundedRectangle(cornerRadius: 6)
                     .fill(isSelected ? Color.kTerra : .white)
-                    .frame(width: 22, height: 22)
+                    .frame(width: 19, height: 19)
                     .overlay {
-                        Circle()
+                        RoundedRectangle(cornerRadius: 6)
                             .stroke(isSelected ? Color.clear : Color.kPale, lineWidth: 1.5)
                         if isSelected {
                             Text("✓")
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.white)
                         }
                     }
             }
-            .padding(18)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .padding(12)
+            .background(isSelected ? Color.kTerraLight.opacity(0.3) : .white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: 14)
                     .stroke(isSelected ? Color.kTerra : Color.kPale, lineWidth: 1.5)
             )
         }
+        .padding(.bottom, 8)
     }
 
-    private func formField<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+    private func fieldGroup<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
             Text(label)
-                .font(.kinnaBodyMedium(10))
-                .foregroundStyle(.kLight)
-                .tracking(1)
+                .font(.kinnaBodyMedium(9))
+                .foregroundStyle(.kMuted)
+                .tracking(1.2)
+                .padding(.leading, 2)
 
             content()
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 11)
                 .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color.kPale, lineWidth: 1.5)
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.kTerra, lineWidth: 1.5)
                 )
         }
     }
 
-    private func genderButton(_ title: String, gender: Baby.Gender) -> some View {
+    private func dateSegment(label: String, value: String, isActive: Bool) -> some View {
+        VStack(spacing: 2) {
+            Text(label)
+                .font(.kinnaBody(8))
+                .foregroundStyle(.kMuted)
+                .tracking(0.8)
+            Text(value)
+                .font(.kinnaDisplay(18))
+                .foregroundStyle(isActive ? .kTerra : .kChar)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 9)
+        .background(isActive ? Color.kTerraLight.opacity(0.3) : .white)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isActive ? Color.kTerra : Color.kPale, lineWidth: 1.5)
+        )
+    }
+
+    private func genderPill(_ title: String, gender: Baby.Gender) -> some View {
         let isSelected = selectedGender == gender
         return Button {
             withAnimation(.easeInOut(duration: 0.2)) { selectedGender = gender }
         } label: {
             Text(title)
-                .font(.kinnaBody(13))
+                .font(.kinnaBody(12))
                 .foregroundStyle(isSelected ? .kTerra : .kMid)
                 .fontWeight(isSelected ? .medium : .regular)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .padding(12)
+                .padding(.vertical, 9)
                 .frame(maxWidth: .infinity)
-                .background(isSelected ? Color.kTerraLight.opacity(0.5) : .white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .background(isSelected ? Color.kTerraLight.opacity(0.4) : .white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 10)
                         .stroke(isSelected ? Color.kTerra : Color.kPale, lineWidth: 1.5)
                 )
         }
     }
 
-    private func notifExample(emoji: String, title: String, desc: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Text(emoji)
-                .font(.system(size: 18))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.kinnaBodyMedium(12))
-                    .foregroundStyle(.kChar)
-                Text(desc)
-                    .font(.kinnaBody(11))
-                    .foregroundStyle(.kMid)
-                    .italic()
-                    .lineSpacing(2)
-            }
+    private func numberButton(_ number: Int, label: String? = nil) -> some View {
+        let isSelected = childOrder == number
+        return Button {
+            withAnimation(.easeInOut(duration: 0.2)) { childOrder = number }
+        } label: {
+            Text(label ?? "\(number).")
+                .font(.kinnaDisplay(22))
+                .foregroundStyle(isSelected ? .white : .kMid)
+                .frame(width: 56, height: 56)
+                .background(isSelected ? Color.kTerra : .white)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(isSelected ? Color.clear : Color.kPale, lineWidth: 1.5)
+                )
+                .shadow(color: isSelected ? .kTerra.opacity(0.3) : .clear, radius: 8, y: 4)
         }
+    }
+
+    enum InfoBoxStyle { case terra, sage }
+
+    private func infoBox(title: String, body: String, style: InfoBoxStyle) -> some View {
+        let bg = style == .terra ? Color.kTerraLight.opacity(0.3) : Color.kSage.opacity(0.1)
+        let border = style == .terra ? Color.kTerra : Color.kSageDark
+        let titleColor = style == .terra ? Color.kTerra : Color.kSageDark
+
+        return VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.kinnaBodyMedium(10))
+                .foregroundStyle(titleColor)
+            Text(body)
+                .font(.kinnaBody(10))
+                .foregroundStyle(.kMid)
+                .lineSpacing(2)
+        }
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(bg)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(alignment: .leading) {
+            Rectangle()
+                .fill(border)
+                .frame(width: 3)
+                .clipShape(RoundedRectangle(cornerRadius: 2))
+        }
+    }
+
+    private func featurePreviewRow(_ emoji: String, _ text: String, _ bg: Color) -> some View {
+        HStack(spacing: 8) {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(bg)
+                .frame(width: 20, height: 20)
+                .overlay {
+                    Text(emoji)
+                        .font(.system(size: 10))
+                }
+            Text(text)
+                .font(.kinnaBody(11))
+                .foregroundStyle(.kMid)
+        }
+    }
+
+    private func notificationCard(time: String, title: String, body: String) -> some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 7) {
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(hex: 0xD4896A), Color(hex: 0xA85E42)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 24, height: 24)
+                    .overlay {
+                        Text("K")
+                            .font(.system(size: 11, weight: .bold, design: .serif))
+                            .foregroundStyle(.white)
+                            .italic()
+                    }
+                Text("Kinna")
+                    .font(.kinnaBodyMedium(9))
+                    .foregroundStyle(.kChar)
+                Spacer()
+                Text(time)
+                    .font(.kinnaBody(8))
+                    .foregroundStyle(.kMuted)
+            }
+
+            Text(title)
+                .font(.kinnaBodyMedium(11))
+                .foregroundStyle(.kChar)
+            Text(body)
+                .font(.kinnaBody(10))
+                .foregroundStyle(.kMid)
+                .lineSpacing(2)
+        }
         .padding(12)
         .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: 14))
@@ -826,6 +880,22 @@ struct OnboardingView: View {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(Color.kPale, lineWidth: 1)
         )
+        .shadow(color: .black.opacity(0.05), radius: 6, y: 3)
+    }
+
+    private func darkButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button {
+            withAnimation { action() }
+        } label: {
+            Text(title)
+                .font(.kinnaBodyMedium(13))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(14)
+                .background(Color.kChar)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: .kChar.opacity(0.2), radius: 8, y: 4)
+        }
     }
 }
 

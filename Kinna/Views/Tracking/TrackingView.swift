@@ -6,6 +6,7 @@ struct TrackingView: View {
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
     @Query private var babies: [Baby]
     @State private var showAddSheet = false
+    @State private var preselectedType: DailyLog.LogType = .feeding
 
     private var baby: Baby? { babies.first }
 
@@ -34,13 +35,21 @@ struct TrackingView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
+                    Text(Date.now, format: .dateTime.day().month(.wide).year().weekday(.wide))
+                        .font(.kinnaBody(9))
+                        .foregroundStyle(.kMuted)
+                        .tracking(1.5)
+                        .textCase(.uppercase)
+
                     Text("Bugün")
-                        .font(.kinnaDisplay(26))
+                        .font(.kinnaDisplayItalic(26))
                         .foregroundStyle(.kChar)
 
-                    Text(Date.now, format: .dateTime.day().month(.wide).year().weekday(.wide))
-                        .font(.kinnaBody(12))
-                        .foregroundStyle(.kLight)
+                    if let baby {
+                        Text("\(baby.name)'nin \(baby.ageInDays). gunu")
+                            .font(.kinnaBody(10))
+                            .foregroundStyle(.kMuted)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 12)
@@ -74,17 +83,11 @@ struct TrackingView: View {
                 }
                 .padding(.bottom, 16)
 
-                // Add log button
-                Button {
-                    showAddSheet = true
-                } label: {
-                    Text("+ Kayıt ekle")
-                        .font(.kinnaBodyMedium(14))
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(15)
-                        .background(Color.kTerra)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                // Quick-add buttons
+                HStack(spacing: 6) {
+                    quickAddButton("+ Beslenme", type: .feeding)
+                    quickAddButton("+ Uyku", type: .sleep)
+                    quickAddButton("+ Bez", type: .diaper)
                 }
                 .padding(.bottom, 16)
 
@@ -110,8 +113,29 @@ struct TrackingView: View {
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showAddSheet) {
-            AddLogSheet()
+            AddLogSheet(initialType: preselectedType)
                 .presentationDetents([.medium])
+        }
+    }
+
+    // MARK: - Quick Add Button
+
+    private func quickAddButton(_ title: String, type: DailyLog.LogType) -> some View {
+        Button {
+            preselectedType = type
+            showAddSheet = true
+        } label: {
+            Text(title)
+                .font(.kinnaBodyMedium(11))
+                .foregroundStyle(.kMid)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.kPale, lineWidth: 1)
+                )
         }
     }
 
@@ -224,6 +248,7 @@ struct AddLogSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    var initialType: DailyLog.LogType = .feeding
     @State private var selectedType: DailyLog.LogType = .feeding
     @State private var feedingType: DailyLog.FeedingType = .breast
     @State private var sleepMinutes: Double = 30
@@ -303,6 +328,7 @@ struct AddLogSheet: View {
                 .padding(.bottom, 20)
             }
             .background(Color.kCream.ignoresSafeArea())
+            .onAppear { selectedType = initialType }
             .navigationTitle("Kayit Ekle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -18,15 +18,24 @@ struct AllergyView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Besin Günlüğü")
-                        .font(.kinnaDisplay(26))
-                        .foregroundStyle(.kChar)
+                    Text("EK GIDA GUNLUGU")
+                        .font(.kinnaBody(9))
+                        .foregroundStyle(.kMuted)
+                        .tracking(1.5)
 
-                    if let baby {
-                        Text("\(baby.name) · 6. aydan itibaren")
-                            .font(.kinnaBody(12))
-                            .foregroundStyle(.kLight)
-                    }
+                    (
+                        Text("Besin ")
+                            .font(.kinnaDisplay(26))
+                            .foregroundStyle(.kChar)
+                        +
+                        Text("takibi")
+                            .font(.kinnaDisplayItalic(26))
+                            .foregroundStyle(.kTerra)
+                    )
+
+                    Text("Reaksiyonlari ilk 24 saatte not al.")
+                        .font(.kinnaBody(12, weight: .light))
+                        .foregroundStyle(.kMid)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 12)
@@ -63,6 +72,24 @@ struct AllergyView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.top, 40)
                 }
+
+                // Tip box
+                HStack(alignment: .top, spacing: 8) {
+                    Text("📌")
+                        .font(.system(size: 12))
+                    Text("Yeni besinleri tek tek ve 3 gun arayla dene. Belirgin reaksiyon durumunda doktoruna danis.")
+                        .font(.kinnaBody(10))
+                        .foregroundStyle(.kMid)
+                        .lineSpacing(2)
+                }
+                .padding(12)
+                .background(Color.kWarm)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.kPale, style: StrokeStyle(lineWidth: 1, dash: [5, 3]))
+                )
+                .padding(.top, 8)
 
                 // Add food button
                 Button {
@@ -156,24 +183,26 @@ struct AllergyView: View {
     }
 
     private func reactionBadge(_ reaction: AllergyLog.ReactionType) -> some View {
-        let (bg, fg, icon): (Color, Color, String) = {
+        let (bg, fg, label): (Color, Color, String) = {
             switch reaction {
             case .none:
-                return (Color(hex: 0xEAF3EF), .kSageDark, "✓")
+                return (Color(hex: 0xEAF3EF), .kSageDark, "Iyi")
             case .mild:
-                return (Color(hex: 0xFFF8ED), Color(hex: 0xC49A4A), "~")
-            case .moderate, .severe:
-                return (Color(hex: 0xFFF3ED), Color(hex: 0xC4644A), "⚠️")
+                return (Color(hex: 0xFFF8ED), Color(hex: 0x8B7030), "Hafif")
+            case .moderate:
+                return (Color(hex: 0xFFF3ED), Color(hex: 0xA85E42), "Kizariklik")
+            case .severe:
+                return (Color(hex: 0xFFF3ED), Color(hex: 0xC4644A), "Ciddi")
             }
         }()
 
-        return Text(icon)
-            .font(.kinnaBodyMedium(10))
+        return Text(label)
+            .font(.kinnaBodyMedium(9))
             .foregroundStyle(fg)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
             .background(bg)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 100))
     }
 
     private func foodEmoji(_ name: String) -> String {

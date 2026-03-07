@@ -21,6 +21,7 @@ extension Color {
     // Text
     static let kChar = Color(hex: 0x2C2C2C)
     static let kMid = Color(hex: 0x6B6560)
+    static let kMuted = Color(hex: 0x9E9590)
     static let kLight = Color(hex: 0xA09890)
     static let kPale = Color(hex: 0xEDE8E2)
 
@@ -54,6 +55,7 @@ extension ShapeStyle where Self == Color {
 
     static var kChar: Color { Color(hex: 0x2C2C2C) }
     static var kMid: Color { Color(hex: 0x6B6560) }
+    static var kMuted: Color { Color(hex: 0x9E9590) }
     static var kLight: Color { Color(hex: 0xA09890) }
     static var kPale: Color { Color(hex: 0xEDE8E2) }
 }
