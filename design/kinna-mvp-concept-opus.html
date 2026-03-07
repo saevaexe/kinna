@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinna — MVP UI Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --cream: #FAF6F0;
+  --linen: #F3ECE2;
+  --parchment: #FFFCF7;
+  --terra: #C4785A;
+  --terra-deep: #A85E42;
+  --terra-glow: #E8956F;
+  --terra-whisper: #F7EDE6;
+  --sage: #7A9E8E;
+  --sage-deep: #4A7A68;
+  --sage-whisper: #E4EFE8;
+  --char: #2C2C2C;
+  --ink: #1A1816;
+  --mid: #6B6560;
+  --muted: #9E9590;
+  --faint: #C8BFB5;
+  --line: #E8E0D6;
+  --white: #FFFFFF;
+  --sky: #7FA4BE;
+  --sky-whisper: #E8F0F6;
+  --lavender: #8B7FA8;
+  --lavender-whisper: #EEEBF4;
+  --sun: #D4A643;
+  --sun-whisper: #F5EDD4;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: #0E0C0A;
+  color: var(--cream);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══ BACKGROUND ATMOSPHERE ═══ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(196,120,90,0.08), transparent),
+    radial-gradient(ellipse 60% 50% at 85% 75%, rgba(122,158,142,0.06), transparent),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(212,166,67,0.03), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* grain */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page { position: relative; z-index: 2; }
+
+/* ═══ HEADER ═══ */
+.header {
+  text-align: center;
+  padding: 56px 24px 16px;
+}
+
+.logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 72px;
+  font-weight: 400;
+  color: var(--cream);
+  letter-spacing: -2px;
+  line-height: 1;
+  position: relative;
+  display: inline-block;
+}
+
+.logo .a { color: var(--terra-glow); }
+
+.logo::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--terra), transparent);
+  opacity: 0.3;
+}
+
+.tagline {
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.header-meta {
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid rgba(200,191,181,0.15);
+  color: var(--faint);
+  background: rgba(255,255,255,0.02);
+  backdrop-filter: blur(4px);
+}
+
+/* ═══ SCREEN STRIP ═══ */
+.strip {
+  display: flex;
+  gap: 20px;
+  padding: 36px 32px 64px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.strip::-webkit-scrollbar { display: none; }
+
+.screen-col {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  scroll-snap-align: center;
+  animation: float-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.screen-col:nth-child(1) { animation-delay: 0.05s; }
+.screen-col:nth-child(2) { animation-delay: 0.12s; }
+.screen-col:nth-child(3) { animation-delay: 0.19s; }
+.screen-col:nth-child(4) { animation-delay: 0.26s; }
+.screen-col:nth-child(5) { animation-delay: 0.33s; }
+.screen-col:nth-child(6) { animation-delay: 0.40s; }
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.screen-label {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.screen-label span {
+  color: var(--terra-glow);
+  margin-right: 4px;
+}
+
+/* ═══ PHONE SHELL ═══ */
+.phone {
+  width: 310px;
+  height: 670px;
+  border-radius: 42px;
+  background: var(--cream);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 30px 80px rgba(0,0,0,0.5),
+    0 8px 20px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.phone:hover { transform: translateY(-4px); }
+
+.notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 26px;
+  background: var(--ink);
+  border-radius: 16px;
+  z-index: 30;
+}
+
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  padding: 14px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 25;
+}
+
+.status-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--char);
+}
+
+.status-icons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.status-icons i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--char);
+}
+
+.screen-content {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 42px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══ SHARED UI ATOMS ═══ */
+.s-eyebrow {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.s-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  color: var(--char);
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+}
+
+.s-title em {
+  font-style: italic;
+  color: var(--terra);
+}
+
+.s-body {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.55;
+  font-weight: 300;
+}
+
+.s-btn {
+  border-radius: 14px;
+  padding: 13px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+}
+
+.s-btn-dark { background: var(--char); color: var(--white); }
+.s-btn-terra { background: var(--terra); color: var(--white); box-shadow: 0 8px 24px rgba(196,120,90,0.3); }
+
+/* tab bar */
+.tab-bar {
+  margin-top: auto;
+  height: 62px;
+  background: var(--white);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 4px 0;
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.tab-icon { font-size: 16px; }
+.tab-label { font-size: 8px; color: var(--muted); font-weight: 400; }
+.tab.active .tab-label { color: var(--terra-deep); font-weight: 600; }
+
+.tab-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--terra);
+  margin-top: -1px;
+}
+
+/* ═══════════════════════════════════
+   SCREEN 1 — ONBOARDING
+═══════════════════════════════════ */
+.s1 .screen-content { background: var(--cream); }
+
+.s1-inner {
+  padding: 60px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.s1-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 28px;
+}
+
+.s1-step {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.s1-step.done { background: var(--terra); }
+.s1-step.current { background: rgba(196,120,90,0.35); }
+
+.s1-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.s1-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--terra-whisper), var(--linen));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  position: relative;
+  box-shadow: 0 0 0 3px var(--white), 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.s1-avatar-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  background: var(--terra);
+  border-radius: 50%;
+  border: 2.5px solid var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.s1-field {
+  margin-bottom: 10px;
+}
+
+.s1-field-label {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 5px;
+  padding-left: 4px;
+}
+
+.s1-field-input {
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--char);
+  font-weight: 400;
+}
+
+.s1-field-input.filled {
+  border-color: var(--terra);
+  background: var(--terra-whisper);
+}
+
+.s1-date-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.s1-date-seg {
+  flex: 1;
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 8px;
+  text-align: center;
+}
+
+.s1-date-seg-label {
+  font-size: 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 2px;
+}
+
+.s1-date-seg-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 18px;
+  color: var(--char);
+}
+
+.s1-gender-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.s1-gender {
+  flex: 1;
+  padding: 9px 6px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--mid);
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  font-weight: 400;
+}
+
+.s1-gender.active {
+  background: var(--terra-whisper);
+  border-color: var(--terra);
+  color: var(--terra);
+  font-weight: 500;
+}
+
+.s1-privacy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sage-whisper);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(122,158,142,0.15);
+}
+
+.s1-privacy-icon { font-size: 14px; flex-shrink: 0; }
+
+.s1-privacy-txt {
+  font-size: 10px;
+  color: var(--sage-deep);
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.s1-privacy-txt strong { font-weight: 600; }
+
+/* ═══════════════════════════════════
+   SCREEN 2 — HOME DASHBOARD
+═══════════════════════════════════ */
+.s2 .screen-content { background: var(--cream); }
+
+.s2-inner {
+  padding: 58px 18px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.s2-greeting {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.s2-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 24px;
+  color: var(--char);
+  margin-bottom: 14px;
+}
+
+/* age hero */
+.s2-age-hero {
+  background: var(--char);
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.s2-age-hero::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(196,120,90,0.08);
+}
+
+.s2-age-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -15px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(122,158,142,0.06);
+}
+
+.s2-age-eyebrow {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.s2-age-value {
+  font-family: 'Instrument Serif', serif;
+  font-size: 36px;
+  color: var(--white);
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  font-weight: 400;
+}
+
+.s2-age-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.s2-age-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  margin-top: 14px;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.s2-age-bar-fill {
+  width: 42%;
+  height: 100%;
+  background: var(--terra);
+  border-radius: 2px;
+}
+
+/* motivation quote */
+.s2-motiv {
+  background: linear-gradient(135deg, var(--sage-deep), var(--sage));
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.s2-motiv-q {
+  font-family: 'Instrument Serif', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--white);
+  line-height: 1.55;
+  margin-bottom: 5px;
+}
+
+.s2-motiv-s {
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+
+/* daily cards */
+.s2-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.s2-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--char);
+  letter-spacing: 0.2px;
+}
+
+.s2-section-link {
+  font-size: 10px;
+  color: var(--sage-deep);
+  font-weight: 600;
+}
+
+.s2-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+}
+
+.s2-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.s2-card-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--char);
+  margin-bottom: 2px;
+}
+
+.s2-card-desc {
+  font-size: 10px;
+  color: var(--mid);
+  line-height: 1.45;
+}
+
+.s2-ref {
+  font-size: 9px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+/* ═══════════════════════════════════
+   SCREEN 3 — MILESTONES
+═══════════════════════════════════ */
+.s3 .screen-content { background: var(--cream); }
+
+.s3-inner {
+  padding: 58px 18px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.s3-ring-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.s3-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: conic-gradient(var(--sage) 0deg 230deg, var(--line) 230deg 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.s3-ring::after {
+  content: '';
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+.s3-ring-val {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--char);
+}
+
+.s3-ring-text {
+  flex: 1;
+}
+
+.s3-ring-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--char);
+  margin-bottom: 3px;
+}
+
+.s3-ring-sub {
+  font-size: 10px;
+  color: var(--mid);
+  line-height: 1.4;
+}
+
+.s3-months {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.s3-month {
+  padding: 5px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  color: var(--mid);
+  background: var(--white);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.s3-month.active {
+  background: var(--char);
+  color: var(--white);
+  border-color: var(--char);
+  font-weight: 500;
+}
+
+.s3-milestone {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.s3-milestone:last-child { border-bottom: none; }
+
+.s3-chk {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.s3-chk-done { background: var(--sage-whisper); color: var(--sage-deep); }
+.s3-chk-warn { background: #FAE7DE; color: var(--terra); }
+.s3-chk-wait { background: var(--white); border: 1.5px solid var(--line); }
+
+.s3-m-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--char);
+  margin-bottom: 2px;
+}
+
+.s3-m-desc {
+  font-size: 10px;
+  color: var(--mid);
+  line-height: 1.4;
+}
+
+.s3-tag {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.s3-tag-motor { background: var(--sage-whisper); color: var(--sage-deep); }
+.s3-tag-cog { background: var(--sky-whisper); color: #4A7A9E; }
+.s3-tag-social { background: var(--terra-whisper); color: var(--terra-deep); }
+.s3-tag-lang { background: var(--lavender-whisper); color: var(--lavender); }
+
+/* ═══════════════════════════════════
+   SCREEN 4 — DAILY TRACKING
+═══════════════════════════════════ */
+.s4 .screen-content { background: var(--cream); }
+
+.s4-inner {
+  padding: 58px 18px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.s4-date-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.s4-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.s4-metric {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+}
+
+.s4-metric-icon { font-size: 18px; margin-bottom: 6px; }
+
+.s4-metric-label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.s4-metric-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 26px;
+  color: var(--char);
+  line-height: 1;
+}
+
+.s4-metric-val span {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  color: var(--mid);
+  font-weight: 300;
+}
+
+.s4-metric-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.s4-metric-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* quick add */
+.s4-quick {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.s4-quick-btn {
+  flex: 1;
+  padding: 8px 6px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--mid);
+  background: var(--white);
+  border: 1px solid var(--line);
+  font-weight: 500;
+}
+
+.s4-quick-btn.active {
+  background: var(--sage-whisper);
+  border-color: var(--sage);
+  color: var(--sage-deep);
+}
+
+/* timeline */
+.s4-timeline {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+
+.s4-tl-head {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.s4-event {
+  display: grid;
+  grid-template-columns: 36px 8px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.s4-event:last-child { margin-bottom: 0; }
+
+.s4-event-time {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.s4-event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-feed { background: var(--sage); }
+.dot-sleep { background: var(--sky); }
+.dot-diaper { background: #E0BAA6; }
+
+.s4-event-text {
+  font-size: 11px;
+  color: var(--mid);
+}
+
+/* ═══════════════════════════════════
+   SCREEN 5 — VACCINATION
+═══════════════════════════════════ */
+.s5 .screen-content { background: var(--cream); }
+
+.s5-inner {
+  padding: 58px 18px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.s5-next {
+  background: linear-gradient(140deg, var(--sage-deep), #5B8B79);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 12px;
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.s5-next::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+.s5-next-label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.s5-next-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 3px;
+}
+
+.s5-next-date {
+  font-size: 11px;
+  opacity: 0.65;
+  position: relative;
+  z-index: 2;
+}
+
+.s5-next-pill {
+  display: inline-block;
+  margin-top: 8px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  opacity: 0.8;
+  position: relative;
+  z-index: 2;
+}
+
+.s5-list {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+
+.s5-group {
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 6px 0;
+  font-weight: 500;
+}
+
+.s5-vax {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.s5-vax:last-child { border-bottom: none; }
+
+.s5-vax-state {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.s5-vax-done { background: var(--sage-whisper); color: var(--sage-deep); font-weight: 700; }
+.s5-vax-next { background: var(--terra-whisper); color: var(--terra); font-weight: 700; }
+.s5-vax-future { background: var(--linen); color: var(--muted); }
+
+.s5-vax-name {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--char);
+}
+
+.s5-vax-age {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ═══════════════════════════════════
+   SCREEN 6 — FOOD / ALLERGY
+═══════════════════════════════════ */
+.s6 .screen-content { background: var(--cream); }
+
+.s6-inner {
+  padding: 58px 18px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.s6-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.s6-stat {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid var(--line);
+}
+
+.s6-stat-val {
+  font-family: 'Instrument Serif', serif;
+  font-size: 24px;
+  color: var(--char);
+  line-height: 1;
+}
+
+.s6-stat-label {
+  font-size: 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 3px;
+}
+
+.s6-food-list {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+
+.s6-food {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.s6-food:last-child { border-bottom: none; }
+
+.s6-food-emoji {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--parchment);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.s6-food-body { flex: 1; }
+
+.s6-food-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--char);
+}
+
+.s6-food-date {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.s6-reaction {
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.s6-rx-ok { background: var(--sage-whisper); color: var(--sage-deep); }
+.s6-rx-warn { background: #FAE7DE; color: var(--terra-deep); }
+.s6-rx-mild { background: var(--sun-whisper); color: #8B7030; }
+
+.s6-tip {
+  border: 1px dashed var(--faint);
+  border-radius: 12px;
+  background: var(--parchment);
+  padding: 10px 12px;
+  font-size: 10px;
+  color: var(--mid);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+/* ═══ FOOTER ═══ */
+.footer {
+  text-align: center;
+  padding: 0 24px 48px;
+}
+
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 10px 20px;
+  margin-bottom: 12px;
+}
+
+.footer-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+.footer-badge-txt {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.footer-legal {
+  font-size: 10px;
+  color: rgba(255,255,255,0.15);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .strip { padding: 24px 16px 48px; gap: 16px; }
+  .phone { width: 280px; height: 605px; border-radius: 38px; }
+  .screen-content { border-radius: 38px; }
+  .logo { font-size: 56px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="header">
+    <div class="logo">Kinn<span class="a">a</span></div>
+    <div class="tagline">Bilimi annelik diline ceviren gunluk mikro-doz rehber</div>
+    <div class="header-meta">
+      <div class="meta-pill">MVP Concept</div>
+      <div class="meta-pill">SwiftUI + SwiftData</div>
+      <div class="meta-pill">iOS 17+</div>
+      <div class="meta-pill">TR + EN</div>
+    </div>
+  </header>
+
+  <!-- ═══ 6 SCREENS ═══ -->
+  <div class="strip">
+
+    <!-- ── 1. ONBOARDING ── -->
+    <div class="screen-col">
+      <div class="screen-label"><span>01</span> Onboarding</div>
+      <div class="phone s1">
+        <div class="notch"></div>
+        <div class="screen-content">
+          <div class="s1-inner">
+            <div class="s1-steps">
+              <div class="s1-step done"></div>
+              <div class="s1-step current"></div>
+              <div class="s1-step"></div>
+              <div class="s1-step"></div>
+            </div>
+
+            <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Adim 2 / 4</div>
+            <div class="s-title" style="margin-bottom:4px">Bebeginle<br><em>tanisalim.</em></div>
+            <div class="s-body" style="margin-bottom:16px">Kinna'yi bebegin icin kisisel hale getirelim.</div>
+
+            <div class="s1-avatar-wrap">
+              <div class="s1-avatar">
+                <span>&#x1F476;</span>
+                <div class="s1-avatar-badge">+</div>
+              </div>
+            </div>
+
+            <div class="s1-field">
+              <div class="s1-field-label">Bebegin adi</div>
+              <div class="s1-field-input filled">Ela</div>
+            </div>
+
+            <div class="s1-field-label">Dogum tarihi</div>
+            <div class="s1-date-row">
+              <div class="s1-date-seg"><div class="s1-date-seg-label">Gun</div><div class="s1-date-seg-val">12</div></div>
+              <div class="s1-date-seg"><div class="s1-date-seg-label">Ay</div><div class="s1-date-seg-val">Oca</div></div>
+              <div class="s1-date-seg"><div class="s1-date-seg-label">Yil</div><div class="s1-date-seg-val">2025</div></div>
+            </div>
+
+            <div class="s1-field-label">Cinsiyet</div>
+            <div class="s1-gender-row">
+              <div class="s1-gender active">Kiz</div>
+              <div class="s1-gender">Erkek</div>
+              <div class="s1-gender">Belirtme</div>
+            </div>
+
+            <div class="s1-privacy">
+              <div class="s1-privacy-icon">&#x1F512;</div>
+              <div class="s1-privacy-txt"><strong>Veriler sadece sende.</strong> Hicbir sunucuya gonderilmez.</div>
+            </div>
+
+            <div class="s-btn s-btn-dark" style="text-align:center">Devam</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. HOME DASHBOARD ── -->
+    <div class="screen-col">
+      <div class="screen-label"><span>02</span> Ana Ekran</div>
+      <div class="phone s2">
+        <div class="notch"></div>
+        <div class="screen-content">
+          <div class="s2-inner">
+            <div class="s2-greeting">Gunaydin</div>
+            <div class="s2-name">Ela'nin annesi</div>
+
+            <div class="s2-age-hero">
+              <div class="s2-age-eyebrow">Ela bugun</div>
+              <div class="s2-age-value">2 ay</div>
+              <div class="s2-age-sub">15 gun &middot; 75 gundur hayatinizda</div>
+              <div class="s2-age-bar"><div class="s2-age-bar-fill"></div></div>
+            </div>
+
+            <div class="s2-motiv">
+              <div class="s2-motiv-q">"Her gun bebeginle kurdugu bag, onun beyin mimarisini sekillendiriyor."</div>
+              <div class="s2-motiv-s">Gunluk Kinna notu</div>
+            </div>
+
+            <div class="s2-section">
+              <div class="s2-section-title">Bu ay icin</div>
+              <div class="s2-section-link">Tumu</div>
+            </div>
+
+            <div class="s2-card">
+              <div class="s2-card-icon" style="background:var(--sage-whisper)">&#x1F9E0;</div>
+              <div>
+                <div class="s2-card-title">Kontrast oyunu</div>
+                <div class="s2-card-desc">Siyah-beyaz kartlari 20 cm mesafeden goster. Noral devreler tekrarla guclenir.</div>
+              </div>
+            </div>
+
+            <div class="s2-card">
+              <div class="s2-card-icon" style="background:var(--terra-whisper)">&#x26A0;&#xFE0F;</div>
+              <div>
+                <div class="s2-card-title">Guvenli uyku</div>
+                <div class="s2-card-desc">Sirtustu uyku, bos besik ve duz yatak SIDS riskini azaltir.</div>
+              </div>
+            </div>
+
+            <div class="s2-card">
+              <div class="s2-card-icon" style="background:var(--sky-whisper)">&#x1F489;</div>
+              <div>
+                <div class="s2-card-title">Asi randevusu</div>
+                <div class="s2-card-desc">2. ay asilari icin 5 gun kaldi.</div>
+              </div>
+            </div>
+
+            <div class="s2-ref">Iceriklerimiz WHO rehberleri ve T.C. Saglik Bakanligi protokolleri temel alinarak hazirlanmistir.</div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab active"><div class="tab-icon">&#x1F3E0;</div><div class="tab-dot"></div><div class="tab-label">Ana</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4C8;</div><div class="tab-label">Gelisim</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4DD;</div><div class="tab-label">Takip</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F489;</div><div class="tab-label">Asilar</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F944;</div><div class="tab-label">Besin</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. MILESTONES ── -->
+    <div class="screen-col">
+      <div class="screen-label"><span>03</span> Gelisim</div>
+      <div class="phone s3">
+        <div class="notch"></div>
+        <div class="screen-content">
+          <div class="s3-inner">
+            <div class="s-eyebrow" style="margin-bottom:4px">Aylik kilometre taslari</div>
+            <div class="s-title" style="margin-bottom:3px">Ela <em>buyuyor</em></div>
+            <div class="s-body" style="margin-bottom:14px">2. ay &middot; 11 tastan 7'si tamamlandi</div>
+
+            <div class="s3-ring-row">
+              <div class="s3-ring"><div class="s3-ring-val">%64</div></div>
+              <div class="s3-ring-text">
+                <div class="s3-ring-title">Baglanma kaliplari destekleniyor</div>
+                <div class="s3-ring-sub">Ses, gulumseme ve goz temasiyla etkilesimler bu ay kritik.</div>
+              </div>
+            </div>
+
+            <div class="s3-months">
+              <div class="s3-month">1. ay</div>
+              <div class="s3-month active">2. ay</div>
+              <div class="s3-month">3. ay</div>
+              <div class="s3-month">4. ay</div>
+              <div class="s3-month">5. ay</div>
+            </div>
+
+            <div style="background:var(--white);border-radius:14px;padding:4px 12px;border:1px solid var(--line)">
+              <div class="s3-milestone">
+                <div class="s3-chk s3-chk-done">&#x2713;</div>
+                <div>
+                  <div class="s3-m-title">Sosyal gulumseme</div>
+                  <div class="s3-m-desc">Yuzune bakarak tepki veriyor.</div>
+                  <div class="s3-tag s3-tag-social">Sosyal</div>
+                </div>
+              </div>
+              <div class="s3-milestone">
+                <div class="s3-chk s3-chk-done">&#x2713;</div>
+                <div>
+                  <div class="s3-m-title">Seslere tepki</div>
+                  <div class="s3-m-desc">Yuksek sese irkilme var.</div>
+                  <div class="s3-tag s3-tag-cog">Bilissel</div>
+                </div>
+              </div>
+              <div class="s3-milestone">
+                <div class="s3-chk s3-chk-warn">!</div>
+                <div>
+                  <div class="s3-m-title">Sesi takip etme</div>
+                  <div class="s3-m-desc">Ses kaynagina donme dalgali.</div>
+                  <div class="s3-tag s3-tag-cog">Bilissel</div>
+                </div>
+              </div>
+              <div class="s3-milestone">
+                <div class="s3-chk s3-chk-wait"></div>
+                <div>
+                  <div class="s3-m-title">Basini 45&deg; kaldirma</div>
+                  <div class="s3-m-desc">Yuzustu kisa oyunlarla desteklenebilir.</div>
+                  <div class="s3-tag s3-tag-motor">Motor</div>
+                </div>
+              </div>
+              <div class="s3-milestone">
+                <div class="s3-chk s3-chk-wait"></div>
+                <div>
+                  <div class="s3-m-title">Ilk "aguu" sesleri</div>
+                  <div class="s3-m-desc">Aglama disinda sesler baslar.</div>
+                  <div class="s3-tag s3-tag-lang">Dil</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab"><div class="tab-icon">&#x1F3E0;</div><div class="tab-label">Ana</div></div>
+            <div class="tab active"><div class="tab-icon">&#x1F4C8;</div><div class="tab-dot"></div><div class="tab-label">Gelisim</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4DD;</div><div class="tab-label">Takip</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F489;</div><div class="tab-label">Asilar</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F944;</div><div class="tab-label">Besin</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. DAILY TRACKING ── -->
+    <div class="screen-col">
+      <div class="screen-label"><span>04</span> Gunluk Takip</div>
+      <div class="phone s4">
+        <div class="notch"></div>
+        <div class="screen-content">
+          <div class="s4-inner">
+            <div class="s-eyebrow" style="margin-bottom:4px">7 Mart 2026, Cumartesi</div>
+            <div class="s-title" style="margin-bottom:2px"><em>Bugun</em></div>
+            <div class="s4-date-sub">Ela'nin 75. gunu</div>
+
+            <div class="s4-metrics">
+              <div class="s4-metric">
+                <div class="s4-metric-icon">&#x1F37C;</div>
+                <div class="s4-metric-label">Emzirme</div>
+                <div class="s4-metric-val">7 <span>kez</span></div>
+                <div class="s4-metric-bar"><div class="s4-metric-bar-fill" style="width:70%;background:var(--sage)"></div></div>
+              </div>
+              <div class="s4-metric">
+                <div class="s4-metric-icon">&#x1F634;</div>
+                <div class="s4-metric-label">Uyku</div>
+                <div class="s4-metric-val">11 <span>sa</span></div>
+                <div class="s4-metric-bar"><div class="s4-metric-bar-fill" style="width:56%;background:var(--sky)"></div></div>
+              </div>
+              <div class="s4-metric">
+                <div class="s4-metric-icon">&#x1F9F7;</div>
+                <div class="s4-metric-label">Bez</div>
+                <div class="s4-metric-val">5 <span>kez</span></div>
+                <div class="s4-metric-bar"><div class="s4-metric-bar-fill" style="width:50%;background:#E0BAA6"></div></div>
+              </div>
+              <div class="s4-metric">
+                <div class="s4-metric-icon">&#x2696;&#xFE0F;</div>
+                <div class="s4-metric-label">Son tarti</div>
+                <div class="s4-metric-val">5.2 <span>kg</span></div>
+                <div class="s4-metric-bar"><div class="s4-metric-bar-fill" style="width:62%;background:var(--faint)"></div></div>
+              </div>
+            </div>
+
+            <div class="s4-quick">
+              <div class="s4-quick-btn active">+ Beslenme</div>
+              <div class="s4-quick-btn">+ Uyku</div>
+              <div class="s4-quick-btn">+ Bez</div>
+            </div>
+
+            <div class="s4-timeline">
+              <div class="s4-tl-head">Bugunun kaydi</div>
+              <div class="s4-event">
+                <div class="s4-event-time">08:30</div>
+                <div class="s4-event-dot dot-feed"></div>
+                <div class="s4-event-text">Emzirme &middot; Sol &middot; 18 dk</div>
+              </div>
+              <div class="s4-event">
+                <div class="s4-event-time">09:15</div>
+                <div class="s4-event-dot dot-sleep"></div>
+                <div class="s4-event-text">Uyku basladi</div>
+              </div>
+              <div class="s4-event">
+                <div class="s4-event-time">11:00</div>
+                <div class="s4-event-dot dot-diaper"></div>
+                <div class="s4-event-text">Bez degisimi &middot; Islak</div>
+              </div>
+              <div class="s4-event">
+                <div class="s4-event-time">11:30</div>
+                <div class="s4-event-dot dot-feed"></div>
+                <div class="s4-event-text">Emzirme &middot; Sag &middot; 22 dk</div>
+              </div>
+              <div class="s4-event">
+                <div class="s4-event-time">13:45</div>
+                <div class="s4-event-dot dot-sleep"></div>
+                <div class="s4-event-text">Ogle uykusu &middot; 40 dk</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab"><div class="tab-icon">&#x1F3E0;</div><div class="tab-label">Ana</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4C8;</div><div class="tab-label">Gelisim</div></div>
+            <div class="tab active"><div class="tab-icon">&#x1F4DD;</div><div class="tab-dot"></div><div class="tab-label">Takip</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F489;</div><div class="tab-label">Asilar</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F944;</div><div class="tab-label">Besin</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. VACCINATION ── -->
+    <div class="screen-col">
+      <div class="screen-label"><span>05</span> Asi Takvimi</div>
+      <div class="phone s5">
+        <div class="notch"></div>
+        <div class="screen-content">
+          <div class="s5-inner">
+            <div class="s-eyebrow" style="margin-bottom:4px">T.C. Saglik Bakanligi protokolu</div>
+            <div class="s-title" style="margin-bottom:14px">Asi <em>plani</em></div>
+
+            <div class="s5-next">
+              <div class="s5-next-label">Siradaki asi</div>
+              <div class="s5-next-name">Besli Asi (DTaP)</div>
+              <div class="s5-next-date">12 Mart 2026 &middot; 5 gun sonra</div>
+              <div class="s5-next-pill">&#x1F4CD; Randevu hatirlatici</div>
+            </div>
+
+            <div class="s5-list">
+              <div class="s5-group">Tamamlananlar</div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-done">&#x2713;</div>
+                <div class="s5-vax-name">Hepatit B (1. doz)</div>
+                <div class="s5-vax-age">Dogum</div>
+              </div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-done">&#x2713;</div>
+                <div class="s5-vax-name">BCG (Verem)</div>
+                <div class="s5-vax-age">1. ay</div>
+              </div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-done">&#x2713;</div>
+                <div class="s5-vax-name">Hepatit B (2. doz)</div>
+                <div class="s5-vax-age">1. ay</div>
+              </div>
+
+              <div class="s5-group" style="margin-top:4px">Yaklasan</div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-next">&#x2192;</div>
+                <div class="s5-vax-name">Besli Asi (DTaP)</div>
+                <div class="s5-vax-age">2. ay</div>
+              </div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-next">&#x2192;</div>
+                <div class="s5-vax-name">Pnomokok (KPA)</div>
+                <div class="s5-vax-age">2. ay</div>
+              </div>
+
+              <div class="s5-group" style="margin-top:4px">Gelecek</div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-future"></div>
+                <div class="s5-vax-name">Rotavirus</div>
+                <div class="s5-vax-age">2. ay</div>
+              </div>
+              <div class="s5-vax">
+                <div class="s5-vax-state s5-vax-future"></div>
+                <div class="s5-vax-name">IPV (Cocuk felci)</div>
+                <div class="s5-vax-age">4. ay</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab"><div class="tab-icon">&#x1F3E0;</div><div class="tab-label">Ana</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4C8;</div><div class="tab-label">Gelisim</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4DD;</div><div class="tab-label">Takip</div></div>
+            <div class="tab active"><div class="tab-icon">&#x1F489;</div><div class="tab-dot"></div><div class="tab-label">Asilar</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F944;</div><div class="tab-label">Besin</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. FOOD / ALLERGY ── -->
+    <div class="screen-col">
+      <div class="screen-label"><span>06</span> Besin Takibi</div>
+      <div class="phone s6">
+        <div class="notch"></div>
+        <div class="screen-content">
+          <div class="s6-inner">
+            <div class="s-eyebrow" style="margin-bottom:4px">Ek gida gunlugu</div>
+            <div class="s-title" style="margin-bottom:3px">Besin <em>takibi</em></div>
+            <div class="s-body" style="margin-bottom:12px">Reaksiyonlari ilk 24 saatte not al.</div>
+
+            <div class="s6-stats">
+              <div class="s6-stat">
+                <div class="s6-stat-val">14</div>
+                <div class="s6-stat-label">Denenen</div>
+              </div>
+              <div class="s6-stat">
+                <div class="s6-stat-val" style="color:var(--sage-deep)">12</div>
+                <div class="s6-stat-label">Sorunsuz</div>
+              </div>
+              <div class="s6-stat">
+                <div class="s6-stat-val" style="color:var(--terra)">2</div>
+                <div class="s6-stat-label">Dikkat</div>
+              </div>
+            </div>
+
+            <div class="s6-food-list">
+              <div class="s6-food">
+                <div class="s6-food-emoji">&#x1F95A;</div>
+                <div class="s6-food-body">
+                  <div class="s6-food-name">Yumurta sarisi</div>
+                  <div class="s6-food-date">28 Subat &middot; ilk kez</div>
+                </div>
+                <div class="s6-reaction s6-rx-warn">Kizariklik</div>
+              </div>
+              <div class="s6-food">
+                <div class="s6-food-emoji">&#x1F955;</div>
+                <div class="s6-food-body">
+                  <div class="s6-food-name">Havuc puresi</div>
+                  <div class="s6-food-date">25 Subat</div>
+                </div>
+                <div class="s6-reaction s6-rx-ok">Iyi</div>
+              </div>
+              <div class="s6-food">
+                <div class="s6-food-emoji">&#x1F34C;</div>
+                <div class="s6-food-body">
+                  <div class="s6-food-name">Muz</div>
+                  <div class="s6-food-date">22 Subat</div>
+                </div>
+                <div class="s6-reaction s6-rx-ok">Iyi</div>
+              </div>
+              <div class="s6-food">
+                <div class="s6-food-emoji">&#x1F34E;</div>
+                <div class="s6-food-body">
+                  <div class="s6-food-name">Elma puresi</div>
+                  <div class="s6-food-date">18 Subat</div>
+                </div>
+                <div class="s6-reaction s6-rx-mild">Hafif gaz</div>
+              </div>
+              <div class="s6-food">
+                <div class="s6-food-emoji">&#x1F966;</div>
+                <div class="s6-food-body">
+                  <div class="s6-food-name">Brokoli</div>
+                  <div class="s6-food-date">15 Subat</div>
+                </div>
+                <div class="s6-reaction s6-rx-ok">Iyi</div>
+              </div>
+            </div>
+
+            <div class="s6-tip">&#x1F4CC; Yeni besinleri tek tek ve 3 gun arayla dene. Belirgin reaksiyon durumunda doktoruna danis.</div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab"><div class="tab-icon">&#x1F3E0;</div><div class="tab-label">Ana</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4C8;</div><div class="tab-label">Gelisim</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F4DD;</div><div class="tab-label">Takip</div></div>
+            <div class="tab"><div class="tab-icon">&#x1F489;</div><div class="tab-label">Asilar</div></div>
+            <div class="tab active"><div class="tab-icon">&#x1F944;</div><div class="tab-dot"></div><div class="tab-label">Besin</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="footer-badge">
+      <div class="footer-badge-dot"></div>
+      <div class="footer-badge-txt">Tum veriler cihazda &middot; 3rd party analytics yok</div>
+    </div>
+    <div class="footer-legal">
+      Bu uygulama doktor tavsiyesinin yerini tutmaz. Saglik endiseleriniz icin doktorunuza danisin.<br>
+      Iceriklerimiz WHO rehberleri ve T.C. Saglik Bakanligi protokolleri temel alinarak hazirlanmistir.
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinna — Paywall</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,200;1,9..144,300;1,9..144,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#FAF7F2;--blush:#F2E8DF;--warm:#FFFDF9;
+  --sage:#7A9E8E;--sage-d:#4A7A68;--sage-l:#B8D4C8;
+  --terra:#C4785A;--terra-l:#EDD5C5;--terra-p:#F7EDE6;
+  --char:#2C2C2C;--mid:#6B6560;--light:#A09890;--pale:#EDE8E2;
+}
+body{
+  background:#181512;font-family:'DM Sans',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 20px 60px;
+}
+.hdr{text-align:center;margin-bottom:28px}
+.hdr-logo{font-family:'Fraunces',serif;font-size:34px;font-weight:300;color:var(--cream);letter-spacing:-1px}
+.hdr-logo span{color:var(--terra)}
+.hdr-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3A3530;margin-top:4px}
+
+/* phone */
+.phone{
+  width:340px;background:#0F0D0B;border-radius:52px;padding:12px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 60px 120px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.1);
+  position:relative;
+}
+.pscreen{width:100%;border-radius:42px;overflow:hidden;position:relative;background:var(--cream)}
+.di{width:100px;height:28px;background:#0F0D0B;border-radius:20px;position:absolute;top:22px;left:50%;transform:translateX(-50%);z-index:200}
+
+/* tabs */
+.tabs{display:flex;gap:12px;margin-top:20px;justify-content:center}
+.tab{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:#3A3530;border:1px solid #2A2520}
+.tab.active{background:var(--terra);color:white;border-color:var(--terra)}
+
+/* ════════════════════════════
+   PAYWALL SCREEN
+════════════════════════════ */
+.pw-screen{display:flex;flex-direction:column;min-height:700px;position:relative;overflow:hidden}
+
+/* üst — duygusal fotoğraf alanı */
+.pw-photo{
+  height:240px;flex-shrink:0;position:relative;overflow:hidden;
+  background-image:url('https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=600&q=80');
+  background-size:cover;background-position:center 20%;
+}
+.pw-photo-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(250,247,242,0) 0%,
+    rgba(250,247,242,.3) 60%,
+    rgba(250,247,242,1) 100%
+  );
+}
+/* 3 gün rozeti */
+.pw-trial-badge{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  background:rgba(44,44,44,.75);backdrop-filter:blur(8px);
+  border-radius:20px;padding:6px 14px;
+  display:flex;align-items:center;gap:6px;
+  border:1px solid rgba(255,255,255,.12);
+}
+.ptb-dot{width:7px;height:7px;border-radius:50%;background:#4CAF50}
+.ptb-txt{font-size:11px;color:white;font-weight:500}
+
+/* içerik */
+.pw-body{flex:1;padding:0 22px 28px;display:flex;flex-direction:column}
+
+.pw-eyebrow{font-size:10px;color:var(--terra);letter-spacing:2px;text-transform:uppercase;font-weight:500;margin-bottom:8px;text-align:center}
+.pw-headline{
+  font-family:'Fraunces',serif;font-size:26px;font-weight:400;
+  color:var(--char);line-height:1.15;letter-spacing:-.5px;
+  margin-bottom:6px;text-align:center;
+}
+.pw-headline em{font-style:italic;color:var(--terra)}
+.pw-sub{font-size:12px;color:var(--mid);line-height:1.6;font-weight:300;text-align:center;margin-bottom:18px}
+
+/* plan seçici */
+.plans{display:flex;gap:8px;margin-bottom:16px}
+.plan{
+  flex:1;border-radius:16px;padding:14px 10px;text-align:center;
+  border:1.5px solid var(--pale);background:white;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.plan:hover{border-color:var(--terra-l)}
+.plan.sel{border-color:var(--terra);background:var(--terra-p)}
+.plan-badge{
+  position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  background:var(--terra);color:white;font-size:9px;font-weight:600;
+  padding:3px 9px;border-radius:8px;white-space:nowrap;letter-spacing:.3px;
+}
+.plan-period{font-size:10px;color:var(--light);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.plan-price{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:var(--char);line-height:1}
+.plan-unit{font-size:10px;color:var(--light);margin-top:2px}
+.plan-saving{font-size:10px;color:var(--sage-d);font-weight:500;margin-top:4px}
+.plan.sel .plan-period{color:var(--terra)}
+.plan.sel .plan-price{color:var(--char)}
+
+/* per day reframe */
+.perday{
+  background:linear-gradient(135deg,var(--blush),var(--terra-p));
+  border-radius:12px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+  border:1px solid rgba(196,120,90,.15);
+}
+.pd-ico{font-size:18px;flex-shrink:0}
+.pd-txt{font-size:12px;color:var(--mid);line-height:1.5}
+.pd-txt strong{color:var(--char)}
+
+/* özellikler */
+.features{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.feat{display:flex;align-items:center;gap:10px}
+.feat-chk{width:18px;height:18px;border-radius:6px;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:9px;color:white;flex-shrink:0}
+.feat-txt{font-size:12px;color:var(--char)}
+.feat-txt span{color:var(--light);font-size:11px}
+
+/* CTA */
+.pw-cta{
+  background:var(--terra);color:white;border-radius:16px;
+  padding:15px;text-align:center;font-size:15px;font-weight:500;
+  cursor:pointer;border:none;width:100%;font-family:'DM Sans',sans-serif;
+  box-shadow:0 8px 28px rgba(196,120,90,.4);
+  transition:opacity .15s;
+}
+.pw-cta:hover{opacity:.88}
+.pw-fine{font-size:10px;color:var(--light);text-align:center;margin-top:8px;line-height:1.5}
+.pw-restore{font-size:11px;color:var(--light);text-align:center;margin-top:6px;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+
+/* ════════════════════════════
+   TRIAL SCREEN (alternatif)
+   3 gün trial sona erdi versiyonu
+════════════════════════════ */
+.trial-screen{display:none;flex-direction:column;min-height:700px}
+
+.trial-top{
+  background:var(--char);padding:36px 22px 28px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.trial-top::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(196,120,90,.12);
+}
+.trial-top::after{
+  content:'';position:absolute;bottom:-50px;left:-30px;
+  width:140px;height:140px;border-radius:50%;
+  background:rgba(122,158,142,.08);
+}
+.trial-icon{
+  width:56px;height:56px;background:rgba(196,120,90,.15);border-radius:18px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  margin:0 auto 14px;position:relative;z-index:2;
+}
+.trial-title{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:white;line-height:1.2;margin-bottom:6px;position:relative;z-index:2}
+.trial-title em{font-style:italic;color:var(--terra)}
+.trial-sub{font-size:12px;color:rgba(255,255,255,.45);line-height:1.5;position:relative;z-index:2}
+
+.trial-body{flex:1;padding:18px 22px 28px;display:flex;flex-direction:column}
+
+/* ne kaçıracak */
+.miss-label{font-size:10px;color:var(--light);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.miss-items{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.miss-item{
+  background:white;border-radius:12px;padding:11px 13px;
+  display:flex;align-items:center;gap:10px;
+  border:1px solid var(--pale);
+  filter:grayscale(.3);
+}
+.miss-item.blur{filter:blur(1.5px) grayscale(.5);opacity:.5}
+.mi-ico{font-size:18px;flex-shrink:0}
+.mi-body{flex:1}
+.mi-ttl{font-size:12px;font-weight:500;color:var(--char);margin-bottom:1px}
+.mi-dsc{font-size:10px;color:var(--light)}
+.mi-lock{font-size:14px;color:var(--light);flex-shrink:0}
+
+.trial-plans{display:flex;gap:8px;margin-bottom:14px}
+
+.trial-cta{
+  background:var(--terra);color:white;border-radius:16px;
+  padding:15px;text-align:center;font-size:15px;font-weight:500;
+  cursor:pointer;border:none;width:100%;font-family:'DM Sans',sans-serif;
+  box-shadow:0 8px 28px rgba(196,120,90,.4);margin-bottom:8px;
+}
+.trial-ghost{
+  background:transparent;color:var(--light);font-size:12px;
+  padding:8px;cursor:pointer;width:100%;text-align:center;
+  border:none;font-family:'DM Sans',sans-serif;
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">Kinn<span>a</span></div>
+  <div class="hdr-sub">Paywall · 2 Senaryo</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('onboarding')">Onboarding sonu</div>
+  <div class="tab" onclick="showTab('trial')">3. gün — Trial bitti</div>
+</div>
+
+<div style="height:20px"></div>
+
+<div class="phone">
+  <div class="di"></div>
+  <div class="pscreen">
+
+    <!-- ══ PAYWALL v1: Onboarding sonu ══ -->
+    <div class="pw-screen" id="tab-onboarding">
+
+      <div class="pw-photo">
+        <div class="pw-photo-overlay"></div>
+        <div class="pw-trial-badge">
+          <div class="ptb-dot"></div>
+          <div class="ptb-txt">3 gün ücretsiz dene</div>
+        </div>
+      </div>
+
+      <div class="pw-body">
+        <div class="pw-eyebrow">Kinna Premium</div>
+        <div class="pw-headline">
+          Ela'nın her anını<br><em>kaçırma.</em>
+        </div>
+        <div class="pw-sub">3 gün boyunca her şey ücretsiz. Sonra istersen devam et.</div>
+
+        <div class="plans">
+          <div class="plan" id="plan-monthly" onclick="selectPlan('monthly')">
+            <div class="plan-period">Aylık</div>
+            <div class="plan-price">₺169</div>
+            <div class="plan-unit">/ ay</div>
+          </div>
+          <div class="plan sel" id="plan-yearly" onclick="selectPlan('yearly')">
+            <div class="plan-badge">🔥 %34 indirim</div>
+            <div class="plan-period">Yıllık</div>
+            <div class="plan-price">₺999</div>
+            <div class="plan-unit">/ yıl</div>
+            <div class="plan-saving">ayda ₺83</div>
+          </div>
+        </div>
+
+        <div class="perday">
+          <div class="pd-ico">☕</div>
+          <div class="pd-txt"><strong>Günde 2,7₺.</strong> Bir kahveden az, Ela'nın tüm yolculuğu için.</div>
+        </div>
+
+        <div class="features">
+          <div class="feat"><div class="feat-chk">✓</div><div class="feat-txt">Sınırsız gelişim takibi <span>0–5 yaş</span></div></div>
+          <div class="feat"><div class="feat-chk">✓</div><div class="feat-txt">Kişiselleştirilmiş günlük rehberlik</div></div>
+          <div class="feat"><div class="feat-chk">✓</div><div class="feat-txt">Aşı takvimi + hatırlatmalar</div></div>
+          <div class="feat"><div class="feat-chk">✓</div><div class="feat-txt">Besin günlüğü ve geçiş rehberi</div></div>
+          <div class="feat"><div class="feat-chk">✓</div><div class="feat-txt">Tüm veriler cihazında <span>gizli & güvenli</span></div></div>
+        </div>
+
+        <button class="pw-cta">3 gün ücretsiz başla →</button>
+        <div class="pw-fine">İstediğin zaman iptal edebilirsin. Kredi kartı gerekli.</div>
+        <div class="pw-restore">Satın almayı geri yükle</div>
+      </div>
+    </div>
+
+    <!-- ══ PAYWALL v2: 3. gün trial bitti ══ -->
+    <div class="trial-screen" id="tab-trial">
+      <div class="trial-top">
+        <div class="trial-icon">⏳</div>
+        <div class="trial-title">3 günlük denemen<br><em>sona erdi.</em></div>
+        <div class="trial-sub">Ela'yı takip etmeye devam etmek için Kinna Premium'a geç.</div>
+      </div>
+
+      <div class="trial-body">
+        <div class="miss-label">Premium olmadan kaçıracakların</div>
+        <div class="miss-items">
+          <div class="miss-item">
+            <div class="mi-ico">📈</div>
+            <div class="mi-body">
+              <div class="mi-ttl">Gelişim takibi</div>
+              <div class="mi-dsc">Ela'nın kilometre taşları</div>
+            </div>
+          </div>
+          <div class="miss-item blur">
+            <div class="mi-ico">💛</div>
+            <div class="mi-body">
+              <div class="mi-ttl">Günlük motivasyon notu</div>
+              <div class="mi-dsc">Her sabah seni bekliyor</div>
+            </div>
+            <div class="mi-lock">🔒</div>
+          </div>
+          <div class="miss-item blur">
+            <div class="mi-ico">💉</div>
+            <div class="mi-body">
+              <div class="mi-ttl">Aşı hatırlatmaları</div>
+              <div class="mi-dsc">Bir sonraki aşı 5 gün sonra</div>
+            </div>
+            <div class="mi-lock">🔒</div>
+          </div>
+          <div class="miss-item blur">
+            <div class="mi-ico">🧠</div>
+            <div class="mi-body">
+              <div class="mi-ttl">Günlük aktivite önerileri</div>
+              <div class="mi-dsc">Ela'nın yaşına özel</div>
+            </div>
+            <div class="mi-lock">🔒</div>
+          </div>
+        </div>
+
+        <div class="trial-plans">
+          <div class="plan" id="tp-monthly" onclick="selectTrialPlan('monthly')" style="padding:12px 8px">
+            <div class="plan-period">Aylık</div>
+            <div class="plan-price" style="font-size:18px">₺169</div>
+            <div class="plan-unit">/ ay</div>
+          </div>
+          <div class="plan sel" id="tp-yearly" onclick="selectTrialPlan('yearly')" style="padding:12px 8px">
+            <div class="plan-badge">En iyi değer</div>
+            <div class="plan-period">Yıllık</div>
+            <div class="plan-price" style="font-size:18px">₺999</div>
+            <div class="plan-saving">ayda ₺83</div>
+          </div>
+        </div>
+
+        <button class="trial-cta">Devam et →</button>
+        <div class="pw-fine" style="margin-bottom:4px">İstediğin zaman iptal · Güvenli ödeme</div>
+        <button class="trial-ghost">Şimdi değil</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['onboarding','trial'][i]===t));
+  document.getElementById('tab-onboarding').style.display=t==='onboarding'?'flex':'none';
+  document.getElementById('tab-trial').style.display=t==='trial'?'flex':'none';
+}
+function selectPlan(p){
+  ['monthly','yearly'].forEach(id=>document.getElementById('plan-'+id).classList.toggle('sel',id===p));
+}
+function selectTrialPlan(p){
+  ['monthly','yearly'].forEach(id=>document.getElementById('tp-'+id).classList.toggle('sel',id===p));
+}
+</script>
+</body>
+</html>

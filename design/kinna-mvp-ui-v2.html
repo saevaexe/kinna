@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinna - MVP UI Concept v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-ink: #1e1916;
+    --bg-clay: #2c231f;
+    --bg-olive: #2d3128;
+
+    --oat: #f8f3ec;
+    --paper: #fffdf8;
+    --line: #eadfce;
+
+    --text: #2f2a25;
+    --muted: #7b7168;
+    --muted-soft: #a29487;
+
+    --sage: #6d8f7f;
+    --sage-soft: #deebdf;
+    --sage-deep: #4f7464;
+
+    --coral: #cf7758;
+    --coral-soft: #f2d7c9;
+    --sun: #efb561;
+    --sky: #8aa8c4;
+
+    --phone-w: 332px;
+    --phone-h: 706px;
+    --phone-r: 36px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    color: var(--oat);
+    padding: 48px 28px 72px;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(239, 181, 97, 0.14), transparent 30%),
+      radial-gradient(circle at 90% 84%, rgba(109, 143, 127, 0.18), transparent 32%),
+      linear-gradient(145deg, var(--bg-clay), var(--bg-ink) 42%, #161311);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.22;
+    z-index: -1;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 62px;
+    line-height: 0.95;
+    letter-spacing: -0.8px;
+    color: #f6efe6;
+  }
+
+  .logo span {
+    color: var(--coral);
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #b8a99b;
+  }
+
+  .meta {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .meta-chip {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+    color: #e5d8cd;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 10px;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+  }
+
+  .legal-panel {
+    max-width: 1120px;
+    margin: 0 auto 34px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    padding: 14px 16px;
+    background: linear-gradient(120deg, rgba(255, 253, 248, 0.98), rgba(245, 236, 226, 0.95));
+    color: #4f463f;
+    font-size: 13px;
+    line-height: 1.52;
+  }
+
+  .legal-panel strong {
+    color: #2f2a25;
+    font-weight: 700;
+  }
+
+  .grid {
+    max-width: 1720px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+    gap: 34px;
+    justify-items: center;
+  }
+
+  .screen {
+    width: min(100%, 370px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    animation: rise 560ms ease-out both;
+  }
+
+  .screen:nth-child(1) { animation-delay: 40ms; }
+  .screen:nth-child(2) { animation-delay: 90ms; }
+  .screen:nth-child(3) { animation-delay: 140ms; }
+  .screen:nth-child(4) { animation-delay: 190ms; }
+  .screen:nth-child(5) { animation-delay: 240ms; }
+  .screen:nth-child(6) { animation-delay: 290ms; }
+
+  .screen-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #9f8f81;
+  }
+
+  .phone {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    border-radius: var(--phone-r);
+    position: relative;
+    overflow: hidden;
+    background: var(--oat);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow:
+      0 26px 60px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: transform 180ms ease;
+  }
+
+  .phone:hover {
+    transform: translateY(-3px);
+  }
+
+  .island {
+    width: 96px;
+    height: 27px;
+    border-radius: 18px;
+    background: #151211;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+  }
+
+  .content {
+    height: 100%;
+    padding: 56px 20px 18px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+    margin-bottom: 4px;
+  }
+
+  .title {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--text);
+    font-size: 34px;
+    line-height: 0.98;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+
+  .sub {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .stack-12 { display: flex; flex-direction: column; gap: 12px; }
+  .stack-10 { display: flex; flex-direction: column; gap: 10px; }
+  .stack-8 { display: flex; flex-direction: column; gap: 8px; }
+
+  .field {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .field-label {
+    color: var(--muted-soft);
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .field-value {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .chip-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--muted);
+    padding: 7px 11px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .chip.active {
+    background: var(--coral-soft);
+    border-color: #e5b79f;
+    color: #8d472e;
+  }
+
+  .chip.active.sage {
+    background: var(--sage-soft);
+    border-color: #b7d1c0;
+    color: #3f6353;
+  }
+
+  .privacy-box {
+    margin-top: 2px;
+    border: 1px dashed #d7c8b6;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #7a6f65;
+    background: #fffaf5;
+  }
+
+  .primary-btn {
+    margin-top: auto;
+    border-radius: 14px;
+    border: 0;
+    background: linear-gradient(140deg, #3a332e, #24201d);
+    color: #fff;
+    padding: 14px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .hero {
+    border-radius: 20px;
+    padding: 16px;
+    margin-top: 10px;
+    color: #fff;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.16), transparent 38%),
+      linear-gradient(132deg, #313a32, #242b24 36%, #1f2420);
+  }
+
+  .hero-label {
+    font-size: 10px;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-bottom: 3px;
+  }
+
+  .hero-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px;
+    line-height: 0.9;
+    margin-bottom: 4px;
+  }
+
+  .hero-sub {
+    font-size: 12px;
+    opacity: 0.82;
+  }
+
+  .progress {
+    margin-top: 12px;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+
+  .progress > span {
+    display: block;
+    width: 42%;
+    height: 100%;
+    background: var(--sun);
+    border-radius: 99px;
+  }
+
+  .notice {
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 13px;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 10px;
+  }
+
+  .notice-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .notice-icon.brain { background: #e9f0ea; }
+  .notice-icon.warn { background: #fbe7de; }
+  .notice-icon.vax { background: #e6edf3; }
+
+  .notice-title {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .notice-sub {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .reference {
+    margin-top: 4px;
+    font-size: 10px;
+    line-height: 1.45;
+    color: #8a7d72;
+  }
+
+  .split {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 2px 6px;
+  }
+
+  .split-title {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .split-link {
+    color: var(--sage-deep);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .tabbar {
+    margin-top: auto;
+    height: 70px;
+    border-top: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.85);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding-top: 10px;
+  }
+
+  .tab {
+    text-align: center;
+    color: var(--muted-soft);
+    font-size: 9px;
+    line-height: 1.3;
+  }
+
+  .tab .icon {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .tab.active {
+    color: #8d4d34;
+    font-weight: 700;
+  }
+
+  .tab.active .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 99px;
+    margin: 2px auto;
+    background: var(--coral);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  .section-card {
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 12px;
+  }
+
+  .milestone-overview {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .ring {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: conic-gradient(var(--sage) 0deg 228deg, #e9e1d5 228deg 360deg);
+    display: grid;
+    place-items: center;
+  }
+
+  .ring::after {
+    content: '';
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .ring-value {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .month-row {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .month {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .month.active {
+    background: #312a25;
+    border-color: #312a25;
+    color: #fff;
+  }
+
+  .mile-item {
+    border-bottom: 1px solid var(--line);
+    padding: 11px 0;
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 10px;
+  }
+
+  .state {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .state.done { background: #e2efe8; color: #3f6a57; }
+  .state.warn { background: #fae6dc; color: #a35536; }
+  .state.wait { border: 1px solid #dfd3c3; background: #fff; }
+
+  .mile-title {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .mile-sub {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .tag {
+    display: inline-block;
+    margin-top: 4px;
+    border-radius: 8px;
+    padding: 2px 7px;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tag.motor { background: #e9f2eb; color: #3f6553; }
+  .tag.cog { background: #e8eef5; color: #48647d; }
+  .tag.social { background: #f7e7de; color: #8e4f35; }
+
+  .metric-grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .metric {
+    border-radius: 15px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 12px;
+  }
+
+  .metric-name {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+    margin-bottom: 5px;
+  }
+
+  .metric-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--text);
+    line-height: 0.95;
+  }
+
+  .metric-value span {
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .mini-bar {
+    margin-top: 8px;
+    height: 4px;
+    border-radius: 99px;
+    background: #efe6d8;
+    overflow: hidden;
+  }
+
+  .mini-bar > i {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+  }
+
+  .quick-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .quick-actions .chip {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    padding: 8px 6px;
+  }
+
+  .timeline {
+    margin-top: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 11px;
+  }
+
+  .timeline-head {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+    margin-bottom: 8px;
+  }
+
+  .event {
+    display: grid;
+    grid-template-columns: 42px 8px 1fr;
+    gap: 9px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .event:last-child { margin-bottom: 0; }
+
+  .event-time {
+    font-size: 10px;
+    color: var(--muted-soft);
+  }
+
+  .event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 99px;
+  }
+
+  .dot-feed { background: var(--sage); }
+  .dot-sleep { background: var(--sky); }
+  .dot-diaper { background: var(--coral-soft); }
+
+  .event-text {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .next-vaccine {
+    margin-top: 10px;
+    border-radius: 18px;
+    padding: 14px;
+    color: #fff;
+    background:
+      radial-gradient(circle at 84% 18%, rgba(255, 255, 255, 0.2), transparent 40%),
+      linear-gradient(140deg, #5b7f6f, #3f5f52);
+  }
+
+  .next-vaccine .small {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    opacity: 0.72;
+    margin-bottom: 3px;
+  }
+
+  .next-vaccine .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 25px;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .next-vaccine .date {
+    font-size: 12px;
+    opacity: 0.85;
+  }
+
+  .pill {
+    margin-top: 8px;
+    display: inline-block;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    padding: 5px 9px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .v-list {
+    margin-top: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 10px;
+  }
+
+  .v-group {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+    margin: 5px 0;
+  }
+
+  .v-item {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 9px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .v-item:last-child { border-bottom: 0; }
+
+  .v-state {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+  }
+
+  .v-state.done { background: #deebdf; color: #4c6f5f; }
+  .v-state.next { background: #f5dfd2; color: #9a573d; }
+  .v-state.future { background: #f2ece3; color: #998a7c; }
+
+  .v-name {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .v-age {
+    color: var(--muted-soft);
+    font-size: 10px;
+  }
+
+  .food-stats {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+  }
+
+  .food-stat {
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 10px 8px;
+    text-align: center;
+  }
+
+  .food-stat .val {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--text);
+    font-size: 28px;
+    line-height: 0.9;
+  }
+
+  .food-stat .lbl {
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--muted-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .food-list {
+    margin-top: 10px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 10px;
+  }
+
+  .food-item {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    gap: 9px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .food-item:last-child { border-bottom: 0; }
+
+  .food-emoji {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    background: #fefcf8;
+    font-size: 17px;
+  }
+
+  .food-name {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .food-date {
+    color: var(--muted-soft);
+    font-size: 10px;
+  }
+
+  .reaction {
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .reaction.ok { background: #e5f0e8; color: #3f6654; }
+  .reaction.warn { background: #fae7df; color: #984f35; }
+  .reaction.mild { background: #fff3df; color: #966e31; }
+
+  .food-tip {
+    margin-top: 10px;
+    border: 1px dashed #d7c6b3;
+    border-radius: 12px;
+    background: #fff9ef;
+    color: #796b5c;
+    font-size: 11px;
+    line-height: 1.45;
+    padding: 10px;
+  }
+
+  @keyframes rise {
+    from {
+      transform: translateY(14px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.35); opacity: 0.65; }
+  }
+
+  @media (max-width: 1180px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    body {
+      padding: 30px 12px 56px;
+    }
+
+    .logo {
+      font-size: 50px;
+    }
+
+    .legal-panel {
+      margin-bottom: 22px;
+      font-size: 12px;
+      padding: 11px 12px;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+
+    .screen {
+      width: 100%;
+    }
+
+    .phone {
+      width: min(100%, 350px);
+      height: 690px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Kinn<span>a</span></div>
+  <div class="subtitle">MVP UI Concept v2 · 6 Screen Flow</div>
+  <div class="meta">
+    <div class="meta-chip">Faz 1 Odak</div>
+    <div class="meta-chip">TR + EN Localizable</div>
+    <div class="meta-chip">SwiftData On Device</div>
+    <div class="meta-chip">Sıcak Pediatrist Tonu</div>
+  </div>
+</div>
+
+<div class="legal-panel">
+  <strong>Karar uyumu:</strong> Tasarım sadece MVP kapsamını içerir (Onboarding, Gelişim, Takip, Aşı, Besin). Tüm veriler cihazda tutulur. Bu uygulama doktor tavsiyesinin yerini tutmaz.
+</div>
+
+<div class="grid">
+
+  <div class="screen">
+    <div class="screen-label">01 · Onboarding</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="content">
+        <div class="eyebrow">Adım 2 / 4</div>
+        <h2 class="title">Birlikte başlayalım</h2>
+        <p class="sub">Kinna, bebeğinin ayına göre doğru mikro-doz rehberlik verebilmek için temel bilgileri ister.</p>
+
+        <div class="stack-10" style="margin-top: 14px;">
+          <div class="field">
+            <div class="field-label">Bebeğin adı</div>
+            <div class="field-value">Ela</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Doğum tarihi</div>
+            <div class="field-value">12 Ocak 2025</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;" class="eyebrow">Cinsiyet</div>
+        <div class="chip-row">
+          <div class="chip active">Kız</div>
+          <div class="chip">Erkek</div>
+          <div class="chip">Belirtmek istemiyorum</div>
+        </div>
+
+        <div style="margin-top:10px;" class="eyebrow">Ebeveyn rolü</div>
+        <div class="chip-row">
+          <div class="chip active sage">Anne</div>
+          <div class="chip">Baba</div>
+        </div>
+
+        <div class="privacy-box">🔒 Verilerin sadece cihazında saklanır. Kinna, çocuk verisini minimum düzeyde tutar ve üçüncü taraf analitik SDK kullanmaz.</div>
+
+        <div class="primary-btn">Devam et</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-label">02 · Ana Ekran</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="content">
+        <div class="eyebrow">Günaydın</div>
+        <h2 class="title" style="font-size: 31px;">Ela'nın annesi</h2>
+
+        <div class="hero">
+          <div class="hero-label">Ela bugün</div>
+          <div class="hero-value">2 ay</div>
+          <div class="hero-sub">15 gün · 75 gündür seninle</div>
+          <div class="progress"><span></span></div>
+        </div>
+
+        <div class="split">
+          <div class="split-title">Bu ay için öneriler</div>
+          <div class="split-link">Tümü</div>
+        </div>
+
+        <div class="stack-10">
+          <div class="notice">
+            <div class="notice-icon brain">🧠</div>
+            <div>
+              <div class="notice-title">Beyin mimarisi için kontrast oyunu</div>
+              <div class="notice-sub">Siyah-beyaz kartları 20-25 cm mesafeden 2-3 dakika göster. Nöral devreler tekrar ile güçlenir.</div>
+            </div>
+          </div>
+
+          <div class="notice">
+            <div class="notice-icon warn">⚠️</div>
+            <div>
+              <div class="notice-title">Güvenli uyku hatırlatması</div>
+              <div class="notice-sub">Sırtüstü uyku, boş beşik ve düz yatak zemini SIDS riskini azaltır.</div>
+            </div>
+          </div>
+
+          <div class="notice">
+            <div class="notice-icon vax">💉</div>
+            <div>
+              <div class="notice-title">Aşı randevusu yaklaşıyor</div>
+              <div class="notice-sub">2. ay aşıları için 5 gün kaldı. Takviminden uygun gün seçebilirsin.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reference">İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.</div>
+
+        <div class="tabbar">
+          <div class="tab active"><span class="icon">🏠</span><div class="dot"></div>Ana</div>
+          <div class="tab"><span class="icon">📈</span>Gelişim</div>
+          <div class="tab"><span class="icon">📝</span>Takip</div>
+          <div class="tab"><span class="icon">💉</span>Aşılar</div>
+          <div class="tab"><span class="icon">🥄</span>Besinler</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-label">03 · Gelişim</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="content">
+        <div class="eyebrow">Aylık kilometre taşları</div>
+        <h2 class="title" style="font-size: 32px;">Ela büyüyor</h2>
+        <p class="sub">2. ay hedefleri · 11 taştan 7'si tamamlandı</p>
+
+        <div class="section-card milestone-overview">
+          <div style="position:relative; width:92px; height:92px;">
+            <div class="ring"></div>
+            <div class="ring-value">%64</div>
+          </div>
+          <div class="stack-8">
+            <div class="split-title" style="font-size: 13px;">Bağlanma kalıpları destekleniyor</div>
+            <div class="notice-sub">Ses, gülümseme ve göz temasıyla tekrar eden etkileşimler bu ay kritik.</div>
+          </div>
+        </div>
+
+        <div class="month-row">
+          <div class="month">1. ay</div>
+          <div class="month active">2. ay</div>
+          <div class="month">3. ay</div>
+          <div class="month">4. ay</div>
+        </div>
+
+        <div class="section-card" style="margin-top:10px; padding: 0 12px;">
+          <div class="mile-item">
+            <div class="state done">✓</div>
+            <div>
+              <div class="mile-title">Sosyal gülümseme</div>
+              <div class="mile-sub">Yüzüne bakarak tepki veriyor.</div>
+              <span class="tag social">sosyal</span>
+            </div>
+          </div>
+
+          <div class="mile-item">
+            <div class="state warn">!</div>
+            <div>
+              <div class="mile-title">Sesi takip etme</div>
+              <div class="mile-sub">Ses kaynağına dönme davranışı dalgalı.</div>
+              <span class="tag cog">bilişsel</span>
+            </div>
+          </div>
+
+          <div class="mile-item">
+            <div class="state wait"></div>
+            <div>
+              <div class="mile-title">Başını 45° kaldırma</div>
+              <div class="mile-sub">Yüzüstü kısa oyunlarla desteklenebilir.</div>
+              <span class="tag motor">motor</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab"><span class="icon">🏠</span>Ana</div>
+          <div class="tab active"><span class="icon">📈</span><div class="dot"></div>Gelişim</div>
+          <div class="tab"><span class="icon">📝</span>Takip</div>
+          <div class="tab"><span class="icon">💉</span>Aşılar</div>
+          <div class="tab"><span class="icon">🥄</span>Besinler</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-label">04 · Günlük Takip</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="content">
+        <div class="eyebrow">1 Mart 2026, Pazar</div>
+        <h2 class="title" style="font-size: 33px;">Bugün</h2>
+
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="metric-name">Emzirme</div>
+            <div class="metric-value">7 <span>kez</span></div>
+            <div class="mini-bar"><i style="width: 70%; background: var(--sage);"></i></div>
+          </div>
+          <div class="metric">
+            <div class="metric-name">Uyku</div>
+            <div class="metric-value">11 <span>sa</span></div>
+            <div class="mini-bar"><i style="width: 56%; background: var(--sky);"></i></div>
+          </div>
+          <div class="metric">
+            <div class="metric-name">Bez</div>
+            <div class="metric-value">5 <span>kez</span></div>
+            <div class="mini-bar"><i style="width: 50%; background: #e6bfae;"></i></div>
+          </div>
+          <div class="metric">
+            <div class="metric-name">Son tartı</div>
+            <div class="metric-value">5.2 <span>kg</span></div>
+            <div class="mini-bar"><i style="width: 62%; background: #d7cab9;"></i></div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <div class="chip active sage">+ Beslenme</div>
+          <div class="chip">+ Uyku</div>
+          <div class="chip">+ Bez</div>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-head">Bugünün kaydı</div>
+          <div class="event">
+            <div class="event-time">08:30</div>
+            <div class="event-dot dot-feed"></div>
+            <div class="event-text">Emzirme · Sol · 18 dk</div>
+          </div>
+          <div class="event">
+            <div class="event-time">09:15</div>
+            <div class="event-dot dot-sleep"></div>
+            <div class="event-text">Uyku başladı</div>
+          </div>
+          <div class="event">
+            <div class="event-time">11:00</div>
+            <div class="event-dot dot-diaper"></div>
+            <div class="event-text">Bez değişimi · Islak</div>
+          </div>
+          <div class="event">
+            <div class="event-time">11:30</div>
+            <div class="event-dot dot-feed"></div>
+            <div class="event-text">Emzirme · Sağ · 22 dk</div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab"><span class="icon">🏠</span>Ana</div>
+          <div class="tab"><span class="icon">📈</span>Gelişim</div>
+          <div class="tab active"><span class="icon">📝</span><div class="dot"></div>Takip</div>
+          <div class="tab"><span class="icon">💉</span>Aşılar</div>
+          <div class="tab"><span class="icon">🥄</span>Besinler</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-label">05 · Aşı Takvimi</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="content">
+        <div class="eyebrow">T.C. protokolüne göre</div>
+        <h2 class="title" style="font-size: 33px;">Aşı planı</h2>
+
+        <div class="next-vaccine">
+          <div class="small">Sıradaki aşı</div>
+          <div class="name">Beşli Aşı (DTaP)</div>
+          <div class="date">6 Mart 2026 · 5 gün sonra</div>
+          <div class="pill">📍 Randevu hatırlatıcısı</div>
+        </div>
+
+        <div class="v-list">
+          <div class="v-group">Tamamlananlar</div>
+          <div class="v-item">
+            <div class="v-state done">✓</div>
+            <div class="v-name">Hepatit B (1. doz)</div>
+            <div class="v-age">Doğum</div>
+          </div>
+          <div class="v-item">
+            <div class="v-state done">✓</div>
+            <div class="v-name">BCG (Verem)</div>
+            <div class="v-age">1. ay</div>
+          </div>
+
+          <div class="v-group" style="margin-top: 8px;">Yaklaşan</div>
+          <div class="v-item">
+            <div class="v-state next">→</div>
+            <div class="v-name">Beşli Aşı (DTaP)</div>
+            <div class="v-age">2. ay</div>
+          </div>
+          <div class="v-item">
+            <div class="v-state next">→</div>
+            <div class="v-name">Pnömokok</div>
+            <div class="v-age">2. ay</div>
+          </div>
+
+          <div class="v-group" style="margin-top: 8px;">Gelecek</div>
+          <div class="v-item">
+            <div class="v-state future"></div>
+            <div class="v-name">Rotavirüs</div>
+            <div class="v-age">4. ay</div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab"><span class="icon">🏠</span>Ana</div>
+          <div class="tab"><span class="icon">📈</span>Gelişim</div>
+          <div class="tab"><span class="icon">📝</span>Takip</div>
+          <div class="tab active"><span class="icon">💉</span><div class="dot"></div>Aşılar</div>
+          <div class="tab"><span class="icon">🥄</span>Besinler</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-label">06 · Besinler</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="content">
+        <div class="eyebrow">Ek gıda günlüğü</div>
+        <h2 class="title" style="font-size: 33px;">Besin takibi</h2>
+        <p class="sub">Alerji reaksiyonlarını ilk 24 saatte not almak doktor görüşmesinde faydalıdır.</p>
+
+        <div class="food-stats">
+          <div class="food-stat">
+            <div class="val">14</div>
+            <div class="lbl">Denenen</div>
+          </div>
+          <div class="food-stat">
+            <div class="val" style="color: #4e7362;">12</div>
+            <div class="lbl">Sorunsuz</div>
+          </div>
+          <div class="food-stat">
+            <div class="val" style="color: #a15436;">2</div>
+            <div class="lbl">Dikkat</div>
+          </div>
+        </div>
+
+        <div class="food-list">
+          <div class="food-item">
+            <div class="food-emoji">🥚</div>
+            <div>
+              <div class="food-name">Yumurta sarısı</div>
+              <div class="food-date">28 Şubat · ilk kez</div>
+            </div>
+            <div class="reaction warn">Kızarıklık</div>
+          </div>
+
+          <div class="food-item">
+            <div class="food-emoji">🥕</div>
+            <div>
+              <div class="food-name">Havuç püresi</div>
+              <div class="food-date">25 Şubat</div>
+            </div>
+            <div class="reaction ok">İyi</div>
+          </div>
+
+          <div class="food-item">
+            <div class="food-emoji">🍌</div>
+            <div>
+              <div class="food-name">Muz</div>
+              <div class="food-date">22 Şubat</div>
+            </div>
+            <div class="reaction ok">İyi</div>
+          </div>
+
+          <div class="food-item">
+            <div class="food-emoji">🍎</div>
+            <div>
+              <div class="food-name">Elma püresi</div>
+              <div class="food-date">18 Şubat</div>
+            </div>
+            <div class="reaction mild">Hafif gaz</div>
+          </div>
+        </div>
+
+        <div class="food-tip">📌 Yeni besinleri tek tek ve 3 gün arayla dene. Belirgin reaksiyon durumunda doktoruna danış.</div>
+
+        <div class="tabbar">
+          <div class="tab"><span class="icon">🏠</span>Ana</div>
+          <div class="tab"><span class="icon">📈</span>Gelişim</div>
+          <div class="tab"><span class="icon">📝</span>Takip</div>
+          <div class="tab"><span class="icon">💉</span>Aşılar</div>
+          <div class="tab active"><span class="icon">🥄</span><div class="dot"></div>Besinler</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

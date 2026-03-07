@@ -1,0 +1,52 @@
+[
+  {
+    "id": "motor_1",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "motor",
+    "titleTR": "Başını kaldırma",
+    "titleEN": "Head lifting",
+    "descriptionTR": "Yüzüstü pozisyonda başını kısa süreliğine kaldırabilir.",
+    "descriptionEN": "Can briefly lift head while lying on tummy."
+  },
+  {
+    "id": "social_1",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "social",
+    "titleTR": "Sosyal gülümseme",
+    "titleEN": "Social smile",
+    "descriptionTR": "Yüzünüze bakarak gülümsemeye başlar.",
+    "descriptionEN": "Begins to smile at faces."
+  },
+  {
+    "id": "motor_2",
+    "monthStart": 3,
+    "monthEnd": 4,
+    "category": "motor",
+    "titleTR": "Nesneleri kavrama",
+    "titleEN": "Grasping objects",
+    "descriptionTR": "Elindeki nesneleri kavrayıp tutabilir.",
+    "descriptionEN": "Can grasp and hold objects in hand."
+  },
+  {
+    "id": "language_1",
+    "monthStart": 3,
+    "monthEnd": 4,
+    "category": "language",
+    "titleTR": "Agulama",
+    "titleEN": "Cooing",
+    "descriptionTR": "Sesli agulama ve gıgıldama başlar.",
+    "descriptionEN": "Starts cooing and gurgling sounds."
+  },
+  {
+    "id": "motor_3",
+    "monthStart": 5,
+    "monthEnd": 6,
+    "category": "motor",
+    "titleTR": "Desteksiz oturma",
+    "titleEN": "Sitting without support",
+    "descriptionTR": "Kısa süre desteksiz oturabilir.",
+    "descriptionEN": "Can sit briefly without support."
+  }
+]

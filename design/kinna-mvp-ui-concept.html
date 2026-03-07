@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinna — MVP UI Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --warm-white: #FFFDF9;
+    --blush: #F2E8DF;
+    --sage: #7A9E8E;
+    --sage-light: #B8D4C8;
+    --sage-dark: #4A7A68;
+    --terracotta: #C4785A;
+    --terracotta-light: #E8C4B0;
+    --charcoal: #2C2C2C;
+    --mid: #6B6560;
+    --light: #A09890;
+    --pale: #EDE8E2;
+    --phone-w: 320px;
+    --phone-h: 640px;
+    --radius: 40px;
+    --notch: 120px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(circle at 20% 20%, #2F2824 0%, #1A1714 45%, #14110F 100%);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 60px 40px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 15% 80%, rgba(196, 120, 90, 0.10), transparent 35%),
+      radial-gradient(circle at 80% 12%, rgba(122, 158, 142, 0.11), transparent 30%);
+    z-index: -1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--cream);
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .header-logo span {
+    color: var(--terracotta);
+  }
+  .header-sub {
+    color: #6B6560;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .header-meta {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .meta-chip {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #D7CCC1;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .global-note {
+    max-width: 1080px;
+    margin: 0 auto 40px;
+    background: linear-gradient(130deg, rgba(250, 247, 242, 0.98), rgba(242, 232, 223, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    padding: 14px 18px;
+    color: #4E4742;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .global-note strong {
+    color: #2C2C2C;
+    font-weight: 500;
+  }
+
+  /* Layout */
+  .screens-grid {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .screen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: floatIn 520ms ease-out both;
+  }
+
+  .screen-wrap:nth-child(1) { animation-delay: 40ms; }
+  .screen-wrap:nth-child(2) { animation-delay: 90ms; }
+  .screen-wrap:nth-child(3) { animation-delay: 140ms; }
+  .screen-wrap:nth-child(4) { animation-delay: 190ms; }
+  .screen-wrap:nth-child(5) { animation-delay: 240ms; }
+  .screen-wrap:nth-child(6) { animation-delay: 290ms; }
+
+  .screen-label {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #4A4540;
+    font-weight: 400;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+      0 0 0 1px rgba(255,255,255,0.06),
+      0 40px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px 0;
+    position: relative;
+    z-index: 10;
+  }
+  .status-time {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+  .status-icons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .status-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--charcoal);
+  }
+  .status-battery {
+    width: 18px;
+    height: 9px;
+    border: 1.5px solid var(--charcoal);
+    border-radius: 2px;
+    position: relative;
+    margin-left: 2px;
+  }
+  .status-battery::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 5px;
+    background: var(--charcoal);
+    border-radius: 0 1px 1px 0;
+  }
+  .status-battery-fill {
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    bottom: 1px;
+    width: 70%;
+    background: var(--charcoal);
+    border-radius: 1px;
+  }
+
+  /* Dynamic island */
+  .dynamic-island {
+    width: 90px;
+    height: 26px;
+    background: #1A1714;
+    border-radius: 20px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+  }
+
+  /* Screen content */
+  .screen-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
+  /* ========================
+     SCREEN 1: ONBOARDING
+  ======================== */
+  .onboarding-bg {
+    background: var(--cream);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 28px 32px;
+  }
+
+  .onboarding-step {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 40px;
+  }
+  .step-dot {
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--pale);
+  }
+  .step-dot.active {
+    background: var(--terracotta);
+    width: 32px;
+  }
+
+  .onboarding-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--terracotta-light);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    font-size: 32px;
+  }
+
+  .onboarding-title {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--charcoal);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .onboarding-sub {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .input-field {
+    background: white;
+    border: 1.5px solid var(--pale);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .input-label {
+    font-size: 10px;
+    color: var(--light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .input-value {
+    font-size: 15px;
+    color: var(--charcoal);
+    font-weight: 400;
+  }
+  .input-value.placeholder {
+    color: var(--light);
+  }
+
+  .gender-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .gender-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+    background: white;
+    border: 1.5px solid var(--pale);
+    color: var(--mid);
+  }
+  .gender-btn.selected {
+    background: var(--terracotta-light);
+    border-color: var(--terracotta);
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  .role-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .source-note {
+    font-size: 10px;
+    color: var(--light);
+    line-height: 1.4;
+    margin-top: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .btn-primary {
+    background: var(--charcoal);
+    color: white;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: auto;
+  }
+
+  /* ========================
+     SCREEN 2: HOME
+  ======================== */
+  .home-bg {
+    background: var(--cream);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home-header {
+    padding: 56px 24px 0;
+    background: var(--cream);
+  }
+
+  .home-greeting {
+    font-size: 12px;
+    color: var(--light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .home-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--charcoal);
+    margin-bottom: 20px;
+  }
+
+  .age-card {
+    background: var(--charcoal);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .age-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .age-card-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .age-card-value {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: white;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .age-card-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+  .age-progress {
+    margin-top: 16px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
+  .age-progress-fill {
+    width: 42%;
+    height: 100%;
+    background: var(--terracotta);
+    border-radius: 2px;
+  }
+
+  .home-scroll {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 24px 20px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    letter-spacing: 0.3px;
+  }
+  .section-more {
+    font-size: 11px;
+    color: var(--sage);
+    font-weight: 500;
+  }
+
+  .daily-card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--pale);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .daily-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .icon-sage { background: #EAF3EF; }
+  .icon-terra { background: var(--terracotta-light); }
+  .icon-pale { background: var(--pale); }
+
+  .daily-card-text {}
+  .daily-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 3px;
+  }
+  .daily-card-desc {
+    font-size: 11px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+
+  .motivation-card {
+    background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .motivation-text {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 300;
+    font-style: italic;
+    color: white;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .motivation-source {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    height: 76px;
+    background: white;
+    border-top: 1px solid var(--pale);
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 0 0;
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .tab-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+  .tab-label {
+    font-size: 9px;
+    color: var(--light);
+    font-weight: 400;
+  }
+  .tab-item.active .tab-label {
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .tab-active-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    margin-top: -2px;
+  }
+
+  /* ========================
+     SCREEN 3: MILESTONES
+  ======================== */
+  .milestone-bg {
+    background: var(--cream);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .milestone-header {
+    padding: 56px 24px 20px;
+  }
+  .milestone-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--charcoal);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .milestone-sub {
+    font-size: 12px;
+    color: var(--light);
+  }
+
+  .month-selector {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .month-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    white-space: nowrap;
+    background: white;
+    color: var(--mid);
+    border: 1px solid var(--pale);
+  }
+  .month-chip.active {
+    background: var(--charcoal);
+    color: white;
+    border-color: var(--charcoal);
+  }
+
+  .milestone-list {
+    padding: 0 24px;
+    flex: 1;
+    overflow: hidden;
+  }
+  .milestone-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--pale);
+  }
+  .milestone-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .check-done {
+    background: var(--sage);
+    color: white;
+    font-size: 12px;
+  }
+  .check-pending {
+    background: white;
+    border: 1.5px solid var(--pale);
+  }
+  .check-warn {
+    background: var(--terracotta-light);
+    color: var(--terracotta);
+    font-size: 12px;
+  }
+  .milestone-info {}
+  .milestone-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 2px;
+  }
+  .milestone-desc {
+    font-size: 11px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+  .milestone-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 500;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tag-motor { background: #EAF3EF; color: var(--sage-dark); }
+  .tag-social { background: var(--terracotta-light); color: var(--terracotta); }
+  .tag-cognitive { background: #E8E4F0; color: #6B5C8F; }
+
+  /* ========================
+     SCREEN 4: TRACKING
+  ======================== */
+  .tracking-bg {
+    background: var(--cream);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tracking-header {
+    padding: 56px 24px 20px;
+  }
+  .tracking-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--charcoal);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .tracking-date {
+    font-size: 12px;
+    color: var(--light);
+  }
+
+  .tracking-grid {
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .tracking-tile {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid var(--pale);
+  }
+  .tracking-tile.wide {
+    grid-column: span 2;
+  }
+  .tile-icon { font-size: 22px; margin-bottom: 8px; }
+  .tile-label {
+    font-size: 10px;
+    color: var(--light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .tile-value {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--charcoal);
+    font-weight: 400;
+    line-height: 1;
+  }
+  .tile-unit {
+    font-size: 11px;
+    color: var(--mid);
+    font-family: 'DM Sans', sans-serif;
+    margin-left: 3px;
+  }
+  .tile-bar {
+    margin-top: 10px;
+    height: 3px;
+    background: var(--pale);
+    border-radius: 2px;
+  }
+  .tile-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .add-log-btn {
+    margin: 0 24px;
+    background: var(--terracotta);
+    border-radius: 16px;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .timeline {
+    padding: 16px 24px 0;
+  }
+  .timeline-title {
+    font-size: 11px;
+    color: var(--light);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .timeline-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .timeline-time {
+    font-size: 10px;
+    color: var(--light);
+    width: 36px;
+    flex-shrink: 0;
+  }
+  .timeline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-feed { background: var(--sage); }
+  .dot-sleep { background: #8BA7C7; }
+  .dot-diaper { background: var(--terracotta-light); }
+  .timeline-text {
+    font-size: 12px;
+    color: var(--mid);
+  }
+
+  /* ========================
+     SCREEN 5: VACCINE
+  ======================== */
+  .vaccine-bg {
+    background: var(--cream);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .vaccine-header {
+    padding: 56px 24px 20px;
+  }
+  .vaccine-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--charcoal);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .vaccine-sub {
+    font-size: 12px;
+    color: var(--light);
+  }
+
+  .vaccine-next {
+    margin: 0 24px 16px;
+    background: var(--sage-dark);
+    border-radius: 20px;
+    padding: 18px;
+    color: white;
+  }
+  .vaccine-next-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+  .vaccine-next-name {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 2px;
+  }
+  .vaccine-next-date {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  .vaccine-next-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 10px;
+    margin-top: 10px;
+    font-weight: 500;
+  }
+
+  .vaccine-list {
+    padding: 0 24px;
+    flex: 1;
+    overflow: hidden;
+  }
+  .vaccine-group-title {
+    font-size: 10px;
+    color: var(--light);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    margin-top: 4px;
+  }
+  .vaccine-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--pale);
+  }
+  .vaccine-status {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .vstatus-done { background: var(--sage-light); }
+  .vstatus-next { background: var(--terracotta-light); }
+  .vstatus-future { background: var(--pale); }
+  .vaccine-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    flex: 1;
+  }
+  .vaccine-age {
+    font-size: 11px;
+    color: var(--light);
+  }
+
+  /* ========================
+     SCREEN 6: ALLERGY
+  ======================== */
+  .allergy-bg {
+    background: var(--cream);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .allergy-header {
+    padding: 56px 24px 20px;
+  }
+  .allergy-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--charcoal);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .allergy-sub {
+    font-size: 12px;
+    color: var(--light);
+  }
+
+  .allergy-stats {
+    display: flex;
+    gap: 10px;
+    padding: 0 24px;
+    margin-bottom: 16px;
+  }
+  .allergy-stat {
+    flex: 1;
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    border: 1px solid var(--pale);
+    text-align: center;
+  }
+  .allergy-stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--charcoal);
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .allergy-stat-label {
+    font-size: 10px;
+    color: var(--light);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .allergy-list {
+    padding: 0 24px;
+    flex: 1;
+    overflow: hidden;
+  }
+  .allergy-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--pale);
+  }
+  .allergy-emoji {
+    width: 36px;
+    height: 36px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 1px solid var(--pale);
+    flex-shrink: 0;
+  }
+  .allergy-food {}
+  .allergy-food-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 2px;
+  }
+  .allergy-food-date {
+    font-size: 10px;
+    color: var(--light);
+  }
+  .allergy-reaction {
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .react-ok { background: #EAF3EF; color: var(--sage-dark); }
+  .react-warn { background: #FFF3ED; color: #C4644A; }
+  .react-mild { background: #FFF8ED; color: #C49A4A; }
+
+  .add-food-btn {
+    margin: 12px 24px 0;
+    border: 1.5px dashed var(--pale);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+    color: var(--light);
+    font-size: 13px;
+  }
+
+  /* Section row labels */
+  .section-row {
+    padding: 0 24px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @keyframes floatIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    body {
+      padding: 30px 16px 50px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .header-logo {
+      font-size: 40px;
+    }
+
+    .global-note {
+      margin-bottom: 26px;
+      font-size: 12px;
+      padding: 12px;
+    }
+
+    .screens-grid {
+      gap: 30px;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">Kinn<span>a</span></div>
+  <div class="header-sub">MVP UI Concept · 6 Ekran</div>
+  <div class="header-meta">
+    <div class="meta-chip">MVP Faz 1</div>
+    <div class="meta-chip">TR + EN Ready</div>
+    <div class="meta-chip">Privacy-first</div>
+  </div>
+</div>
+
+<div class="global-note">
+  <strong>Ürün kararı hizası:</strong> Tasarım sadece MVP kapsamını içerir (Onboarding, Gelişim, Takip, Aşı, Besin). Tüm veriler cihazda tutulur (SwiftData). Bu uygulama doktor tavsiyesinin yerini tutmaz.
+</div>
+
+<div class="screens-grid">
+
+  <!-- SCREEN 1: ONBOARDING -->
+  <div class="screen-wrap">
+    <div class="screen-label">01 · Onboarding</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="screen-content">
+        <div class="onboarding-bg">
+          <div style="height:44px"></div>
+          <div class="onboarding-step">
+            <div class="step-dot active"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+          </div>
+          <div class="onboarding-icon">👶</div>
+          <div class="onboarding-title">Bebeğinle tanışalım</div>
+          <div class="onboarding-sub">Kinna sana özel rehberlik sunabilmek için birkaç bilgiye ihtiyaç duyuyor.</div>
+
+          <div class="input-field">
+            <div class="input-label">Bebeğinin adı</div>
+            <div class="input-value">Ela</div>
+          </div>
+          <div class="input-field">
+            <div class="input-label">Doğum tarihi</div>
+            <div class="input-value">12 Ocak 2025</div>
+          </div>
+
+          <div style="margin-top:4px; margin-bottom:8px; font-size:10px; color: var(--light); letter-spacing:1px; text-transform:uppercase;">Cinsiyet</div>
+          <div class="gender-row">
+            <div class="gender-btn selected">Kız</div>
+            <div class="gender-btn">Erkek</div>
+            <div class="gender-btn">Belirtmek istemiyorum</div>
+          </div>
+
+          <div style="margin-top:2px; margin-bottom:8px; font-size:10px; color: var(--light); letter-spacing:1px; text-transform:uppercase;">Ebeveyn rolü</div>
+          <div class="role-row">
+            <div class="gender-btn selected">Anne</div>
+            <div class="gender-btn">Baba</div>
+          </div>
+
+          <div class="btn-primary">Devam</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: HOME -->
+  <div class="screen-wrap">
+    <div class="screen-label">02 · Ana Ekran</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="screen-content">
+        <div class="home-bg">
+          <div class="home-header">
+            <div style="height:44px"></div>
+            <div class="home-greeting">Günaydın</div>
+            <div class="home-name">Ela'nın annesi 👋</div>
+            <div class="age-card">
+              <div class="age-card-label">Ela bugün</div>
+              <div class="age-card-value">2 ay</div>
+              <div class="age-card-sub">15 gün · 75 gün yaşıyor</div>
+              <div class="age-progress"><div class="age-progress-fill"></div></div>
+            </div>
+          </div>
+
+          <div class="home-scroll">
+            <div class="motivation-card">
+              <div class="motivation-text">"Zor günleri geçtin. Bu hafta emzirme düzene girmeye başlıyor."</div>
+              <div class="motivation-source">Günlük Kinna notu</div>
+              <div class="source-note">İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.</div>
+            </div>
+
+            <div class="section-row">
+              <div class="section-title">Bu ay için</div>
+              <div class="section-more">Tümü →</div>
+            </div>
+
+            <div class="daily-card">
+              <div class="daily-card-icon icon-sage">🧠</div>
+              <div class="daily-card-text">
+                <div class="daily-card-title">Siyah-beyaz kartlar dene</div>
+                <div class="daily-card-desc">Bebeğin kontrastı seviyor. 25 cm mesafede göster.</div>
+              </div>
+            </div>
+
+            <div class="daily-card">
+              <div class="daily-card-icon icon-terra">⚠️</div>
+              <div class="daily-card-text">
+                <div class="daily-card-title">Güvenlik hatırlatması</div>
+                <div class="daily-card-desc">Bebekleri yüzüstü uyutmayın. SIDS riskini azaltır.</div>
+              </div>
+            </div>
+
+            <div class="daily-card">
+              <div class="daily-card-icon icon-pale">💉</div>
+              <div class="daily-card-text">
+                <div class="daily-card-title">Aşı yaklaşıyor</div>
+                <div class="daily-card-desc">2. ay aşısı 5 gün sonra. Randevu aldın mı?</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab-item active">
+              <div class="tab-icon">🏠</div>
+              <div class="tab-active-dot"></div>
+              <div class="tab-label" style="color:var(--terracotta)">Ana</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">📈</div>
+              <div class="tab-label">Gelişim</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">📝</div>
+              <div class="tab-label">Takip</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">💉</div>
+              <div class="tab-label">Aşılar</div>
+            </div>
+            <div class="tab-item">
+              <div class="tab-icon">🥄</div>
+              <div class="tab-label">Besinler</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: MILESTONES -->
+  <div class="screen-wrap">
+    <div class="screen-label">03 · Gelişim Kilometre Taşları</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="screen-content">
+        <div class="milestone-bg">
+          <div class="milestone-header">
+            <div style="height:44px"></div>
+            <div class="milestone-title">Ela büyüyor</div>
+            <div class="milestone-sub">2. ay · 11 taştan 7'si tamamlandı</div>
+          </div>
+
+          <div class="month-selector">
+            <div class="month-chip">1. ay</div>
+            <div class="month-chip active">2. ay</div>
+            <div class="month-chip">3. ay</div>
+            <div class="month-chip">4. ay</div>
+          </div>
+
+          <div class="milestone-list">
+            <div class="milestone-item">
+              <div class="milestone-check check-done">✓</div>
+              <div class="milestone-info">
+                <div class="milestone-name">Seslere tepki veriyor</div>
+                <div class="milestone-desc">Yüksek sese irkilme refleksi var.</div>
+                <div class="milestone-tag tag-cognitive">bilişsel</div>
+              </div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-check check-done">✓</div>
+              <div class="milestone-info">
+                <div class="milestone-name">Sosyal gülümseme</div>
+                <div class="milestone-desc">Yüzünüze bakarak gülümsüyor.</div>
+                <div class="milestone-tag tag-social">sosyal</div>
+              </div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-check check-pending"></div>
+              <div class="milestone-info">
+                <div class="milestone-name">Başını 45° kaldırıyor</div>
+                <div class="milestone-desc">Yüzüstü pozisyonda başını kaldırıyor.</div>
+                <div class="milestone-tag tag-motor">motor</div>
+              </div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-check check-warn">!</div>
+              <div class="milestone-info">
+                <div class="milestone-name">Sesi takip ediyor</div>
+                <div class="milestone-desc">Gözler ses kaynağına yöneliyor.</div>
+                <div class="milestone-tag tag-cognitive">bilişsel</div>
+              </div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-check check-pending"></div>
+              <div class="milestone-info">
+                <div class="milestone-name">"Ah", "oh" sesleri</div>
+                <div class="milestone-desc">İlk vokal sesler çıkarmaya başlıyor.</div>
+                <div class="milestone-tag tag-social">sosyal</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-label">Ana</div></div>
+            <div class="tab-item active"><div class="tab-icon">📈</div><div class="tab-active-dot"></div><div class="tab-label" style="color:var(--terracotta)">Gelişim</div></div>
+            <div class="tab-item"><div class="tab-icon">📝</div><div class="tab-label">Takip</div></div>
+            <div class="tab-item"><div class="tab-icon">💉</div><div class="tab-label">Aşılar</div></div>
+            <div class="tab-item"><div class="tab-icon">🥄</div><div class="tab-label">Besinler</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: TRACKING -->
+  <div class="screen-wrap">
+    <div class="screen-label">04 · Günlük Takip</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="screen-content">
+        <div class="tracking-bg">
+          <div class="tracking-header">
+            <div style="height:44px"></div>
+            <div class="tracking-title">Bugün</div>
+            <div class="tracking-date">1 Mart 2026, Pazar</div>
+          </div>
+
+          <div class="tracking-grid">
+            <div class="tracking-tile">
+              <div class="tile-icon">🍼</div>
+              <div class="tile-label">Emzirme</div>
+              <div class="tile-value">7<span class="tile-unit">kez</span></div>
+              <div class="tile-bar"><div class="tile-bar-fill" style="width:70%; background:var(--sage)"></div></div>
+            </div>
+            <div class="tracking-tile">
+              <div class="tile-icon">😴</div>
+              <div class="tile-label">Uyku</div>
+              <div class="tile-value">11<span class="tile-unit">sa</span></div>
+              <div class="tile-bar"><div class="tile-bar-fill" style="width:55%; background:#8BA7C7"></div></div>
+            </div>
+            <div class="tracking-tile">
+              <div class="tile-icon">🩲</div>
+              <div class="tile-label">Bez</div>
+              <div class="tile-value">5<span class="tile-unit">kez</span></div>
+              <div class="tile-bar"><div class="tile-bar-fill" style="width:50%; background:var(--terracotta-light)"></div></div>
+            </div>
+            <div class="tracking-tile">
+              <div class="tile-icon">⚖️</div>
+              <div class="tile-label">Son tartı</div>
+              <div class="tile-value">5.2<span class="tile-unit">kg</span></div>
+              <div class="tile-bar"><div class="tile-bar-fill" style="width:60%; background:var(--blush)"></div></div>
+            </div>
+          </div>
+
+          <div class="add-log-btn">+ Kayıt ekle</div>
+
+          <div class="timeline" style="margin-top:16px">
+            <div class="timeline-title">Bugünün kaydı</div>
+            <div class="timeline-item">
+              <div class="timeline-time">08:30</div>
+              <div class="timeline-dot dot-feed"></div>
+              <div class="timeline-text">Emzirme · Sol · 18 dk</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">09:15</div>
+              <div class="timeline-dot dot-sleep"></div>
+              <div class="timeline-text">Uyku başladı</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">11:00</div>
+              <div class="timeline-dot dot-diaper"></div>
+              <div class="timeline-text">Bez değişimi · Islak</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">11:30</div>
+              <div class="timeline-dot dot-feed"></div>
+              <div class="timeline-text">Emzirme · Sağ · 22 dk</div>
+            </div>
+          </div>
+
+          <div class="tab-bar" style="margin-top:auto">
+            <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-label">Ana</div></div>
+            <div class="tab-item"><div class="tab-icon">📈</div><div class="tab-label">Gelişim</div></div>
+            <div class="tab-item active"><div class="tab-icon">📝</div><div class="tab-active-dot"></div><div class="tab-label" style="color:var(--terracotta)">Takip</div></div>
+            <div class="tab-item"><div class="tab-icon">💉</div><div class="tab-label">Aşılar</div></div>
+            <div class="tab-item"><div class="tab-icon">🥄</div><div class="tab-label">Besinler</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: VACCINE -->
+  <div class="screen-wrap">
+    <div class="screen-label">05 · Aşı Takvimi</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="screen-content">
+        <div class="vaccine-bg">
+          <div class="vaccine-header">
+            <div style="height:44px"></div>
+            <div class="vaccine-title">Aşı Takvimi</div>
+            <div class="vaccine-sub">T.C. Sağlık Bakanlığı protokolü</div>
+          </div>
+
+          <div class="vaccine-next">
+            <div class="vaccine-next-label">Sıradaki aşı</div>
+            <div class="vaccine-next-name">Beşli Aşı (DTaP)</div>
+            <div class="vaccine-next-date">6 Mart 2026 · 5 gün sonra</div>
+            <div class="vaccine-next-badge">📍 Randevu al</div>
+          </div>
+
+          <div class="vaccine-list">
+            <div class="vaccine-group-title">Tamamlananlar</div>
+            <div class="vaccine-item">
+              <div class="vaccine-status vstatus-done">✓</div>
+              <div class="vaccine-name">Hepatit B (1. doz)</div>
+              <div class="vaccine-age">Doğumda</div>
+            </div>
+            <div class="vaccine-item">
+              <div class="vaccine-status vstatus-done">✓</div>
+              <div class="vaccine-name">BCG (Verem)</div>
+              <div class="vaccine-age">1. ay</div>
+            </div>
+            <div class="vaccine-item">
+              <div class="vaccine-status vstatus-done">✓</div>
+              <div class="vaccine-name">Hepatit B (2. doz)</div>
+              <div class="vaccine-age">1. ay</div>
+            </div>
+
+            <div class="vaccine-group-title" style="margin-top:8px">Yaklaşan</div>
+            <div class="vaccine-item">
+              <div class="vaccine-status vstatus-next">→</div>
+              <div class="vaccine-name">Beşli Aşı (DTaP)</div>
+              <div class="vaccine-age">2. ay</div>
+            </div>
+            <div class="vaccine-item">
+              <div class="vaccine-status vstatus-next">→</div>
+              <div class="vaccine-name">Pnömokok</div>
+              <div class="vaccine-age">2. ay</div>
+            </div>
+
+            <div class="vaccine-group-title" style="margin-top:8px">Gelecek</div>
+            <div class="vaccine-item">
+              <div class="vaccine-status vstatus-future"></div>
+              <div class="vaccine-name">Rotavirüs</div>
+              <div class="vaccine-age">4. ay</div>
+            </div>
+          </div>
+
+          <div class="tab-bar" style="position:absolute; bottom:0; left:0; right:0;">
+            <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-label">Ana</div></div>
+            <div class="tab-item"><div class="tab-icon">📈</div><div class="tab-label">Gelişim</div></div>
+            <div class="tab-item"><div class="tab-icon">📝</div><div class="tab-label">Takip</div></div>
+            <div class="tab-item active"><div class="tab-icon">💉</div><div class="tab-active-dot"></div><div class="tab-label" style="color:var(--terracotta)">Aşılar</div></div>
+            <div class="tab-item"><div class="tab-icon">🥄</div><div class="tab-label">Besinler</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: ALLERGY -->
+  <div class="screen-wrap">
+    <div class="screen-label">06 · Alerji &amp; Ek Gıda</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div class="screen-content">
+        <div class="allergy-bg">
+          <div class="allergy-header">
+            <div style="height:44px"></div>
+            <div class="allergy-title">Besin Günlüğü</div>
+            <div class="allergy-sub">Ela · 6. aydan itibaren</div>
+          </div>
+
+          <div class="allergy-stats">
+            <div class="allergy-stat">
+              <div class="allergy-stat-value">14</div>
+              <div class="allergy-stat-label">Denenen</div>
+            </div>
+            <div class="allergy-stat">
+              <div class="allergy-stat-value" style="color:var(--sage-dark)">12</div>
+              <div class="allergy-stat-label">Sorunsuz</div>
+            </div>
+            <div class="allergy-stat">
+              <div class="allergy-stat-value" style="color:var(--terracotta)">2</div>
+              <div class="allergy-stat-label">Dikkat</div>
+            </div>
+          </div>
+
+          <div class="allergy-list">
+            <div class="section-title" style="font-size:11px; color:var(--light); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px;">Son eklenenler</div>
+
+            <div class="allergy-item">
+              <div class="allergy-emoji">🥚</div>
+              <div class="allergy-food">
+                <div class="allergy-food-name">Yumurta sarısı</div>
+                <div class="allergy-food-date">28 Şubat · ilk kez</div>
+              </div>
+              <div class="allergy-reaction react-warn">⚠️ Kızarıklık</div>
+            </div>
+
+            <div class="allergy-item">
+              <div class="allergy-emoji">🥕</div>
+              <div class="allergy-food">
+                <div class="allergy-food-name">Havuç püresi</div>
+                <div class="allergy-food-date">25 Şubat</div>
+              </div>
+              <div class="allergy-reaction react-ok">✓ İyi</div>
+            </div>
+
+            <div class="allergy-item">
+              <div class="allergy-emoji">🍌</div>
+              <div class="allergy-food">
+                <div class="allergy-food-name">Muz</div>
+                <div class="allergy-food-date">22 Şubat</div>
+              </div>
+              <div class="allergy-reaction react-ok">✓ İyi</div>
+            </div>
+
+            <div class="allergy-item">
+              <div class="allergy-emoji">🍎</div>
+              <div class="allergy-food">
+                <div class="allergy-food-name">Elma püresi</div>
+                <div class="allergy-food-date">18 Şubat</div>
+              </div>
+              <div class="allergy-reaction react-mild">~ Hafif gaz</div>
+            </div>
+          </div>
+
+          <div class="add-food-btn">+ Yeni besin ekle</div>
+
+          <div class="tab-bar" style="position:absolute; bottom:0; left:0; right:0;">
+            <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-label">Ana</div></div>
+            <div class="tab-item"><div class="tab-icon">📈</div><div class="tab-label">Gelişim</div></div>
+            <div class="tab-item"><div class="tab-icon">📝</div><div class="tab-label">Takip</div></div>
+            <div class="tab-item"><div class="tab-icon">💉</div><div class="tab-label">Aşılar</div></div>
+            <div class="tab-item active"><div class="tab-icon">🥄</div><div class="tab-active-dot"></div><div class="tab-label" style="color:var(--terracotta)">Besinler</div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

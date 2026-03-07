@@ -1,0 +1,336 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "tab_home" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Home" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ana Sayfa" } }
+      }
+    },
+    "tab_milestones" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Growth" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelişim" } }
+      }
+    },
+    "tab_tracking" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Track" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Takip" } }
+      }
+    },
+    "tab_vaccines" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Vaccines" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aşılar" } }
+      }
+    },
+    "tab_allergy" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Foods" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Besinler" } }
+      }
+    },
+    "onboarding_welcome_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Welcome to Kinna" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kinna'ya Hoş Geldiniz" } }
+      }
+    },
+    "onboarding_welcome_subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your daily parenting companion" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Günlük ebeveynlik rehberiniz" } }
+      }
+    },
+    "onboarding_features_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Track & Learn" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Takip Et ve Öğren" } }
+      }
+    },
+    "onboarding_features_subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Development milestones, vaccinations, daily tracking — all in one place" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelişim aşamaları, aşılar, günlük takip — hepsi tek yerde" } }
+      }
+    },
+    "onboarding_science_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Science-Backed" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bilime Dayalı" } }
+      }
+    },
+    "onboarding_science_subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Based on WHO guidelines and Ministry of Health protocols" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "WHO rehberleri ve Sağlık Bakanlığı protokollerine dayalı" } }
+      }
+    },
+    "onboarding_privacy_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your Data Stays Yours" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Verileriniz Sizde Kalır" } }
+      }
+    },
+    "onboarding_privacy_subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All data is stored on your device. We never collect your baby's information." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tüm veriler cihazınızda saklanır. Bebeğinizin bilgilerini asla toplamayız." } }
+      }
+    },
+    "onboarding_notif_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stay on Track" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Takipte Kalın" } }
+      }
+    },
+    "onboarding_notif_subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Get vaccine reminders and daily development tips" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aşı hatırlatmaları ve günlük gelişim ipuçları alın" } }
+      }
+    },
+    "onboarding_disclaimer_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Important Note" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Önemli Not" } }
+      }
+    },
+    "onboarding_disclaimer_body" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This app does not replace medical advice. Always consult your doctor for health concerns." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu uygulama doktor tavsiyesinin yerini tutmaz. Sağlık endişeleriniz için her zaman doktorunuza danışın." } }
+      }
+    },
+    "onboarding_get_started" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Get Started" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Başlayalım" } }
+      }
+    },
+    "onboarding_next" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Next" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İleri" } }
+      }
+    },
+    "home_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kinna" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kinna" } }
+      }
+    },
+    "home_add_baby" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add your baby's profile" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bebeğinizin profilini ekleyin" } }
+      }
+    },
+    "home_disclaimer" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This app does not replace medical advice. Consult your doctor for health concerns." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu uygulama doktor tavsiyesinin yerini tutmaz. Sağlık endişeleriniz için doktorunuza danışın." } }
+      }
+    },
+    "notif_daily_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Good morning!" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Günaydın!" } }
+      }
+    },
+    "notif_daily_body" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check today's tip for your baby's development." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bebeğinizin gelişimi için bugünün ipucuna göz atın." } }
+      }
+    },
+    "notif_vaccine_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Vaccine Reminder" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aşı Hatırlatma" } }
+      }
+    },
+    "settings_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ayarlar" } }
+      }
+    },
+    "settings_appearance" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Appearance" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Görünüm" } }
+      }
+    },
+    "settings_theme" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Theme" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Tema" } }
+      }
+    },
+    "settings_theme_system" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "System" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sistem" } }
+      }
+    },
+    "settings_theme_light" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Light" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Açık" } }
+      }
+    },
+    "settings_theme_dark" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Dark" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Koyu" } }
+      }
+    },
+    "settings_notifications" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notifications" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bildirimler" } }
+      }
+    },
+    "settings_daily_reminder" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Daily Reminder" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Günlük Hatırlatma" } }
+      }
+    },
+    "settings_subscription" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Subscription" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Abonelik" } }
+      }
+    },
+    "settings_pro_active" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kinna Pro Active" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kinna Pro Aktif" } }
+      }
+    },
+    "settings_upgrade" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Upgrade to Pro" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Pro'ya Yükselt" } }
+      }
+    },
+    "settings_about" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "About" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Hakkında" } }
+      }
+    },
+    "settings_version" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Version" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Sürüm" } }
+      }
+    },
+    "settings_disclaimer" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This app does not replace medical advice. Always consult your doctor for health concerns." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu uygulama doktor tavsiyesinin yerini tutmaz. Sağlık endişeleriniz için her zaman doktorunuza danışın." } }
+      }
+    },
+    "paywall_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlock Kinna Pro" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Kinna Pro'yu Aç" } }
+      }
+    },
+    "paywall_subtitle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Everything you need for your baby's journey" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bebeğinizin yolculuğu için ihtiyacınız olan her şey" } }
+      }
+    },
+    "paywall_subscribe" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start Free Trial" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ücretsiz Denemeyi Başlat" } }
+      }
+    },
+    "paywall_restore" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restore Purchases" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Satın Alımları Geri Yükle" } }
+      }
+    },
+    "milestones_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Milestones" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelişim Aşamaları" } }
+      }
+    },
+    "milestones_empty_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Milestones Yet" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Henüz Gelişim Aşaması Yok" } }
+      }
+    },
+    "milestones_empty_desc" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add your baby's profile to see development milestones." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Gelişim aşamalarını görmek için bebeğinizin profilini ekleyin." } }
+      }
+    },
+    "tracking_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Daily Tracking" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Günlük Takip" } }
+      }
+    },
+    "tracking_empty_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Logs Yet" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Henüz Kayıt Yok" } }
+      }
+    },
+    "tracking_empty_desc" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start tracking feeding, sleep, and diaper changes." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Beslenme, uyku ve bez değişimini takip etmeye başlayın." } }
+      }
+    },
+    "vaccination_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Vaccinations" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aşılar" } }
+      }
+    },
+    "vaccination_empty_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Vaccines Scheduled" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Henüz Aşı Planlanmadı" } }
+      }
+    },
+    "vaccination_empty_desc" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add your baby's profile to generate the vaccination schedule." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Aşı takvimini oluşturmak için bebeğinizin profilini ekleyin." } }
+      }
+    },
+    "allergy_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Food Diary" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Besin Günlüğü" } }
+      }
+    },
+    "allergy_empty_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Foods Logged" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Henüz Besin Kaydı Yok" } }
+      }
+    },
+    "allergy_empty_desc" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Track new foods your baby tries and any reactions." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bebeğinizin denediği yeni yiyecekleri ve reaksiyonları takip edin." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

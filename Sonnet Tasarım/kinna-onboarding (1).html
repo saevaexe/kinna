@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinna — Onboarding v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#FAF7F2;--blush:#F2E8DF;--warm:#FFFDF9;
+  --sage:#7A9E8E;--sage-d:#4A7A68;--sage-l:#B8D4C8;
+  --terra:#C4785A;--terra-l:#EDD5C5;--terra-p:#F7EDE6;
+  --char:#2C2C2C;--mid:#6B6560;--light:#A09890;--pale:#EDE8E2;
+}
+body{
+  background:#181512;font-family:'DM Sans',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 20px 60px;user-select:none;
+}
+.hdr{text-align:center;margin-bottom:20px}
+.hdr-logo{font-family:'Fraunces',serif;font-size:30px;font-weight:300;color:var(--cream);letter-spacing:-1px}
+.hdr-logo span{color:var(--terra)}
+.hdr-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3A3530;margin-top:4px}
+
+.phone{
+  width:340px;height:720px;background:#0F0D0B;border-radius:52px;padding:12px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 60px 120px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.1);
+  position:relative;
+}
+.pscreen{width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;background:var(--warm)}
+.di{width:100px;height:28px;background:#0F0D0B;border-radius:20px;position:absolute;top:22px;left:50%;transform:translateX(-50%);z-index:200}
+
+.scr{position:absolute;inset:0;display:none;flex-direction:column}
+.scr.active{display:flex;animation:fs .35s cubic-bezier(.25,.46,.45,.94) both}
+.scr.active.back{animation:fsb .35s cubic-bezier(.25,.46,.45,.94) both}
+@keyframes fs{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fsb{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+
+.nav-dots{display:flex;gap:6px;justify-content:center;margin-top:20px}
+.nd{height:6px;border-radius:3px;background:#2A2520;transition:all .3s;cursor:pointer;width:6px}
+.nd.active{background:var(--terra);width:22px}
+.nav-lbl{font-size:11px;color:#3A3530;margin-top:8px;text-align:center;letter-spacing:1.5px;text-transform:uppercase;min-height:16px}
+
+.safe{height:52px;flex-shrink:0}
+.prog{display:flex;gap:5px;margin-bottom:18px;padding:0 24px}
+.pw{flex:1;height:2px;border-radius:2px;background:var(--pale);transition:background .4s}
+.pw.done{background:var(--terra)}.pw.cur{background:rgba(196,120,90,.4)}
+.btn{width:100%;border-radius:16px;padding:15px;text-align:center;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;border:none;outline:none;display:block}
+.btn:hover{opacity:.88}
+.btn-dark{background:var(--char);color:white}
+.btn-terra{background:var(--terra);color:white;box-shadow:0 8px 28px rgba(196,120,90,.35)}
+.btn-ghost{background:transparent;color:var(--light);font-size:13px;padding:10px;cursor:pointer;width:100%;text-align:center;border:none;font-family:'DM Sans',sans-serif}
+.btn-ghost-d{background:transparent;color:rgba(255,255,255,.25);font-size:12px;padding:8px;cursor:pointer;width:100%;text-align:center;border:none;font-family:'DM Sans',sans-serif}
+
+/* ══════════════════════════════
+   S0 — SPLASH v3
+   Yeni: rakip acılarına dokunan satır + güven şeridi
+══════════════════════════════ */
+#s0{background:var(--blush);padding:0}
+.s0-photo{
+  position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=600&q=80');
+  background-size:cover;background-position:center 25%;
+  opacity:0.20;
+}
+.s0-fade{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(242,232,223,0) 15%,rgba(242,232,223,.65) 60%,rgba(242,232,223,1) 100%);
+}
+.s0-inner{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:52px 28px 28px}
+.s0-top{display:flex;align-items:center;gap:10px}
+.s0-icon{width:40px;height:40px;background:var(--terra);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 20px rgba(196,120,90,.4);position:relative}
+.s0-badge{position:absolute;bottom:-4px;right:-4px;width:18px;height:18px;background:var(--sage-d);border-radius:50%;border:2px solid var(--blush);display:flex;align-items:center;justify-content:center;font-size:9px}
+.s0-name{font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:var(--char);letter-spacing:-.5px;margin-left:10px}
+.s0-name span{color:var(--terra)}
+
+.s0-mid{margin-top:auto;margin-bottom:6px}
+.s0-headline{font-family:'Fraunces',serif;font-size:34px;font-weight:400;color:var(--char);line-height:1.1;letter-spacing:-1px;margin-bottom:10px}
+.s0-headline em{font-style:italic;color:var(--terra)}
+.s0-sub{font-size:13px;color:var(--mid);line-height:1.7;font-weight:300;margin-bottom:20px}
+
+/* YENİ — rakip acılarına dokunan güvence satırı */
+.s0-promise{
+  display:flex;gap:6px;align-items:flex-start;
+  background:rgba(44,44,44,.06);border-radius:12px;
+  padding:10px 12px;margin-bottom:18px;
+  border:1px solid rgba(196,120,90,.1);
+}
+.s0-promise-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.s0-promise-txt{font-size:11px;color:var(--mid);line-height:1.5}
+.s0-promise-txt strong{color:var(--char);font-weight:500}
+
+.s0-login{text-align:center;margin-top:8px;font-size:12px;color:var(--light)}
+.s0-login span{color:var(--mid);text-decoration:underline;text-underline-offset:2px}
+
+/* YENİ — güven şeridi */
+.trust-strip{
+  display:flex;justify-content:center;gap:14px;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid rgba(196,120,90,.12);
+}
+.ts-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--light)}
+.ts-dot{width:5px;height:5px;border-radius:50%;background:var(--sage);flex-shrink:0}
+
+/* ══════════════════════════════
+   S1 — ROL (değişmedi, güzel)
+══════════════════════════════ */
+.role-cards{display:flex;flex-direction:column;gap:10px;flex:1;justify-content:center}
+.role-card{background:white;border:1.5px solid var(--pale);border-radius:20px;padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:all .2s}
+.role-card:hover{border-color:var(--terra-l)}
+.role-card.sel{border-color:var(--terra);background:var(--terra-p)}
+.rc-ico{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.rc-body{flex:1}
+.rc-ttl{font-size:15px;font-weight:500;color:var(--char);margin-bottom:4px}
+.rc-feel{font-family:'Fraunces',serif;font-size:12px;font-style:italic;color:var(--terra);font-weight:300;margin-bottom:3px}
+.rc-dsc{font-size:11px;color:var(--light);line-height:1.4}
+.rc-chk{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--pale);background:white;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;flex-shrink:0;transition:all .2s;margin-top:2px}
+.role-card.sel .rc-chk{background:var(--terra);border-color:var(--terra)}
+
+/* ══════════════════════════════
+   S2 — BEBEK PROFİLİ
+   Yeni: "Bu bilgiler sadece sende kalır" güven notu
+══════════════════════════════ */
+.av-wrap{display:flex;justify-content:center;margin-bottom:16px}
+.baby-av{width:78px;height:78px;border-radius:26px;background:var(--blush);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;box-shadow:0 0 0 3px white,0 6px 24px rgba(0,0,0,.08)}
+.av-plus{position:absolute;bottom:-5px;right:-5px;width:24px;height:24px;background:var(--terra);border-radius:50%;border:2.5px solid var(--cream);display:flex;align-items:center;justify-content:center;color:white;font-size:14px}
+.field{margin-bottom:10px}
+.field-lbl{font-size:10px;color:var(--light);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-weight:500;padding-left:4px}
+.field-val{background:var(--terra-p);border:1.5px solid var(--terra);border-radius:13px;padding:11px 16px;font-size:15px;color:var(--char)}
+.date-row{display:flex;gap:8px;margin-bottom:10px}
+.dseg{flex:1;background:white;border:1.5px solid var(--pale);border-radius:13px;padding:9px;text-align:center}
+.ds-l{font-size:9px;color:var(--light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.ds-v{font-size:16px;color:var(--char);font-family:'Fraunces',serif;font-weight:400}
+.g-row{display:flex;gap:8px;margin-bottom:12px}
+.gb{flex:1;padding:9px 6px;border-radius:12px;text-align:center;font-size:12px;background:white;border:1.5px solid var(--pale);color:var(--mid);cursor:pointer;transition:all .2s}
+.gb.active{background:var(--terra-p);border-color:var(--terra);color:var(--terra);font-weight:500}
+
+/* YENİ — veri gizliliği güvence notu */
+.privacy-note{
+  display:flex;align-items:center;gap:8px;
+  background:var(--cream);border-radius:10px;
+  padding:8px 12px;margin-bottom:12px;
+  border:1px solid var(--pale);
+}
+.pn-icon{font-size:14px;flex-shrink:0}
+.pn-txt{font-size:11px;color:var(--mid);line-height:1.4}
+.pn-txt strong{color:var(--char);font-weight:500}
+
+.name-moment{
+  background:linear-gradient(135deg,var(--blush),var(--terra-p));
+  border-radius:18px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:14px;
+  border:1px solid rgba(196,120,90,.15);
+}
+.nm-emoji{font-size:26px;flex-shrink:0}
+.nm-title{font-family:'Fraunces',serif;font-size:16px;font-weight:400;color:var(--char);margin-bottom:3px}
+.nm-sub{font-size:12px;color:var(--mid);font-weight:300;line-height:1.5}
+
+/* ══════════════════════════════
+   S3 — 30 SANİYEDE DEĞER ANSI ★
+   Yeni ekran: isim girildikten HEMEN sonra
+   "Ela bu hafta şunları yapabilir" — WOW moment
+══════════════════════════════ */
+#s3{background:var(--cream);padding:0}
+.value-screen{
+  height:100%;display:flex;flex-direction:column;
+  padding:0 24px 28px;
+}
+.vs-safe{height:52px;flex-shrink:0}
+.vs-prog{display:flex;gap:5px;margin-bottom:16px}
+.vs-pw{flex:1;height:2px;border-radius:2px;background:var(--pale)}
+.vs-pw.d{background:var(--terra)}.vs-pw.c{background:rgba(196,120,90,.4)}
+
+/* bebek yaşı hero */
+.vs-age-card{
+  background:var(--char);border-radius:20px;padding:18px 20px;
+  margin-bottom:14px;position:relative;overflow:hidden;
+}
+.vs-age-card::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(196,120,90,.08);
+}
+.vs-age-card::after{
+  content:'';position:absolute;bottom:-40px;left:-20px;
+  width:100px;height:100px;border-radius:50%;
+  background:rgba(122,158,142,.06);
+}
+.vs-age-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px}
+.vs-age-name{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:white;margin-bottom:2px}
+.vs-age-value{font-size:13px;color:rgba(255,255,255,.45);margin-bottom:10px}
+.vs-age-bar{height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:4px}
+.vs-age-bar-fill{width:42%;height:100%;background:var(--terra);border-radius:2px}
+.vs-age-note{font-size:10px;color:rgba(255,255,255,.25)}
+
+/* bu hafta yapabilecekleri */
+.vs-section-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--terra);font-weight:500;margin-bottom:10px}
+.vs-items{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.vs-item{
+  background:white;border-radius:14px;padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+  border:1px solid var(--pale);
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+}
+.vs-item-ico{
+  width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  flex-shrink:0;
+}
+.vs-item-body{flex:1}
+.vs-item-title{font-size:13px;font-weight:500;color:var(--char);margin-bottom:2px}
+.vs-item-sub{font-size:11px;color:var(--mid);line-height:1.4}
+.vs-item-tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:5px;margin-top:4px}
+.tag-s{background:#EAF3EF;color:var(--sage-d)}
+.tag-m{background:var(--terra-p);color:var(--terra)}
+.tag-b{background:#EEE8F5;color:#6B5C8F}
+
+/* science badge */
+.vs-science{
+  display:flex;align-items:center;gap:8px;
+  background:var(--blush);border-radius:10px;padding:8px 12px;
+  margin-bottom:16px;border:1px solid rgba(196,120,90,.12);
+}
+.vs-science-ico{font-size:14px;flex-shrink:0}
+.vs-science-txt{font-size:11px;color:var(--mid);line-height:1.4}
+.vs-science-txt strong{color:var(--char);font-weight:500}
+
+/* ══════════════════════════════
+   S4 — BİLDİRİM (önceki S3)
+══════════════════════════════ */
+.notif-phone{background:var(--char);border-radius:20px;padding:14px;margin-bottom:12px}
+.np-island{width:56px;height:15px;background:#111;border-radius:10px;margin:0 auto 12px}
+.notif-bubble{background:white;border-radius:14px;padding:12px 14px}
+.nb-hdr{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.nb-ico{width:20px;height:20px;background:var(--terra);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:700}
+.nb-app{font-size:10px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:.5px}
+.nb-time{font-size:10px;color:var(--light);margin-left:auto}
+.nb-msg{font-size:12px;color:var(--char);line-height:1.5}
+.notif-examples{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.ne{background:white;border-radius:14px;padding:11px 13px;border:1px solid var(--pale);display:flex;gap:10px;align-items:flex-start}
+.ne-ico{font-size:18px;flex-shrink:0}
+.ne-ttl{font-size:12px;font-weight:500;color:var(--char);margin-bottom:2px}
+.ne-dsc{font-size:11px;color:var(--mid);line-height:1.4;font-style:italic}
+
+/* ══════════════════════════════
+   S5 — HAZIR (önceki S4)
+══════════════════════════════ */
+#s5{background:var(--blush);padding:0}
+.s5-photo{
+  position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&q=80');
+  background-size:cover;background-position:center 15%;
+  opacity:0.15;
+}
+.s5-fade{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(242,232,223,0) 10%,rgba(242,232,223,.8) 60%,rgba(242,232,223,1) 100%);
+}
+.s5-inner{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:52px 28px 36px;align-items:center;text-align:center}
+.s5-top{margin-bottom:auto}
+.s5-icon{width:68px;height:68px;background:var(--terra);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 0;box-shadow:0 16px 48px rgba(196,120,90,.45);position:relative}
+.s5-spark{position:absolute;top:-8px;right:-8px;font-size:18px}
+.s5-bottom{width:100%}
+.s5-eyebrow{font-size:10px;color:var(--terra);letter-spacing:2px;text-transform:uppercase;font-weight:500;margin-bottom:10px}
+.s5-headline{font-family:'Fraunces',serif;font-size:28px;font-weight:400;color:var(--char);line-height:1.15;letter-spacing:-.5px;margin-bottom:8px}
+.s5-headline em{font-style:italic;color:var(--terra)}
+.s5-sub{font-size:13px;color:var(--mid);line-height:1.65;font-weight:300;margin-bottom:20px}
+.s5-summary{
+  background:white;border-radius:18px;padding:13px 15px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;text-align:left;
+  border:1px solid rgba(196,120,90,.15);
+  box-shadow:0 4px 16px rgba(0,0,0,.06);
+}
+.s5-av{width:42px;height:42px;border-radius:13px;background:var(--blush);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.s5-info-name{font-family:'Fraunces',serif;font-size:14px;color:var(--char);font-weight:400}
+.s5-info-age{font-size:11px;color:var(--light);margin-top:1px}
+.s5-info-role{font-size:10px;color:var(--terra);font-weight:500;margin-top:1px}
+
+/* YENİ — son güven şeridi */
+.s5-trust{
+  display:flex;justify-content:center;gap:16px;
+  margin-top:10px;
+}
+.s5t-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--light)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">Kinn<span>a</span></div>
+  <div class="hdr-sub">Onboarding · v3</div>
+</div>
+
+<div class="phone">
+  <div class="di"></div>
+  <div class="pscreen">
+
+    <!-- ══ S0: SPLASH ══ -->
+    <div class="scr active" id="s0">
+      <div class="s0-photo"></div>
+      <div class="s0-fade"></div>
+      <div class="s0-inner">
+        <div class="s0-top">
+          <div class="s0-icon">🤍<div class="s0-badge">✨</div></div>
+          <div class="s0-name">Kinn<span>a</span></div>
+        </div>
+        <div class="s0-mid">
+          <div class="s0-headline">
+            Bebek büyütmek<br>zor. Sen <em>yalnız</em><br>değilsin.
+          </div>
+          <div class="s0-sub">
+            Yanlış bilgiden değil, bilimden beslenen. Forum gürültüsü değil, sana özel rehberlik.
+          </div>
+          <!-- YENİ: rakip acısına dokunan güvence -->
+          <div class="s0-promise">
+            <div class="s0-promise-icon">🔒</div>
+            <div class="s0-promise-txt"><strong>Veriler sadece sende kalır.</strong> Hiçbir yere gönderilmez, satılmaz.</div>
+          </div>
+          <button class="btn btn-terra" onclick="goTo(1)">Başlayalım</button>
+          <div class="s0-login">Hesabın var mı? <span>Giriş yap</span></div>
+          <!-- YENİ: güven şeridi -->
+          <div class="trust-strip">
+            <div class="ts-item"><div class="ts-dot"></div>WHO onaylı</div>
+            <div class="ts-item"><div class="ts-dot"></div>T.C. Aşı takvimi</div>
+            <div class="ts-item"><div class="ts-dot"></div>Ücretsiz dene</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S1: ROL ══ -->
+    <div class="scr" id="s1" style="background:var(--cream);padding:0 24px 28px">
+      <div class="safe"></div>
+      <div class="prog"><div class="pw cur"></div><div class="pw"></div><div class="pw"></div><div class="pw"></div></div>
+      <div style="font-size:10px;color:var(--light);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Adım 1 / 4</div>
+      <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:400;color:var(--char);line-height:1.2;margin-bottom:6px">Bu yolculukta<br><em style="color:var(--terra)">kim olarak</em> geçiyorsun?</div>
+      <div style="font-size:13px;color:var(--mid);line-height:1.6;font-weight:300;margin-bottom:24px">Kinna sana özel bir deneyim hazırlasın.</div>
+
+      <div class="role-cards">
+        <div class="role-card sel" id="rc-anne" onclick="selectRole('anne')">
+          <div class="rc-ico" style="background:#F7EDE6">🤱</div>
+          <div class="rc-body">
+            <div class="rc-ttl">Annesiyim</div>
+            <div class="rc-feel">"Bugün ne kadar iyi gittiğini görmek istiyorum."</div>
+            <div class="rc-dsc">Motivasyon, aktiviteler ve günlük rehberlik</div>
+          </div>
+          <div class="rc-chk">✓</div>
+        </div>
+        <div class="role-card" id="rc-baba" onclick="selectRole('baba')">
+          <div class="rc-ico" style="background:#EAF3EF">👨‍👧</div>
+          <div class="rc-body">
+            <div class="rc-ttl">Babasıyım</div>
+            <div class="rc-feel">"Takip edip destek olmak istiyorum."</div>
+            <div class="rc-dsc">Sağlık verileri, paylaşım ve bilgi</div>
+          </div>
+          <div class="rc-chk"></div>
+        </div>
+        <div class="role-card" id="rc-diger" onclick="selectRole('diger')">
+          <div class="rc-ico" style="background:var(--pale)">🫶</div>
+          <div class="rc-body">
+            <div class="rc-ttl">Yakın biriyim</div>
+            <div class="rc-feel">"Ona destek olmak istiyorum."</div>
+            <div class="rc-dsc">Büyükanne, büyükbaba veya bakıcı</div>
+          </div>
+          <div class="rc-chk"></div>
+        </div>
+      </div>
+      <button class="btn btn-dark" style="margin-top:18px" onclick="goTo(2)">Devam</button>
+    </div>
+
+    <!-- ══ S2: BEBEK PROFİLİ ══ -->
+    <div class="scr" id="s2" style="background:var(--cream);padding:0 24px 28px;overflow-y:auto">
+      <div class="safe"></div>
+      <div class="prog"><div class="pw done"></div><div class="pw cur"></div><div class="pw"></div><div class="pw"></div></div>
+      <div style="font-size:10px;color:var(--light);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Adım 2 / 4</div>
+      <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:400;color:var(--char);line-height:1.2;margin-bottom:6px">Bebeğinin adı<br>ne? <em style="color:var(--terra)">Tanışalım.</em></div>
+
+      <!-- YENİ: gizlilik güvencesi hemen burada -->
+      <div class="privacy-note">
+        <div class="pn-icon">🔒</div>
+        <div class="pn-txt"><strong>Sadece senin cihazında.</strong> Bu bilgiler hiçbir sunucuya gönderilmez.</div>
+      </div>
+
+      <div class="av-wrap">
+        <div class="baby-av" style="position:relative">👶<div class="av-plus">+</div></div>
+      </div>
+
+      <div class="field">
+        <div class="field-lbl">Bebeğinin adı</div>
+        <div class="field-val">Ela</div>
+      </div>
+      <div style="font-size:10px;color:var(--light);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-weight:500;padding-left:4px">Doğum tarihi</div>
+      <div class="date-row">
+        <div class="dseg"><div class="ds-l">Gün</div><div class="ds-v">12</div></div>
+        <div class="dseg"><div class="ds-l">Ay</div><div class="ds-v">Oca</div></div>
+        <div class="dseg"><div class="ds-l">Yıl</div><div class="ds-v">2025</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--light);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-weight:500;padding-left:4px">Cinsiyet</div>
+      <div class="g-row">
+        <div class="gb active" id="g-kiz" onclick="selectGender('kiz')">Kız 👧</div>
+        <div class="gb" id="g-erkek" onclick="selectGender('erkek')">Erkek 👦</div>
+        <div class="gb" id="g-yok" onclick="selectGender('yok')">Belirtme</div>
+      </div>
+
+      <div class="name-moment">
+        <div class="nm-emoji">🌸</div>
+        <div>
+          <div class="nm-title">Merhaba, küçük Ela.</div>
+          <div class="nm-sub">Seninle birlikte büyümek çok güzel olacak.</div>
+        </div>
+      </div>
+
+      <button class="btn btn-terra" onclick="goTo(3)">Devam →</button>
+    </div>
+
+    <!-- ══ S3: 30 SANİYEDE DEĞER ANSI ★ YENİ EKRAN ══ -->
+    <div class="scr" id="s3">
+      <div class="value-screen">
+        <div class="vs-safe"></div>
+        <div class="vs-prog" style="padding:0">
+          <div class="vs-pw d"></div><div class="vs-pw d"></div><div class="vs-pw c"></div><div class="vs-pw"></div>
+        </div>
+        <div style="font-size:10px;color:var(--light);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px">Adım 3 / 4</div>
+
+        <!-- yaş hero -->
+        <div class="vs-age-card">
+          <div class="vs-age-label">Ela bugün</div>
+          <div class="vs-age-name">2 ay, 15 gün</div>
+          <div class="vs-age-value">75. gün · 2. ay 3. haftası</div>
+          <div class="vs-age-bar"><div class="vs-age-bar-fill"></div></div>
+          <div class="vs-age-note">2. ay %42 tamamlandı</div>
+        </div>
+
+        <!-- bu hafta yapabilecekleri -->
+        <div class="vs-section-label">Bu hafta Ela'da beklenebilir</div>
+        <div class="vs-items">
+          <div class="vs-item">
+            <div class="vs-item-ico" style="background:#EAF3EF">😊</div>
+            <div class="vs-item-body">
+              <div class="vs-item-title">İlk sosyal gülümseme</div>
+              <div class="vs-item-sub">Yüzüne baktığında gülümseyebilir.</div>
+              <div class="vs-item-tag tag-s">Sosyal</div>
+            </div>
+          </div>
+          <div class="vs-item">
+            <div class="vs-item-ico" style="background:var(--terra-p)">🗣️</div>
+            <div class="vs-item-body">
+              <div class="vs-item-title">Ağlama dışı sesler</div>
+              <div class="vs-item-sub">İlk "aguu" sesleri başlar.</div>
+              <div class="vs-item-tag tag-b">Dil</div>
+            </div>
+          </div>
+          <div class="vs-item">
+            <div class="vs-item-ico" style="background:#EEE8F5">🏋️</div>
+            <div class="vs-item-body">
+              <div class="vs-item-title">Başını 45° kaldırma</div>
+              <div class="vs-item-sub">Yüzüstü pozisyonda kısa süre taşıyabilir.</div>
+              <div class="vs-item-tag tag-m">Motor</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- bilim rozeti -->
+        <div class="vs-science">
+          <div class="vs-science-ico">🔬</div>
+          <div class="vs-science-txt"><strong>WHO & Harvard kaynaklı.</strong> Her bilgi bilimsel literatüre dayanıyor.</div>
+        </div>
+
+        <button class="btn btn-terra" onclick="goTo(4)">Harika, devam et →</button>
+      </div>
+    </div>
+
+    <!-- ══ S4: BİLDİRİM ══ -->
+    <div class="scr" id="s4" style="background:var(--cream);padding:0 24px 28px">
+      <div class="safe"></div>
+      <div class="prog"><div class="pw done"></div><div class="pw done"></div><div class="pw done"></div><div class="pw cur"></div></div>
+      <div style="font-size:10px;color:var(--light);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Adım 4 / 4</div>
+      <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:400;color:var(--char);line-height:1.2;margin-bottom:6px">Seni hiç<br><em style="color:var(--terra)">yalnız bırakmayalım.</em></div>
+      <div style="font-size:13px;color:var(--mid);line-height:1.6;font-weight:300;margin-bottom:18px">Sabah uyandığında seni bekleyen küçük bir not olsun.</div>
+
+      <div class="notif-phone">
+        <div class="np-island"></div>
+        <div class="notif-bubble">
+          <div class="nb-hdr">
+            <div class="nb-ico">K</div>
+            <div class="nb-app">Kinna</div>
+            <div class="nb-time">şimdi</div>
+          </div>
+          <div class="nb-msg"><strong>Ela bugün 2 aylık. 🎉</strong><br>Bu hafta ilk sosyal gülümsemesini görebilirsin.</div>
+        </div>
+      </div>
+
+      <div class="notif-examples">
+        <div class="ne">
+          <div class="ne-ico">💛</div>
+          <div>
+            <div class="ne-ttl">Her sabah bir motivasyon</div>
+            <div class="ne-dsc">"Sen iyi bir annesin. Mükemmel olmak zorunda değilsin."</div>
+          </div>
+        </div>
+        <div class="ne">
+          <div class="ne-ico">💉</div>
+          <div>
+            <div class="ne-ttl">Aşı hatırlatması</div>
+            <div class="ne-dsc">"Beşli Aşı için 5 gün kaldı. Randevu almayı unutma."</div>
+          </div>
+        </div>
+        <div class="ne">
+          <div class="ne-ico">🧠</div>
+          <div>
+            <div class="ne-ttl">Günlük aktivite önerisi</div>
+            <div class="ne-dsc">"Bugün Ela'ya siyah-beyaz kartlar göster."</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-terra" onclick="goTo(5)">İzin ver</button>
+      <button class="btn-ghost" onclick="goTo(5)">Şimdi değil</button>
+    </div>
+
+    <!-- ══ S5: HAZIR ══ -->
+    <div class="scr" id="s5">
+      <div class="s5-photo"></div>
+      <div class="s5-fade"></div>
+      <div class="s5-inner">
+        <div class="s5-top">
+          <div style="position:relative;width:68px;margin:0 auto">
+            <div class="s5-icon">🤍<div class="s5-spark">✨</div></div>
+          </div>
+        </div>
+        <div class="s5-bottom">
+          <div class="s5-eyebrow">Her şey hazır</div>
+          <div class="s5-headline">
+            Hoş geldin,<br><em>Ela'nın annesi.</em>
+          </div>
+          <div class="s5-sub">
+            Bugünden itibaren her sabah seni bekleyen bir rehber var. Yalnız değilsin.
+          </div>
+          <div class="s5-summary">
+            <div class="s5-av">👶</div>
+            <div>
+              <div class="s5-info-name">Ela · 2 ay 15 gün</div>
+              <div class="s5-info-age">12 Ocak 2025 doğumlu</div>
+              <div class="s5-info-role">🤱 Anne olarak takip ediyorsun</div>
+            </div>
+          </div>
+          <button class="btn btn-terra" onclick="goTo(0)">Kinna'ya git →</button>
+          <!-- YENİ: son güven şeridi -->
+          <div class="s5-trust">
+            <div class="s5t-item">🔒 Veriler sende</div>
+            <div class="s5t-item">🔬 Bilimsel</div>
+            <div class="s5t-item">💛 3 gün ücretsiz</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="nav-dots" id="dots"></div>
+<div class="nav-lbl" id="lbl"></div>
+
+<script>
+const LABELS=['Karşılama','Rol Seçimi','Bebek Profili','İlk Bakış ★','Bildirim','Hazır'];
+let cur=0;
+const dotsEl=document.getElementById('dots');
+LABELS.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='nd'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+});
+document.getElementById('lbl').textContent=LABELS[0];
+
+function goTo(n){
+  if(n===cur)return;
+  const back=n<cur;
+  document.getElementById('s'+cur).classList.remove('active','back');
+  cur=n;
+  const next=document.getElementById('s'+cur);
+  next.classList.remove('back');
+  if(back)next.classList.add('back');
+  next.classList.add('active');
+  document.querySelectorAll('.nd').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('lbl').textContent=LABELS[n];
+}
+function selectRole(r){
+  ['anne','baba','diger'].forEach(id=>{
+    const c=document.getElementById('rc-'+id);
+    const ch=c.querySelector('.rc-chk');
+    if(id===r){c.classList.add('sel');ch.textContent='✓';}
+    else{c.classList.remove('sel');ch.textContent='';}
+  });
+}
+function selectGender(g){
+  ['kiz','erkek','yok'].forEach(id=>
+    document.getElementById('g-'+id).classList.toggle('active',id===g));
+}
+</script>
+</body>
+</html>

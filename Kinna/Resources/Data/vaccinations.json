@@ -1,0 +1,42 @@
+[
+  {
+    "id": "hepb_1",
+    "nameTR": "Hepatit B (1. doz)",
+    "nameEN": "Hepatitis B (1st dose)",
+    "monthAge": 0,
+    "descriptionTR": "Doğumda yapılır.",
+    "descriptionEN": "Given at birth."
+  },
+  {
+    "id": "bcg_1",
+    "nameTR": "BCG (Tüberküloz)",
+    "nameEN": "BCG (Tuberculosis)",
+    "monthAge": 2,
+    "descriptionTR": "2. ayın sonunda yapılır.",
+    "descriptionEN": "Given at end of 2nd month."
+  },
+  {
+    "id": "dtap_1",
+    "nameTR": "DTaP-IPV-Hib (1. doz)",
+    "nameEN": "DTaP-IPV-Hib (1st dose)",
+    "monthAge": 2,
+    "descriptionTR": "Difteri, Boğmaca, Tetanoz, Polio, Hemofilus İnfluenza tip B — 1. doz.",
+    "descriptionEN": "Diphtheria, Pertussis, Tetanus, Polio, Haemophilus Influenzae type B — 1st dose."
+  },
+  {
+    "id": "hepb_2",
+    "nameTR": "Hepatit B (2. doz)",
+    "nameEN": "Hepatitis B (2nd dose)",
+    "monthAge": 1,
+    "descriptionTR": "1. ayın sonunda yapılır.",
+    "descriptionEN": "Given at end of 1st month."
+  },
+  {
+    "id": "dtap_2",
+    "nameTR": "DTaP-IPV-Hib (2. doz)",
+    "nameEN": "DTaP-IPV-Hib (2nd dose)",
+    "monthAge": 4,
+    "descriptionTR": "Difteri, Boğmaca, Tetanoz, Polio, Hemofilus İnfluenza tip B — 2. doz.",
+    "descriptionEN": "Diphtheria, Pertussis, Tetanus, Polio, Haemophilus Influenzae type B — 2nd dose."
+  }
+]
