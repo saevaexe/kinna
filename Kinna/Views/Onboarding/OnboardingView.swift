@@ -531,7 +531,7 @@ struct OnboardingView: View {
                     icon: "📋",
                     title: isEN ? "Vaccine schedule is estimated" : "Aşı takvimi tahminidir",
                     body: isEN
-                        ? "Vaccination dates are approximate based on your baby's birth date. Confirm exact dates with your family physician."
+                        ? "The vaccination schedule follows the Turkey National Immunization Program. Dates are approximate. Always confirm with your pediatrician."
                         : "Aşı tarihleri bebeğinin doğum tarihine göre tahminidir. Kesin tarihler için aile hekimine danış."
                 )
 
@@ -539,7 +539,7 @@ struct OnboardingView: View {
                     icon: "📚",
                     title: isEN ? "Science-based content" : "Bilimsel temelli içerik",
                     body: isEN
-                        ? "Our content is based on WHO guidelines and Republic of Turkey Ministry of Health protocols."
+                        ? "Our content is based on WHO guidelines. The vaccination schedule follows the Republic of Turkey Ministry of Health immunization program."
                         : "İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır."
                 )
             }

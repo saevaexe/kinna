@@ -49,7 +49,7 @@ struct LegalDisclaimerView: View {
                     number: "3",
                     title: isEN ? "Vaccination Schedule Disclaimer" : "Aşı Takvimi Sorumluluk Reddi",
                     body: isEN
-                        ? "The vaccination schedule provided in Kinna is based on the Republic of Turkey Ministry of Health Childhood Vaccination Program and is calculated approximately based on your baby's date of birth. These dates are estimates only.\n\nActual vaccination dates may vary. Always confirm your child's vaccination schedule with your family physician or pediatrician."
+                        ? "The vaccination schedule provided in Kinna follows the Republic of Turkey Ministry of Health Childhood Immunization Program and is calculated approximately based on your baby's date of birth. These dates are estimates only and may not apply to other countries' immunization programs.\n\nActual vaccination dates may vary. Always confirm your child's vaccination schedule with your pediatrician."
                         : "Kinna'da sunulan aşı takvimi, T.C. Sağlık Bakanlığı Çocukluk Çağı Aşı Programı temel alınarak bebeğinizin doğum tarihine göre yaklaşık olarak hesaplanmaktadır. Bu tarihler yalnızca tahminidir.\n\nGerçek aşı tarihleri farklılık gösterebilir. Çocuğunuzun aşı takvimini her zaman aile hekiminiz veya çocuk doktorunuzla teyit edin."
                 )
 
@@ -58,7 +58,7 @@ struct LegalDisclaimerView: View {
                     number: "4",
                     title: isEN ? "Content Sources" : "İçerik Kaynakları",
                     body: isEN
-                        ? "Our content is prepared based on World Health Organization (WHO) guidelines and Republic of Turkey Ministry of Health protocols. While we strive to keep information accurate and up-to-date, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or suitability of the information."
+                        ? "Our developmental content is prepared based on World Health Organization (WHO) guidelines. The vaccination schedule follows the Republic of Turkey Ministry of Health immunization program and may differ from schedules in other countries.\n\nWhile we strive to keep information accurate and up-to-date, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or suitability of the information."
                         : "İçeriklerimiz Dünya Sağlık Örgütü (WHO) rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır. Bilgilerin doğru ve güncel olması için çaba göstersek de bilgilerin eksiksizliği, doğruluğu, güvenilirliği veya uygunluğu hakkında açık veya zımni hiçbir garanti vermemekteyiz."
                 )
 

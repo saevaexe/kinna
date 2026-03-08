@@ -30,7 +30,7 @@ struct VaccinationView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(isEN ? "MINISTRY OF HEALTH PROTOCOL" : "T.C. SAĞLIK BAKANLIĞI PROTOKOLÜ")
+                    Text(isEN ? "TURKEY IMMUNIZATION PROGRAM" : "T.C. SAĞLIK BAKANLIĞI PROTOKOLÜ")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .tracking(1.5)
@@ -96,7 +96,7 @@ struct VaccinationView: View {
                     Text("⚕️")
                         .font(.system(size: 12))
                     Text(isEN
-                        ? "Dates are approximate. Always confirm with your family physician."
+                        ? "Based on Turkey's immunization program. Dates are approximate. Always confirm with your pediatrician."
                         : "Tarihler tahminidir. Her zaman aile hekiminizle teyit edin.")
                         .font(.kinnaBody(10))
                         .foregroundStyle(.kMid)

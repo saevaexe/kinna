@@ -10,6 +10,8 @@ struct SettingsView: View {
 
     private var baby: Baby? { babies.first }
 
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -161,7 +163,9 @@ struct SettingsView: View {
                 }
 
                 // WHO reference
-                Text(String(localized: "settings_who_ref", defaultValue: "Our content is based on WHO guidelines and Republic of Turkey Ministry of Health protocols."))
+                Text(isEN
+                    ? "Content based on WHO guidelines. Vaccination schedule follows the Turkey immunization program."
+                    : "İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.")
                     .font(.kinnaBody(9))
                     .foregroundStyle(.kMuted)
                     .lineSpacing(2)
