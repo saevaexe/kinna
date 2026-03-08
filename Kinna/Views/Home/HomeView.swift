@@ -4,13 +4,17 @@ import SwiftData
 struct HomeView: View {
     @State private var selectedTab = 0
 
-    private let tabs: [(emoji: String, label: String)] = [
-        ("🏠", "Ana"),
-        ("📈", "Gelişim"),
-        ("📝", "Takip"),
-        ("💉", "Aşılar"),
-        ("🥄", "Besinler"),
-    ]
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
+    private var tabs: [(emoji: String, label: String)] {
+        [
+            ("🏠", isEN ? "Home" : "Ana"),
+            ("📈", isEN ? "Growth" : "Gelişim"),
+            ("📝", isEN ? "Track" : "Takip"),
+            ("💉", isEN ? "Vaccines" : "Aşılar"),
+            ("🥄", isEN ? "Foods" : "Besinler"),
+        ]
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -81,11 +85,23 @@ struct HomeDashboardView: View {
 
     private var baby: Baby? { babies.first }
 
-    private let motivationQuotes = [
-        "Her gün bebeğinle kurduğun bağ, onun beyin mimarisini şekillendiriyor.",
-        "Bugün gösterdiğin sabır, yarının güçlü nöral devrelerini kuruyor.",
-        "Küçük anlar, büyük bağlanma kalıpları oluşturur.",
-    ]
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
+    private var motivationQuotes: [String] {
+        if isEN {
+            return [
+                "\u{201C}Every bond you build with your baby shapes their brain architecture.\u{201D}",
+                "\u{201C}The patience you show today builds tomorrow\u{2019}s strong neural circuits.\u{201D}",
+                "\u{201C}Small moments create lasting attachment patterns.\u{201D}",
+            ]
+        } else {
+            return [
+                "\u{201C}Her gün bebeğinle kurduğun bağ, onun beyin mimarisini şekillendiriyor.\u{201D}",
+                "\u{201C}Bugün gösterdiğin sabır, yarının güçlü nöral devrelerini kuruyor.\u{201D}",
+                "\u{201C}Küçük anlar, büyük bağlanma kalıpları oluşturur.\u{201D}",
+            ]
+        }
+    }
 
     var body: some View {
         ScrollView {
@@ -98,7 +114,7 @@ struct HomeDashboardView: View {
                             .foregroundStyle(.kLight)
                             .tracking(1)
 
-                        Text("\(baby.name)'ın annesi 👋")
+                        Text(isEN ? "\(baby.name)'s parent 👋" : "\(baby.name)'ın annesi 👋")
                             .font(.kinnaDisplay(26))
                             .foregroundStyle(.kChar)
                     }
@@ -115,12 +131,12 @@ struct HomeDashboardView: View {
 
                     // Section header
                     HStack {
-                        Text("Bu ay için")
+                        Text(isEN ? "This month" : "Bu ay için")
                             .font(.kinnaBodyMedium(13))
                             .foregroundStyle(.kChar)
                             .tracking(0.3)
                         Spacer()
-                        Text("Tümü →")
+                        Text(isEN ? "All →" : "Tümü →")
                             .font(.kinnaBodyMedium(11))
                             .foregroundStyle(.kSage)
                     }
@@ -130,7 +146,9 @@ struct HomeDashboardView: View {
                     dailyCards(baby: baby)
 
                     // WHO reference
-                    Text("İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.")
+                    Text(isEN
+                         ? "Our content is based on WHO guidelines and Republic of Turkey Ministry of Health protocols."
+                         : "İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .lineSpacing(2)
@@ -143,7 +161,7 @@ struct HomeDashboardView: View {
                         Image(systemName: "person.badge.plus")
                             .font(.system(size: 40))
                             .foregroundStyle(.kTerra)
-                        Text("Bebek profili eklenmemiş")
+                        Text(isEN ? "No baby profile added" : "Bebek profili eklenmemiş")
                             .font(.kinnaBodyMedium(15))
                     }
                     .frame(maxWidth: .infinity)
@@ -172,11 +190,20 @@ struct HomeDashboardView: View {
 
     private var greetingText: String {
         let hour = Calendar.current.component(.hour, from: .now)
-        switch hour {
-        case 6..<12: return "Günaydın"
-        case 12..<18: return "İyi günler"
-        case 18..<22: return "İyi akşamlar"
-        default: return "İyi Geceler"
+        if isEN {
+            switch hour {
+            case 6..<12: return "Good Morning"
+            case 12..<18: return "Good Afternoon"
+            case 18..<22: return "Good Evening"
+            default: return "Good Night"
+            }
+        } else {
+            switch hour {
+            case 6..<12: return "Günaydın"
+            case 12..<18: return "İyi günler"
+            case 18..<22: return "İyi akşamlar"
+            default: return "İyi Geceler"
+            }
         }
     }
 
@@ -200,7 +227,9 @@ struct HomeDashboardView: View {
                     .font(.kinnaDisplay(36, weight: .light))
                     .foregroundStyle(.white)
 
-                Text("\(baby.ageInDays) gündür hayatınızda")
+                Text(isEN
+                     ? "\(baby.ageInDays) days in your life"
+                     : "\(baby.ageInDays) gündür hayatınızda")
                     .font(.kinnaBody(12))
                     .foregroundStyle(.white.opacity(0.4))
 
@@ -236,12 +265,11 @@ struct HomeDashboardView: View {
     private var motivationCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(motivationQuotes.randomElement() ?? motivationQuotes[0])
-                .font(.kinnaDisplay(15, weight: .light))
-                .italic()
+                .font(.kinnaDisplayItalic(14, weight: .light))
                 .foregroundStyle(.white)
-                .lineSpacing(4)
+                .lineSpacing(5)
 
-            Text("GÜNLÜK KINNA NOTU")
+            Text(isEN ? "DAILY KINNA NOTE" : "GÜNLÜK KINNA NOTU")
                 .font(.kinnaBody(10))
                 .foregroundStyle(.white.opacity(0.6))
                 .tracking(1)
@@ -261,7 +289,16 @@ struct HomeDashboardView: View {
     // MARK: - Daily Cards
 
     private func dailyCards(baby: Baby) -> some View {
-        let items: [(emoji: String, bg: Color, title: String, desc: String)] = [
+        let items: [(emoji: String, bg: Color, title: String, desc: String)] = isEN
+        ? [
+            ("🧠", Color(hex: 0xEAF3EF), "Month \(baby.ageInMonths) cognitive development",
+             "Tracking objects and orienting to sounds is developing."),
+            ("⚠️", .kTerraLight, "Vaccine reminder",
+             "Don\u{2019}t forget to check upcoming vaccinations."),
+            ("📖", .kPale, "Tip of the day",
+             "Talking to your baby with eye contact strengthens attachment."),
+        ]
+        : [
             ("🧠", Color(hex: 0xEAF3EF), "\(baby.ageInMonths). ay bilişsel gelişim",
              "Nesneleri takip etme ve seslere yönelme becerisi gelişiyor."),
             ("⚠️", .kTerraLight, "Aşı hatırlatması",

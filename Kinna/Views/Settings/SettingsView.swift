@@ -1,61 +1,232 @@
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @AppStorage("preferredTheme") private var preferredTheme = 0
     @AppStorage("notificationEnabled") private var notificationEnabled = true
-    @AppStorage("notificationHour") private var notificationHour = 9
-    @AppStorage("notificationMinute") private var notificationMinute = 0
+    @AppStorage("parentName") private var parentName = ""
+    @Query private var babies: [Baby]
     @Environment(SubscriptionManager.self) private var subscriptionManager
 
-    var body: some View {
-        List {
-            Section(String(localized: "settings_appearance", defaultValue: "Appearance")) {
-                Picker(String(localized: "settings_theme", defaultValue: "Theme"), selection: $preferredTheme) {
-                    Text(String(localized: "settings_theme_system", defaultValue: "System")).tag(0)
-                    Text(String(localized: "settings_theme_light", defaultValue: "Light")).tag(1)
-                    Text(String(localized: "settings_theme_dark", defaultValue: "Dark")).tag(2)
-                }
-            }
+    private var baby: Baby? { babies.first }
 
-            Section(String(localized: "settings_notifications", defaultValue: "Notifications")) {
-                Toggle(String(localized: "settings_daily_reminder", defaultValue: "Daily Reminder"), isOn: $notificationEnabled)
-                    .onChange(of: notificationEnabled) { _, newValue in
-                        if newValue {
-                            NotificationManager.shared.scheduleDailyReminder(hour: notificationHour, minute: notificationMinute)
-                        } else {
-                            NotificationManager.shared.cancelDailyReminder()
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                // Header
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(localized: "settings_eyebrow", defaultValue: "ACCOUNT & PREFERENCES"))
+                        .font(.kinnaBody(9))
+                        .foregroundStyle(.kMuted)
+                        .tracking(1.5)
+
+                    Text(String(localized: "settings_title", defaultValue: "Settings"))
+                        .font(.kinnaDisplayItalic(26))
+                        .foregroundStyle(.kChar)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 12)
+                .padding(.bottom, 20)
+
+                // Baby profile card
+                if let baby {
+                    profileCard(baby)
+                        .padding(.bottom, 16)
+                }
+
+                // Appearance
+                settingsSection(String(localized: "settings_appearance", defaultValue: "Appearance")) {
+                    settingsRow(icon: "paintpalette.fill", title: String(localized: "settings_theme", defaultValue: "Theme")) {
+                        Picker("", selection: $preferredTheme) {
+                            Text(String(localized: "settings_theme_system", defaultValue: "System")).tag(0)
+                            Text(String(localized: "settings_theme_light", defaultValue: "Light")).tag(1)
+                            Text(String(localized: "settings_theme_dark", defaultValue: "Dark")).tag(2)
+                        }
+                        .tint(.kMid)
+                    }
+                }
+                .padding(.bottom, 10)
+
+                // Notifications
+                settingsSection(String(localized: "settings_notifications", defaultValue: "Notifications")) {
+                    settingsRow(icon: "bell.fill", title: String(localized: "settings_daily_reminder", defaultValue: "Daily Reminder")) {
+                        Toggle("", isOn: $notificationEnabled)
+                            .tint(.kSage)
+                            .onChange(of: notificationEnabled) { _, newValue in
+                                if newValue {
+                                    NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
+                                } else {
+                                    NotificationManager.shared.cancelDailyReminder()
+                                }
+                            }
+                    }
+                }
+                .padding(.bottom, 10)
+
+                // Subscription
+                settingsSection(String(localized: "settings_subscription", defaultValue: "Subscription")) {
+                    if subscriptionManager.hasFullAccess {
+                        HStack(spacing: 12) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(.kSageDark)
+
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("Kinna Pro")
+                                    .font(.kinnaBodyMedium(13))
+                                    .foregroundStyle(.kChar)
+                                Text(String(localized: "settings_pro_active_label", defaultValue: "Active"))
+                                    .font(.kinnaBody(11))
+                                    .foregroundStyle(.kSageDark)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    } else {
+                        NavigationLink {
+                            PaywallView()
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundStyle(.kTerra)
+
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(String(localized: "settings_upgrade", defaultValue: "Upgrade to Pro"))
+                                        .font(.kinnaBodyMedium(13))
+                                        .foregroundStyle(.kTerra)
+                                    Text(String(localized: "settings_upgrade_sub", defaultValue: "Access all features"))
+                                        .font(.kinnaBody(11))
+                                        .foregroundStyle(.kMid)
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(.kLight)
+                            }
                         }
                     }
-            }
+                }
+                .padding(.bottom, 10)
 
-            Section(String(localized: "settings_subscription", defaultValue: "Subscription")) {
-                if subscriptionManager.hasFullAccess {
-                    Label(String(localized: "settings_pro_active", defaultValue: "Kinna Pro Active"), systemImage: "checkmark.seal.fill")
-                        .foregroundStyle(.kSage)
-                } else {
-                    NavigationLink {
-                        PaywallView()
-                    } label: {
-                        Label(String(localized: "settings_upgrade", defaultValue: "Upgrade to Pro"), systemImage: "star.fill")
-                            .foregroundStyle(.kTerra)
+                // About
+                settingsSection(String(localized: "settings_about", defaultValue: "About")) {
+                    VStack(spacing: 0) {
+                        HStack {
+                            Text(String(localized: "settings_version", defaultValue: "Version"))
+                                .font(.kinnaBody(13))
+                                .foregroundStyle(.kChar)
+                            Spacer()
+                            Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
+                                .font(.kinnaBody(13))
+                                .foregroundStyle(.kLight)
+                        }
+                        .padding(.bottom, 12)
+
+                        Rectangle()
+                            .fill(Color.kPale)
+                            .frame(height: 1)
+                            .padding(.bottom, 12)
+
+                        Text(String(localized: "settings_disclaimer", defaultValue: "This app does not replace medical advice. Always consult your doctor for health concerns."))
+                            .font(.kinnaBody(11))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
                     }
                 }
-            }
 
-            Section(String(localized: "settings_about", defaultValue: "About")) {
-                HStack {
-                    Text(String(localized: "settings_version", defaultValue: "Version"))
-                    Spacer()
-                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
-                        .foregroundStyle(.secondary)
+                // WHO reference
+                Text(String(localized: "settings_who_ref", defaultValue: "Our content is based on WHO guidelines and Republic of Turkey Ministry of Health protocols."))
+                    .font(.kinnaBody(9))
+                    .foregroundStyle(.kMuted)
+                    .lineSpacing(2)
+                    .padding(.top, 12)
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 20)
+        }
+        .background(Color.kCream.ignoresSafeArea())
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: - Profile Card
+
+    private func profileCard(_ baby: Baby) -> some View {
+        HStack(spacing: 14) {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.kTerraLight.opacity(0.4), Color.kPale.opacity(0.5)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 48, height: 48)
+                .overlay {
+                    Text(baby.gender == .female ? "👧" : baby.gender == .male ? "👦" : "👶")
+                        .font(.system(size: 22))
                 }
 
-                Text(String(localized: "settings_disclaimer", defaultValue: "This app does not replace medical advice. Always consult your doctor for health concerns."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(baby.name)
+                    .font(.kinnaBodyMedium(15))
+                    .foregroundStyle(.kChar)
+                Text(baby.ageDescription)
+                    .font(.kinnaBody(12))
+                    .foregroundStyle(.kMid)
             }
+
+            Spacer()
         }
-        .navigationTitle(String(localized: "settings_title", defaultValue: "Settings"))
+        .padding(16)
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.kPale, lineWidth: 1)
+        )
+    }
+
+    // MARK: - Section
+
+    private func settingsSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title.uppercased())
+                .font(.kinnaBodyMedium(10))
+                .foregroundStyle(.kLight)
+                .tracking(1.5)
+
+            VStack {
+                content()
+            }
+            .padding(16)
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.kPale, lineWidth: 1)
+            )
+        }
+    }
+
+    // MARK: - Row
+
+    private func settingsRow<Trailing: View>(icon: String, title: String, @ViewBuilder trailing: () -> Trailing) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(.kMid)
+                .frame(width: 20)
+
+            Text(title)
+                .font(.kinnaBody(13))
+                .foregroundStyle(.kChar)
+
+            Spacer()
+
+            trailing()
+        }
     }
 }
 
@@ -64,4 +235,5 @@ struct SettingsView: View {
         SettingsView()
     }
     .environment(SubscriptionManager.shared)
+    .modelContainer(for: [Baby.self], inMemory: true)
 }

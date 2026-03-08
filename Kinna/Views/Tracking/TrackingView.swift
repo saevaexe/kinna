@@ -8,6 +8,8 @@ struct TrackingView: View {
     @State private var showAddSheet = false
     @State private var preselectedType: DailyLog.LogType = .feeding
 
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
     private var baby: Baby? { babies.first }
 
     private var todayLogs: [DailyLog] {
@@ -41,12 +43,12 @@ struct TrackingView: View {
                         .tracking(1.5)
                         .textCase(.uppercase)
 
-                    Text("Bugün")
+                    Text(isEN ? "Today" : "Bugün")
                         .font(.kinnaDisplayItalic(26))
                         .foregroundStyle(.kChar)
 
                     if let baby {
-                        Text("\(baby.name)'nın \(baby.ageInDays). günü")
+                        Text(isEN ? "\(baby.name)'s day \(baby.ageInDays)" : "\(baby.name)'nın \(baby.ageInDays). günü")
                             .font(.kinnaBody(10))
                             .foregroundStyle(.kMuted)
                     }
@@ -61,22 +63,22 @@ struct TrackingView: View {
                     GridItem(.flexible(), spacing: 10),
                 ], spacing: 10) {
                     trackingTile(
-                        emoji: "🍼", label: "EMZİRME",
-                        value: "\(feedingCount)", unit: "kez",
+                        emoji: "🍼", label: isEN ? "FEEDING" : "EMZİRME",
+                        value: "\(feedingCount)", unit: isEN ? "times" : "kez",
                         barColor: .kSage, barProgress: min(CGFloat(feedingCount) / 8.0, 1.0)
                     )
                     trackingTile(
-                        emoji: "😴", label: "UYKU",
-                        value: String(format: "%.1f", sleepHours), unit: "saat",
+                        emoji: "😴", label: isEN ? "SLEEP" : "UYKU",
+                        value: String(format: "%.1f", sleepHours), unit: isEN ? "hours" : "saat",
                         barColor: Color(hex: 0x8BA7C7), barProgress: min(sleepHours / 14.0, 1.0)
                     )
                     trackingTile(
-                        emoji: "🧷", label: "BEZ",
-                        value: "\(diaperCount)", unit: "kez",
+                        emoji: "🧷", label: isEN ? "DIAPER" : "BEZ",
+                        value: "\(diaperCount)", unit: isEN ? "times" : "kez",
                         barColor: .kTerraLight, barProgress: min(CGFloat(diaperCount) / 8.0, 1.0)
                     )
                     trackingTile(
-                        emoji: "⚖️", label: "SON TARTI",
+                        emoji: "⚖️", label: isEN ? "LAST WEIGHT" : "SON TARTI",
                         value: "—", unit: "kg",
                         barColor: .kBlush, barProgress: 0.6
                     )
@@ -85,16 +87,16 @@ struct TrackingView: View {
 
                 // Quick-add buttons
                 HStack(spacing: 6) {
-                    quickAddButton("+ Beslenme", type: .feeding)
-                    quickAddButton("+ Uyku", type: .sleep)
-                    quickAddButton("+ Bez", type: .diaper)
+                    quickAddButton(isEN ? "+ Feeding" : "+ Beslenme", type: .feeding)
+                    quickAddButton(isEN ? "+ Sleep" : "+ Uyku", type: .sleep)
+                    quickAddButton(isEN ? "+ Diaper" : "+ Bez", type: .diaper)
                 }
                 .padding(.bottom, 16)
 
                 // Timeline
                 if !todayLogs.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("ZAMAN ÇİZELGESİ")
+                        Text(isEN ? "TIMELINE" : "ZAMAN ÇİZELGESİ")
                             .font(.kinnaBodyMedium(11))
                             .foregroundStyle(.kLight)
                             .tracking(1.5)
@@ -224,20 +226,20 @@ struct TrackingView: View {
         case .feeding:
             if let ft = log.feedingType {
                 switch ft {
-                case .breast: return "Anne sütü"
-                case .bottle: return "Biberon"
-                case .solid: return "Ek gıda"
+                case .breast: return isEN ? "Breast milk" : "Anne sütü"
+                case .bottle: return isEN ? "Bottle" : "Biberon"
+                case .solid: return isEN ? "Solid food" : "Ek gıda"
                 }
             }
-            return "Beslenme"
+            return isEN ? "Feeding" : "Beslenme"
         case .sleep:
             if let dur = log.sleepDuration {
                 let mins = Int(dur / 60)
-                return "\(mins) dk uyku"
+                return isEN ? "\(mins) min sleep" : "\(mins) dk uyku"
             }
-            return "Uyku"
+            return isEN ? "Sleep" : "Uyku"
         case .diaper:
-            return "Bez değişimi"
+            return isEN ? "Diaper change" : "Bez değişimi"
         }
     }
 }
@@ -247,6 +249,8 @@ struct TrackingView: View {
 struct AddLogSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
     var initialType: DailyLog.LogType = .feeding
     @State private var selectedType: DailyLog.LogType = .feeding
@@ -262,9 +266,9 @@ struct AddLogSheet: View {
                 VStack(spacing: 20) {
                     // Type selector
                     HStack(spacing: 8) {
-                        typeButton("Beslenme", type: .feeding, emoji: "🍼")
-                        typeButton("Uyku", type: .sleep, emoji: "😴")
-                        typeButton("Bez", type: .diaper, emoji: "🧷")
+                        typeButton(isEN ? "Feeding" : "Beslenme", type: .feeding, emoji: "🍼")
+                        typeButton(isEN ? "Sleep" : "Uyku", type: .sleep, emoji: "😴")
+                        typeButton(isEN ? "Diaper" : "Bez", type: .diaper, emoji: "🧷")
                     }
                     .padding(.top, 8)
 
@@ -272,20 +276,20 @@ struct AddLogSheet: View {
                     VStack(alignment: .leading, spacing: 12) {
                         switch selectedType {
                         case .feeding:
-                            fieldLabel("TUR")
+                            fieldLabel(isEN ? "TYPE" : "TUR")
                             HStack(spacing: 8) {
-                                feedingButton("Anne sutu", type: .breast)
-                                feedingButton("Biberon", type: .bottle)
-                                feedingButton("Ek gida", type: .solid)
+                                feedingButton(isEN ? "Breast milk" : "Anne sutu", type: .breast)
+                                feedingButton(isEN ? "Bottle" : "Biberon", type: .bottle)
+                                feedingButton(isEN ? "Solid food" : "Ek gida", type: .solid)
                             }
 
                         case .sleep:
-                            fieldLabel("SURE")
+                            fieldLabel(isEN ? "DURATION" : "SURE")
                             HStack(alignment: .firstTextBaseline, spacing: 4) {
                                 Text("\(Int(sleepMinutes))")
                                     .font(.kinnaDisplay(32))
                                     .foregroundStyle(.kChar)
-                                Text("dk")
+                                Text(isEN ? "min" : "dk")
                                     .font(.kinnaBody(14))
                                     .foregroundStyle(.kMid)
                             }
@@ -293,18 +297,18 @@ struct AddLogSheet: View {
                                 .tint(.kSage)
 
                         case .diaper:
-                            fieldLabel("TUR")
+                            fieldLabel(isEN ? "TYPE" : "TUR")
                             HStack(spacing: 8) {
-                                diaperButton("Islak", type: .wet)
-                                diaperButton("Kirli", type: .dirty)
-                                diaperButton("Ikisi de", type: .both)
+                                diaperButton(isEN ? "Wet" : "Islak", type: .wet)
+                                diaperButton(isEN ? "Dirty" : "Kirli", type: .dirty)
+                                diaperButton(isEN ? "Both" : "Ikisi de", type: .both)
                             }
                         }
                     }
 
                     // Time
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel("SAAT")
+                        fieldLabel(isEN ? "TIME" : "SAAT")
                         DatePicker("", selection: $logDate, displayedComponents: .hourAndMinute)
                             .labelsHidden()
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -312,8 +316,8 @@ struct AddLogSheet: View {
 
                     // Note
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel("NOT (isteğe bağlı)")
-                        TextField("Ek bilgi...", text: $note)
+                        fieldLabel(isEN ? "NOTE (optional)" : "NOT (isteğe bağlı)")
+                        TextField(isEN ? "Additional info..." : "Ek bilgi...", text: $note)
                             .font(.kinnaBody(14))
                             .padding(12)
                             .background(.white)
@@ -329,15 +333,15 @@ struct AddLogSheet: View {
             }
             .background(Color.kCream.ignoresSafeArea())
             .onAppear { selectedType = initialType }
-            .navigationTitle("Kayıt Ekle")
+            .navigationTitle(isEN ? "Add Log" : "Kayıt Ekle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Vazgeç") { dismiss() }
+                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
                         .foregroundStyle(.kMid)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Kaydet") { saveLog() }
+                    Button(isEN ? "Save" : "Kaydet") { saveLog() }
                         .fontWeight(.semibold)
                         .foregroundStyle(.kTerra)
                 }

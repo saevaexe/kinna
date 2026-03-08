@@ -9,6 +9,8 @@ struct PaywallView: View {
     @State private var isPurchasing = false
     @State private var errorMessage: String?
 
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
     private var monthlyPackage: Package? {
         offering?.availablePackages.first { $0.packageType == .monthly }
     }
@@ -25,7 +27,7 @@ struct PaywallView: View {
                     Circle()
                         .fill(Color(hex: 0x4CAF50))
                         .frame(width: 7, height: 7)
-                    Text("3 gün ücretsiz dene")
+                    Text(isEN ? "Try 3 days free" : "3 gün ücretsiz dene")
                         .font(.kinnaBodyMedium(11))
                         .foregroundStyle(.white)
                 }
@@ -43,15 +45,28 @@ struct PaywallView: View {
                     .tracking(2)
                     .padding(.bottom, 8)
 
-                Text("Ela'nın her anını\n")
-                    .font(.kinnaDisplay(26))
-                    .foregroundStyle(.kChar)
-                +
-                Text("kaçırma.")
-                    .font(.kinnaDisplayItalic(26))
-                    .foregroundStyle(.kTerra)
+                if isEN {
+                    Text("Don't miss\n")
+                        .font(.kinnaDisplay(26))
+                        .foregroundStyle(.kChar)
+                    +
+                    Text("a moment.")
+                        .font(.kinnaDisplayItalic(26))
+                        .foregroundStyle(.kTerra)
+                } else {
+                    Text("Ela'nın her anını\n")
+                        .font(.kinnaDisplay(26))
+                        .foregroundStyle(.kChar)
+                    +
+                    Text("kaçırma.")
+                        .font(.kinnaDisplayItalic(26))
+                        .foregroundStyle(.kTerra)
+                }
 
-                Text("3 gün boyunca her şey ücretsiz.\nSonra istersen devam et.")
+                Text(isEN
+                    ? "Everything free for 3 days.\nThen continue if you want."
+                    : "3 gün boyunca her şey ücretsiz.\nSonra istersen devam et."
+                )
                     .font(.kinnaBody(12, weight: .light))
                     .foregroundStyle(.kMid)
                     .multilineTextAlignment(.center)
@@ -62,9 +77,9 @@ struct PaywallView: View {
                 // Plan cards
                 HStack(spacing: 8) {
                     planCard(
-                        title: "AYLIK",
+                        title: isEN ? "MONTHLY" : "AYLIK",
                         price: monthlyPackage?.localizedPriceString ?? "₺169",
-                        unit: "/ ay",
+                        unit: isEN ? "/ mo" : "/ ay",
                         saving: nil,
                         badge: nil,
                         isSelected: selectedPlan?.packageType == .monthly
@@ -73,11 +88,11 @@ struct PaywallView: View {
                     }
 
                     planCard(
-                        title: "YILLIK",
+                        title: isEN ? "YEARLY" : "YILLIK",
                         price: yearlyPackage?.localizedPriceString ?? "₺999",
-                        unit: "/ yıl",
-                        saving: "ayda ₺83",
-                        badge: "%34 indirim",
+                        unit: isEN ? "/ yr" : "/ yıl",
+                        saving: isEN ? "$3.33/mo" : "ayda ₺83",
+                        badge: isEN ? "34% off" : "%34 indirim",
                         isSelected: selectedPlan?.packageType != .monthly
                     ) {
                         selectedPlan = yearlyPackage
@@ -90,11 +105,11 @@ struct PaywallView: View {
                 HStack(spacing: 10) {
                     Text("☕")
                         .font(.system(size: 18))
-                    Text("Günde 2,7₺.")
+                    Text(isEN ? "Just $0.11/day." : "Günde 2,7₺.")
                         .font(.kinnaBody(12, weight: .medium))
                         .foregroundStyle(.kChar)
                     +
-                    Text(" Bir kahveden az.")
+                    Text(isEN ? " Less than a coffee." : " Bir kahveden az.")
                         .font(.kinnaBody(12))
                         .foregroundStyle(.kMid)
                 }
@@ -112,11 +127,11 @@ struct PaywallView: View {
 
                 // Features
                 VStack(spacing: 8) {
-                    featureRow("Sınırsız gelişim takibi", sub: "0-5 yaş")
-                    featureRow("Kişiselleştirilmiş günlük rehberlik", sub: nil)
-                    featureRow("Aşı takvimi + hatırlatmalar", sub: nil)
-                    featureRow("Besin günlüğü ve geçiş rehberi", sub: nil)
-                    featureRow("Tüm veriler cihazında", sub: "gizli & güvenli")
+                    featureRow(isEN ? "Unlimited development tracking" : "Sınırsız gelişim takibi", sub: "0-5 \(isEN ? "years" : "yaş")")
+                    featureRow(isEN ? "Personalized daily guidance" : "Kişiselleştirilmiş günlük rehberlik", sub: nil)
+                    featureRow(isEN ? "Vaccine schedule + reminders" : "Aşı takvimi + hatırlatmalar", sub: nil)
+                    featureRow(isEN ? "Food diary & transition guide" : "Besin günlüğü ve geçiş rehberi", sub: nil)
+                    featureRow(isEN ? "All data on your device" : "Tüm veriler cihazında", sub: isEN ? "private & secure" : "gizli & güvenli")
                 }
                 .padding(.bottom, 20)
 
@@ -130,7 +145,7 @@ struct PaywallView: View {
                             .frame(maxWidth: .infinity)
                             .padding(16)
                     } else {
-                        Text("3 gün ücretsiz başla")
+                        Text(isEN ? "Start 3-day free trial" : "3 gün ücretsiz başla")
                             .font(.kinnaBodyMedium(15))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
@@ -143,7 +158,7 @@ struct PaywallView: View {
                 .disabled(isPurchasing)
                 .padding(.bottom, 8)
 
-                Text("İstediğin zaman iptal edebilirsin.")
+                Text(isEN ? "Cancel anytime." : "İstediğin zaman iptal edebilirsin.")
                     .font(.kinnaBody(10))
                     .foregroundStyle(.kLight)
                     .padding(.bottom, 6)
@@ -151,7 +166,7 @@ struct PaywallView: View {
                 Button {
                     Task { await subscriptionManager.restorePurchases() }
                 } label: {
-                    Text("Satın almayı geri yükle")
+                    Text(isEN ? "Restore purchases" : "Satın almayı geri yükle")
                         .font(.kinnaBody(11))
                         .foregroundStyle(.kLight)
                         .underline()

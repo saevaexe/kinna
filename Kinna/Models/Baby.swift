@@ -30,13 +30,24 @@ final class Baby {
         let years = components.year ?? 0
         let months = components.month ?? 0
         let days = components.day ?? 0
+        let isEN = Locale.current.language.languageCode?.identifier != "tr"
 
-        if years > 0 {
-            return "\(years) yıl \(months) ay"
-        } else if months > 0 {
-            return "\(months) ay \(days) gün"
+        if isEN {
+            if years > 0 {
+                return "\(years) yr \(months) mo"
+            } else if months > 0 {
+                return "\(months) mo \(days) days"
+            } else {
+                return "\(days) days"
+            }
         } else {
-            return "\(days) gün"
+            if years > 0 {
+                return "\(years) yıl \(months) ay"
+            } else if months > 0 {
+                return "\(months) ay \(days) gün"
+            } else {
+                return "\(days) gün"
+            }
         }
     }
 

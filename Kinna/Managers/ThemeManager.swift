@@ -65,26 +65,26 @@ extension ShapeStyle where Self == Color {
 extension Font {
     /// Display font — Fraunces variable
     static func kinnaDisplay(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .custom("Fraunces 9pt", size: size, relativeTo: .title)
+        .custom("Fraunces", size: size, relativeTo: .title)
             .weight(weight)
     }
 
     /// Display font — Fraunces italic
     static func kinnaDisplayItalic(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .custom("Fraunces 9pt", size: size, relativeTo: .title)
+        .custom("Fraunces", size: size, relativeTo: .title)
             .weight(weight)
             .italic()
     }
 
     /// Body font — DM Sans variable
     static func kinnaBody(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .custom("DM Sans 9pt", size: size, relativeTo: .body)
+        .custom("DM Sans", size: size, relativeTo: .body)
             .weight(weight)
     }
 
     /// Body font medium
     static func kinnaBodyMedium(_ size: CGFloat) -> Font {
-        .custom("DM Sans 9pt", size: size, relativeTo: .body)
+        .custom("DM Sans", size: size, relativeTo: .body)
             .weight(.medium)
     }
 }

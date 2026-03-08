@@ -7,6 +7,8 @@ struct VaccinationView: View {
 
     private var baby: Baby? { babies.first }
 
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
     private var completedRecords: [VaccinationRecord] {
         records.filter { $0.isCompleted }
     }
@@ -28,17 +30,17 @@ struct VaccinationView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("T.C. SAĞLIK BAKANLIĞI PROTOKOLÜ")
+                    Text(isEN ? "MINISTRY OF HEALTH PROTOCOL" : "T.C. SAĞLIK BAKANLIĞI PROTOKOLÜ")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .tracking(1.5)
 
                     (
-                        Text("Aşı ")
+                        Text(isEN ? "Vaccine " : "Aşı ")
                             .font(.kinnaDisplay(26))
                             .foregroundStyle(.kChar)
                         +
-                        Text("planı")
+                        Text(isEN ? "schedule" : "planı")
                             .font(.kinnaDisplayItalic(26))
                             .foregroundStyle(.kTerra)
                     )
@@ -55,14 +57,14 @@ struct VaccinationView: View {
 
                 // Grouped lists
                 if !completedRecords.isEmpty {
-                    sectionHeader("TAMAMLANANLAR")
+                    sectionHeader(isEN ? "COMPLETED" : "TAMAMLANANLAR")
                     ForEach(completedRecords) { record in
                         vaccineRow(record, status: .done)
                     }
                 }
 
                 if !upcomingRecords.isEmpty {
-                    sectionHeader("YAKLAŞAN")
+                    sectionHeader(isEN ? "UPCOMING" : "YAKLAŞAN")
                     ForEach(upcomingRecords) { record in
                         let isNext = record.id == nextVaccine?.id
                         vaccineRow(record, status: isNext ? .next : .upcoming)
@@ -70,7 +72,7 @@ struct VaccinationView: View {
                 }
 
                 if !futureRecords.isEmpty {
-                    sectionHeader("GELECEK")
+                    sectionHeader(isEN ? "FUTURE" : "GELECEK")
                     ForEach(futureRecords) { record in
                         vaccineRow(record, status: .future)
                     }
@@ -80,7 +82,7 @@ struct VaccinationView: View {
                     VStack(spacing: 12) {
                         Text("💉")
                             .font(.system(size: 40))
-                        Text("Aşı takvimi oluşturmak için bebek profili ekleyin")
+                        Text(isEN ? "Add baby profile to generate vaccination schedule" : "Aşı takvimi oluşturmak için bebek profili ekleyin")
                             .font(.kinnaBody(14))
                             .foregroundStyle(.kMid)
                             .multilineTextAlignment(.center)
@@ -100,7 +102,7 @@ struct VaccinationView: View {
 
     private func heroCard(_ record: VaccinationRecord) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("SIRADAKİ AŞI")
+            Text(isEN ? "NEXT VACCINE" : "SIRADAKİ AŞI")
                 .font(.kinnaBodyMedium(10))
                 .foregroundStyle(.white.opacity(0.6))
                 .tracking(1.5)
@@ -113,7 +115,7 @@ struct VaccinationView: View {
                 .font(.kinnaBody(12))
                 .foregroundStyle(.white.opacity(0.7))
 
-            Text("📍 Randevu al")
+            Text(isEN ? "📍 Book appointment" : "📍 Randevu al")
                 .font(.kinnaBodyMedium(10))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 10)
