@@ -450,7 +450,7 @@ struct OnboardingView: View {
                     ? (isEN ? "First baby 🎉" : "İlk bebek 🎉")
                     : (isEN ? "Child #\(childOrder)" : "\(childOrder). çocuk"),
                 body: childOrder == 1
-                    ? (isEN ? "Everything is new. We'll be with you step by step..." : "Her şey ilk kez. Adım adım seninle olacağız — hiçbir sorun aptalca değil.")
+                    ? (isEN ? "Everything is new. We'll be with you step by step." : "Her şey ilk kez. Adım adım seninle olacağız — merak etme, her soru değerli.")
                     : (isEN ? "You have experience but every baby is different..." : "Deneyimin var ama her bebek farklı. Kinna sana güncel bilgi sunacak."),
                 style: .terra
             )
@@ -468,6 +468,7 @@ struct OnboardingView: View {
                 featurePreviewRow("🧠", isEN ? "Science-based micro-dose content" : "Bilimsel mikro-doz içerik", Color(hex: 0xE8F0F6))
             }
             .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(

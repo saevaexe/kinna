@@ -33,6 +33,8 @@ struct MilestonesView: View {
             case 3...5: return "Motor beceriler gelişiyor"
             case 6...9: return "İletişim temelleri kuruluyor"
             case 10...12: return "Keşfetme dönemi başlıyor"
+            case 13...18: return "Bağımsızlık adımları atılıyor"
+            case 19...24: return "Dil ve hayal gücü patlıyor"
             default: return "Gelişim ilerlemeye devam ediyor"
             }
         } else {
@@ -41,6 +43,8 @@ struct MilestonesView: View {
             case 3...5: return "Motor skills developing"
             case 6...9: return "Communication foundations forming"
             case 10...12: return "Exploration period beginning"
+            case 13...18: return "Steps toward independence"
+            case 19...24: return "Language and imagination bloom"
             default: return "Development continues to progress"
             }
         }
@@ -54,6 +58,8 @@ struct MilestonesView: View {
             case 3...5: return "Nesneleri kavrama ve yuvarlanma gibi hareketler başlıyor."
             case 6...9: return "İlk heceler ve işaret etme gibi iletişim becerileri gelişiyor."
             case 10...12: return "Bağımsız hareket ve çevre keşfetme yoğunlaşıyor."
+            case 13...18: return "Yürüme, kaşık kullanma ve kelime hazinesi hızla genişliyor."
+            case 19...24: return "Koşma, iki kelimelik cümleler ve sembolik oyun dönemi."
             default: return "Her ay yeni gelişim aşamaları bebeğinizi bekliyor."
             }
         } else {
@@ -62,6 +68,8 @@ struct MilestonesView: View {
             case 3...5: return "Grasping objects and rolling movements are starting."
             case 6...9: return "First syllables and pointing communication skills are developing."
             case 10...12: return "Independent movement and environment exploration are intensifying."
+            case 13...18: return "Walking, spoon use, and vocabulary are expanding rapidly."
+            case 19...24: return "Running, two-word sentences, and pretend play emerge."
             default: return "New developmental milestones await your baby each month."
             }
         }
@@ -254,13 +262,9 @@ struct MilestonesView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(isEN ? milestone.titleEN : milestone.titleTR)
-                        .font(.kinnaBodyMedium(13))
-                        .foregroundStyle(.kChar)
-
-                    categoryTag(milestone.category)
-                }
+                Text(isEN ? milestone.titleEN : milestone.titleTR)
+                    .font(.kinnaBodyMedium(13))
+                    .foregroundStyle(.kChar)
 
                 Text(isEN ? milestone.descriptionEN : milestone.descriptionTR)
                     .font(.kinnaBody(11))
@@ -268,6 +272,10 @@ struct MilestonesView: View {
                     .lineSpacing(2)
                     .lineLimit(2)
             }
+
+            Spacer()
+
+            categoryTag(milestone.category)
         }
         .padding(.vertical, 14)
         .overlay(alignment: .bottom) {
@@ -294,7 +302,7 @@ struct MilestonesView: View {
         if isEN {
             switch lowered {
             case "motor", "kaba motor", "ince motor":
-                return (Color(hex: 0xEAF3EF), .kSageDark, "Motor")
+                return (Color(hex: 0xEAF3EF), .kSageDark, "Physical")
             case "sosyal", "sosyal-duygusal", "social":
                 return (.kTerraLight, .kTerra, "Social")
             case "bilişsel", "dil", "dil-bilişsel", "language", "cognitive":
@@ -305,11 +313,11 @@ struct MilestonesView: View {
         } else {
             switch lowered {
             case "motor", "kaba motor", "ince motor":
-                return (Color(hex: 0xEAF3EF), .kSageDark, category)
-            case "sosyal", "sosyal-duygusal":
-                return (.kTerraLight, .kTerra, category)
-            case "bilişsel", "dil", "dil-bilişsel":
-                return (Color(hex: 0xE8E4F0), Color(hex: 0x6B5C8F), category)
+                return (Color(hex: 0xEAF3EF), .kSageDark, "Fiziksel")
+            case "sosyal", "sosyal-duygusal", "social":
+                return (.kTerraLight, .kTerra, "Sosyal")
+            case "bilişsel", "dil", "dil-bilişsel", "language", "cognitive":
+                return (Color(hex: 0xE8E4F0), Color(hex: 0x6B5C8F), "Dil")
             default:
                 return (.kPale, .kMid, category)
             }
