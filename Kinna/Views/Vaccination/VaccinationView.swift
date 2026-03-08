@@ -90,6 +90,27 @@ struct VaccinationView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.top, 60)
                 }
+
+                // Disclaimer banner
+                HStack(alignment: .top, spacing: 8) {
+                    Text("⚕️")
+                        .font(.system(size: 12))
+                    Text(isEN
+                        ? "Dates are approximate. Always confirm with your family physician."
+                        : "Tarihler tahminidir. Her zaman aile hekiminizle teyit edin.")
+                        .font(.kinnaBody(10))
+                        .foregroundStyle(.kMid)
+                        .lineSpacing(2)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.kSage.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.kSage.opacity(0.2), lineWidth: 1)
+                )
+                .padding(.top, 16)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 20)

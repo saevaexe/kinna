@@ -110,6 +110,30 @@ struct SettingsView: View {
                 }
                 .padding(.bottom, 10)
 
+                // Legal
+                settingsSection(String(localized: "settings_legal", defaultValue: "Legal")) {
+                    VStack(spacing: 0) {
+                        NavigationLink {
+                            LegalDisclaimerView()
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "doc.text.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(.kMid)
+                                    .frame(width: 20)
+                                Text(String(localized: "settings_terms", defaultValue: "Terms of Use & Disclaimer"))
+                                    .font(.kinnaBody(13))
+                                    .foregroundStyle(.kChar)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(.kLight)
+                            }
+                        }
+                    }
+                }
+                .padding(.bottom, 10)
+
                 // About
                 settingsSection(String(localized: "settings_about", defaultValue: "About")) {
                     VStack(spacing: 0) {

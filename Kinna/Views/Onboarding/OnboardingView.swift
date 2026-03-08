@@ -15,8 +15,9 @@ struct OnboardingView: View {
     @State private var birthMonth = 1
     @State private var birthYear = Calendar.current.component(.year, from: Date())
     @State private var selectedGender: Baby.Gender? = nil
+    @State private var disclaimerAccepted = false
 
-    private let totalSteps = 6
+    private let totalSteps = 7
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -32,7 +33,8 @@ struct OnboardingView: View {
                 userNameStep.tag(2)
                 babyInfoStep.tag(3)
                 childOrderStep.tag(4)
-                notificationStep.tag(5)
+                disclaimerStep.tag(5)
+                notificationStep.tag(6)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .scrollDisabled(true)
@@ -140,7 +142,7 @@ struct OnboardingView: View {
     private var roleStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 1)
-            stepLabel(isEN ? "Step 1 / 5" : "Adım 1 / 5")
+            stepLabel(isEN ? "Step 1 / 6" : "Adım 1 / 6")
 
             (
                 Text(isEN ? "Are you the baby's\n" : "Sen bebeğin\n")
@@ -199,7 +201,7 @@ struct OnboardingView: View {
     private var userNameStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 2)
-            stepLabel(isEN ? "Step 2 / 5" : "Adım 2 / 5")
+            stepLabel(isEN ? "Step 2 / 6" : "Adım 2 / 6")
 
             (
                 Text(isEN ? "What should we\n" : "Sana nasıl\n")
@@ -270,7 +272,7 @@ struct OnboardingView: View {
         ScrollView {
             VStack(spacing: 0) {
                 progressBar(current: 3)
-                stepLabel(isEN ? "Step 3 / 5" : "Adım 3 / 5")
+                stepLabel(isEN ? "Step 3 / 6" : "Adım 3 / 6")
 
                 (
                     Text(isEN ? "Let's meet\n" : "Bebeğinle\n")
@@ -411,7 +413,7 @@ struct OnboardingView: View {
     private var childOrderStep: some View {
         VStack(spacing: 0) {
             progressBar(current: 4)
-            stepLabel(isEN ? "Step 4 / 5" : "Adım 4 / 5")
+            stepLabel(isEN ? "Step 4 / 6" : "Adım 4 / 6")
 
             let name = babyName.isEmpty ? (isEN ? "Baby" : "Bebek") : babyName
             (
@@ -481,11 +483,138 @@ struct OnboardingView: View {
         .padding(.horizontal, 24)
     }
 
-    // MARK: - Step 5: Notifications
+    // MARK: - Step 5: Disclaimer
+
+    private var disclaimerStep: some View {
+        VStack(spacing: 0) {
+            progressBar(current: 5)
+            stepLabel(isEN ? "Step 5 / 6" : "Adım 5 / 6")
+
+            (
+                Text(isEN ? "Before we\n" : "Başlamadan\n")
+                    .font(.kinnaDisplay(28))
+                    .foregroundStyle(.kChar)
+                +
+                Text(isEN ? "begin." : "önce.")
+                    .font(.kinnaDisplayItalic(28))
+                    .foregroundStyle(.kTerra)
+            )
+            .lineSpacing(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 4)
+
+            Text(isEN ? "Please review the following important information." : "Lütfen aşağıdaki önemli bilgileri incele.")
+                .font(.kinnaBody(12, weight: .light))
+                .foregroundStyle(.kMid)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 20)
+
+            // Disclaimer cards
+            VStack(spacing: 10) {
+                disclaimerCard(
+                    icon: "🩺",
+                    title: isEN ? "Not medical advice" : "Tıbbi tavsiye değildir",
+                    body: isEN
+                        ? "Kinna is for informational purposes only. It does not replace professional medical advice, diagnosis, or treatment."
+                        : "Kinna yalnızca bilgilendirme amaçlıdır. Profesyonel tıbbi tavsiye, teşhis veya tedavinin yerini tutmaz."
+                )
+
+                disclaimerCard(
+                    icon: "👩‍⚕️",
+                    title: isEN ? "Always consult your doctor" : "Her zaman doktoruna danış",
+                    body: isEN
+                        ? "For any health concerns about your baby, always consult your pediatrician. In emergencies, call 112."
+                        : "Bebeğinle ilgili herhangi bir sağlık endişesinde mutlaka çocuk doktoruna danış. Acil durumlarda 112'yi ara."
+                )
+
+                disclaimerCard(
+                    icon: "📋",
+                    title: isEN ? "Vaccine schedule is estimated" : "Aşı takvimi tahminidir",
+                    body: isEN
+                        ? "Vaccination dates are approximate based on your baby's birth date. Confirm exact dates with your family physician."
+                        : "Aşı tarihleri bebeğinin doğum tarihine göre tahminidir. Kesin tarihler için aile hekimine danış."
+                )
+
+                disclaimerCard(
+                    icon: "📚",
+                    title: isEN ? "Science-based content" : "Bilimsel temelli içerik",
+                    body: isEN
+                        ? "Our content is based on WHO guidelines and Republic of Turkey Ministry of Health protocols."
+                        : "İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır."
+                )
+            }
+
+            Spacer()
+
+            // Acceptance toggle
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    disclaimerAccepted.toggle()
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(disclaimerAccepted ? Color.kSage : .white)
+                        .frame(width: 22, height: 22)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(disclaimerAccepted ? Color.clear : Color.kPale, lineWidth: 1.5)
+                            if disclaimerAccepted {
+                                Text("✓")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundStyle(.white)
+                            }
+                        }
+
+                    Text(isEN
+                        ? "I understand that Kinna is informational only and does not replace medical advice."
+                        : "Kinna'nın yalnızca bilgilendirme amaçlı olduğunu ve tıbbi tavsiye yerine geçmediğini anlıyorum.")
+                        .font(.kinnaBody(11))
+                        .foregroundStyle(.kChar)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            .padding(.bottom, 14)
+
+            darkButton(isEN ? "Continue →" : "Devam →") { currentStep = 6 }
+                .disabled(!disclaimerAccepted)
+                .opacity(disclaimerAccepted ? 1 : 0.5)
+                .padding(.bottom, 32)
+        }
+        .padding(.horizontal, 24)
+    }
+
+    private func disclaimerCard(icon: String, title: String, body: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text(icon)
+                .font(.system(size: 18))
+                .frame(width: 28)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.kinnaBodyMedium(12))
+                    .foregroundStyle(.kChar)
+                Text(body)
+                    .font(.kinnaBody(10))
+                    .foregroundStyle(.kMid)
+                    .lineSpacing(2)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.kPale, lineWidth: 1)
+        )
+    }
+
+    // MARK: - Step 6: Notifications
 
     private var notificationStep: some View {
         VStack(spacing: 0) {
-            progressBar(current: 5)
+            progressBar(current: 6)
             stepLabel(isEN ? "Final step" : "Son adım")
 
             let name = babyName.isEmpty ? (isEN ? "Baby" : "Bebek") : babyName
@@ -639,7 +768,7 @@ struct OnboardingView: View {
 
     private func progressBar(current: Int) -> some View {
         HStack(spacing: 4) {
-            ForEach(1...5, id: \.self) { i in
+            ForEach(1...6, id: \.self) { i in
                 RoundedRectangle(cornerRadius: 1.5)
                     .fill(
                         i < current ? Color.kTerra :
