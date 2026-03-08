@@ -9,6 +9,8 @@ struct AllergyView: View {
 
     private var baby: Baby? { babies.first }
 
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
     private var totalCount: Int { logs.count }
     private var safeCount: Int { logs.filter { $0.reaction == .none }.count }
     private var cautionCount: Int { logs.filter { $0.reaction != .none }.count }
@@ -18,22 +20,22 @@ struct AllergyView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("EK GIDA GÜNLÜĞÜ")
+                    Text(isEN ? "FOOD DIARY" : "EK GIDA GÜNLÜĞÜ")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
                         .tracking(1.5)
 
                     (
-                        Text("Besin ")
+                        Text(isEN ? "Food " : "Besin ")
                             .font(.kinnaDisplay(26))
                             .foregroundStyle(.kChar)
                         +
-                        Text("takibi")
+                        Text(isEN ? "tracker" : "takibi")
                             .font(.kinnaDisplayItalic(26))
                             .foregroundStyle(.kTerra)
                     )
 
-                    Text("Reaksiyonları ilk 24 saatte not al.")
+                    Text(isEN ? "Note reactions within the first 24 hours." : "Reaksiyonları ilk 24 saatte not al.")
                         .font(.kinnaBody(12, weight: .light))
                         .foregroundStyle(.kMid)
                 }
@@ -43,15 +45,15 @@ struct AllergyView: View {
 
                 // Stats row
                 HStack(spacing: 10) {
-                    statCard(value: "\(totalCount)", label: "DENENEN", valueColor: .kChar)
-                    statCard(value: "\(safeCount)", label: "SORUNSUZ", valueColor: .kSageDark)
-                    statCard(value: "\(cautionCount)", label: "DİKKAT", valueColor: .kTerra)
+                    statCard(value: "\(totalCount)", label: isEN ? "TRIED" : "DENENEN", valueColor: .kChar)
+                    statCard(value: "\(safeCount)", label: isEN ? "SAFE" : "SORUNSUZ", valueColor: .kSageDark)
+                    statCard(value: "\(cautionCount)", label: isEN ? "CAUTION" : "DİKKAT", valueColor: .kTerra)
                 }
                 .padding(.bottom, 16)
 
                 // Food list
                 if !logs.isEmpty {
-                    Text("SON EKLENENLER")
+                    Text(isEN ? "RECENTLY ADDED" : "SON EKLENENLER")
                         .font(.kinnaBodyMedium(11))
                         .foregroundStyle(.kLight)
                         .tracking(1.5)
@@ -65,7 +67,7 @@ struct AllergyView: View {
                     VStack(spacing: 12) {
                         Text("🥄")
                             .font(.system(size: 40))
-                        Text("Henüz besin kaydı eklenmemiş")
+                        Text(isEN ? "No food records added yet" : "Henüz besin kaydı eklenmemiş")
                             .font(.kinnaBody(14))
                             .foregroundStyle(.kMid)
                     }
@@ -77,7 +79,7 @@ struct AllergyView: View {
                 HStack(alignment: .top, spacing: 8) {
                     Text("📌")
                         .font(.system(size: 12))
-                    Text("Yeni besinleri tek tek ve 3 gün arayla dene. Belirgin reaksiyon durumunda doktoruna danış.")
+                    Text(isEN ? "Try new foods one at a time, 3 days apart. Consult your doctor if there is a noticeable reaction." : "Yeni besinleri tek tek ve 3 gün arayla dene. Belirgin reaksiyon durumunda doktoruna danış.")
                         .font(.kinnaBody(10))
                         .foregroundStyle(.kMid)
                         .lineSpacing(2)
@@ -95,7 +97,7 @@ struct AllergyView: View {
                 Button {
                     showAddSheet = true
                 } label: {
-                    Text("+ Yeni besin ekle")
+                    Text(isEN ? "+ Add new food" : "+ Yeni besin ekle")
                         .font(.kinnaBody(13))
                         .foregroundStyle(.kLight)
                         .frame(maxWidth: .infinity)
@@ -186,13 +188,13 @@ struct AllergyView: View {
         let (bg, fg, label): (Color, Color, String) = {
             switch reaction {
             case .none:
-                return (Color(hex: 0xEAF3EF), .kSageDark, "İyi")
+                return (Color(hex: 0xEAF3EF), .kSageDark, isEN ? "Good" : "İyi")
             case .mild:
-                return (Color(hex: 0xFFF8ED), Color(hex: 0x8B7030), "Hafif")
+                return (Color(hex: 0xFFF8ED), Color(hex: 0x8B7030), isEN ? "Mild" : "Hafif")
             case .moderate:
-                return (Color(hex: 0xFFF3ED), Color(hex: 0xA85E42), "Kızarıklık")
+                return (Color(hex: 0xFFF3ED), Color(hex: 0xA85E42), isEN ? "Rash" : "Kızarıklık")
             case .severe:
-                return (Color(hex: 0xFFF3ED), Color(hex: 0xC4644A), "Ciddi")
+                return (Color(hex: 0xFFF3ED), Color(hex: 0xC4644A), isEN ? "Severe" : "Ciddi")
             }
         }()
 
@@ -207,21 +209,80 @@ struct AllergyView: View {
 
     private func foodEmoji(_ name: String) -> String {
         let lowered = name.lowercased()
-        if lowered.contains("yumurta") { return "🥚" }
-        if lowered.contains("süt") { return "🥛" }
-        if lowered.contains("muz") { return "🍌" }
-        if lowered.contains("elma") { return "🍎" }
-        if lowered.contains("havuç") { return "🥕" }
-        if lowered.contains("patates") { return "🥔" }
-        if lowered.contains("avokado") { return "🥑" }
-        if lowered.contains("pirinç") || lowered.contains("pilav") { return "🍚" }
-        if lowered.contains("balık") { return "🐟" }
-        if lowered.contains("et") { return "🥩" }
-        if lowered.contains("peynir") { return "🧀" }
-        if lowered.contains("ekmek") { return "🍞" }
-        if lowered.contains("yoğurt") { return "🥣" }
-        if lowered.contains("çilek") { return "🍓" }
-        if lowered.contains("portakal") { return "🍊" }
+        let folded = lowered.folding(options: .diacriticInsensitive, locale: Locale(identifier: "tr"))
+
+        // Fruits
+        if lowered.contains("elma") || lowered.contains("apple") { return "🍎" }
+        if lowered.contains("muz") || lowered.contains("banana") { return "🍌" }
+        if lowered.contains("armut") || lowered.contains("pear") { return "🍐" }
+        if lowered.contains("çilek") || folded.contains("cilek") || lowered.contains("strawberry") { return "🍓" }
+        if lowered.contains("karpuz") || lowered.contains("watermelon") { return "🍉" }
+        if lowered.contains("üzüm") || folded.contains("uzum") || lowered.contains("grape") { return "🍇" }
+        if lowered.contains("şeftali") || folded.contains("seftali") || lowered.contains("peach") { return "🍑" }
+        if lowered.contains("erik") || lowered.contains("plum") { return "🫐" }
+        if lowered.contains("kiraz") || lowered.contains("cherry") { return "🍒" }
+        if lowered.contains("kivi") || lowered.contains("kiwi") { return "🥝" }
+        if lowered.contains("mango") { return "🥭" }
+        if lowered.contains("kavun") || lowered.contains("melon") { return "🍈" }
+        if lowered.contains("portakal") || lowered.contains("orange") { return "🍊" }
+        if lowered.contains("yaban mersini") || lowered.contains("blueberry") { return "🫐" }
+        if lowered.contains("ahududu") || lowered.contains("raspberry") { return "🫐" }
+        if lowered.contains("kayısı") || folded.contains("kayisi") || lowered.contains("apricot") { return "🍑" }
+
+        // Vegetables
+        if lowered.contains("havuç") || folded.contains("havuc") || lowered.contains("carrot") { return "🥕" }
+        if lowered.contains("tatlı patates") || lowered.contains("sweet potato") { return "🍠" }
+        if lowered.contains("patates") || lowered.contains("potato") { return "🥔" }
+        if lowered.contains("kabak") || lowered.contains("zucchini") { return "🥒" }
+        if lowered.contains("brokoli") || lowered.contains("broccoli") { return "🥦" }
+        if lowered.contains("ıspanak") || folded.contains("ispanak") || lowered.contains("spinach") { return "🥬" }
+        if lowered.contains("domates") || lowered.contains("tomato") { return "🍅" }
+        if lowered.contains("bezelye") || lowered.contains("peas") { return "🫛" }
+        if lowered.contains("mısır") || folded.contains("misir") || lowered.contains("corn") { return "🌽" }
+        if lowered.contains("biber") || lowered.contains("pepper") { return "🌶️" }
+        if lowered.contains("salatalık") || folded.contains("salatalik") || lowered.contains("cucumber") { return "🥒" }
+        if lowered.contains("marul") || lowered.contains("lettuce") { return "🥬" }
+        if lowered.contains("soğan") || folded.contains("sogan") || lowered.contains("onion") { return "🧅" }
+        if lowered.contains("sarımsak") || folded.contains("sarimsak") || lowered.contains("garlic") { return "🧄" }
+        if lowered.contains("patlıcan") || folded.contains("patlican") || lowered.contains("eggplant") { return "🍆" }
+        if lowered.contains("karnabahar") || lowered.contains("cauliflower") { return "🥦" }
+        if lowered.contains("kereviz") || lowered.contains("celery") { return "🥬" }
+        if lowered.contains("pancar") || lowered.contains("beet") { return "🫒" }
+        if lowered.contains("avokado") || lowered.contains("avocado") { return "🥑" }
+
+        // Protein
+        if lowered.contains("yumurta") || lowered.contains("egg") { return "🥚" }
+        if lowered.contains("tavuk") || lowered.contains("chicken") { return "🍗" }
+        if lowered.contains("balık") || folded.contains("balik") || lowered.contains("fish") { return "🐟" }
+        if lowered.contains("hindi") || lowered.contains("turkey") { return "🍗" }
+        if lowered.contains("kuzu") || lowered.contains("lamb") { return "🥩" }
+        if lowered.contains("et") || lowered.contains("meat") || lowered.contains("beef") { return "🥩" }
+
+        // Dairy
+        if lowered.contains("süt") || folded.contains("sut") || lowered.contains("milk") { return "🥛" }
+        if lowered.contains("yoğurt") || folded.contains("yogurt") { return "🥣" }
+        if lowered.contains("peynir") || lowered.contains("cheese") { return "🧀" }
+        if lowered.contains("tereyağı") || folded.contains("tereyagi") || lowered.contains("butter") { return "🧈" }
+
+        // Grains
+        if lowered.contains("pirinç") || folded.contains("pirinc") || lowered.contains("pilav") || lowered.contains("rice") { return "🍚" }
+        if lowered.contains("ekmek") || lowered.contains("bread") { return "🍞" }
+        if lowered.contains("yulaf") || lowered.contains("oat") { return "🥣" }
+        if lowered.contains("makarna") || lowered.contains("pasta") { return "🍝" }
+        if lowered.contains("buğday") || folded.contains("bugday") || lowered.contains("wheat") { return "🌾" }
+        if lowered.contains("mercimek") || lowered.contains("lentil") { return "🫘" }
+        if lowered.contains("nohut") || lowered.contains("chickpea") { return "🫘" }
+        if lowered.contains("bulgur") { return "🌾" }
+
+        // Other
+        if lowered.contains("bal") || lowered.contains("honey") { return "🍯" }
+        if lowered.contains("fıstık") || folded.contains("fistik") || lowered.contains("peanut") { return "🥜" }
+        if lowered.contains("badem") || lowered.contains("almond") { return "🥜" }
+        if lowered.contains("ceviz") || lowered.contains("walnut") { return "🥜" }
+        if lowered.contains("fındık") || folded.contains("findik") || lowered.contains("hazelnut") { return "🌰" }
+        if lowered.contains("susam") || lowered.contains("sesame") { return "🥜" }
+        if lowered.contains("soya") || lowered.contains("soy") { return "🫘" }
+
         return "🥄"
     }
 }
@@ -237,10 +298,15 @@ struct AddFoodSheet: View {
     @State private var reaction: AllergyLog.ReactionType = .none
     @State private var reactionNote = ""
 
-    private let commonFoods = [
-        "Havuc", "Muz", "Elma", "Patates", "Avokado", "Kabak",
-        "Yumurta", "Yogurt", "Pirinc", "Brokoli", "Armut", "Cilek"
-    ]
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
+    private var commonFoods: [String] {
+        isEN
+            ? ["Carrot", "Banana", "Apple", "Potato", "Avocado", "Zucchini",
+               "Egg", "Yogurt", "Rice", "Broccoli", "Pear", "Strawberry"]
+            : ["Havuç", "Muz", "Elma", "Patates", "Avokado", "Kabak",
+               "Yumurta", "Yoğurt", "Pirinç", "Brokoli", "Armut", "Çilek"]
+    }
 
     var body: some View {
         NavigationStack {
@@ -248,8 +314,8 @@ struct AddFoodSheet: View {
                 VStack(spacing: 20) {
                     // Food name
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel("BESIN ADI")
-                        TextField("örnek: Havuç püresi", text: $foodName)
+                        fieldLabel(isEN ? "FOOD NAME" : "BESIN ADI")
+                        TextField(isEN ? "e.g., Carrot puree" : "örnek: Havuç püresi", text: $foodName)
                             .font(.kinnaBody(14))
                             .padding(12)
                             .background(.white)
@@ -262,7 +328,7 @@ struct AddFoodSheet: View {
 
                     // Quick picks
                     VStack(alignment: .leading, spacing: 8) {
-                        fieldLabel("HIZLI SECIM")
+                        fieldLabel(isEN ? "QUICK PICK" : "HIZLI SECIM")
                         LazyVGrid(columns: [
                             GridItem(.flexible()), GridItem(.flexible()),
                             GridItem(.flexible()), GridItem(.flexible())
@@ -290,7 +356,7 @@ struct AddFoodSheet: View {
 
                     // Date
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel("TANITIM TARIHI")
+                        fieldLabel(isEN ? "INTRODUCTION DATE" : "TANITIM TARIHI")
                         DatePicker("", selection: $introducedDate, in: ...Date(), displayedComponents: .date)
                             .labelsHidden()
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -298,20 +364,20 @@ struct AddFoodSheet: View {
 
                     // Reaction
                     VStack(alignment: .leading, spacing: 8) {
-                        fieldLabel("REAKSIYON")
+                        fieldLabel(isEN ? "REACTION" : "REAKSIYON")
                         HStack(spacing: 8) {
-                            reactionButton("Yok", type: .none, color: .kSage)
-                            reactionButton("Hafif", type: .mild, color: Color(hex: 0xD4A643))
-                            reactionButton("Orta", type: .moderate, color: .kTerra)
-                            reactionButton("Ciddi", type: .severe, color: Color(hex: 0xC44A4A))
+                            reactionButton(isEN ? "None" : "Yok", type: .none, color: .kSage)
+                            reactionButton(isEN ? "Mild" : "Hafif", type: .mild, color: Color(hex: 0xD4A643))
+                            reactionButton(isEN ? "Moderate" : "Orta", type: .moderate, color: .kTerra)
+                            reactionButton(isEN ? "Severe" : "Ciddi", type: .severe, color: Color(hex: 0xC44A4A))
                         }
                     }
 
                     // Reaction note
                     if reaction != .none {
                         VStack(alignment: .leading, spacing: 6) {
-                            fieldLabel("REAKSIYON NOTU")
-                            TextField("Kızarıklık, kusma, gaz...", text: $reactionNote)
+                            fieldLabel(isEN ? "REACTION NOTE" : "REAKSIYON NOTU")
+                            TextField(isEN ? "Rash, vomiting, gas..." : "Kızarıklık, kusma, gaz...", text: $reactionNote)
                                 .font(.kinnaBody(14))
                                 .padding(12)
                                 .background(.white)
@@ -327,7 +393,7 @@ struct AddFoodSheet: View {
                     HStack(alignment: .top, spacing: 8) {
                         Text("📌")
                             .font(.system(size: 12))
-                        Text("Yeni besinleri tek tek ve 3 gun arayla deneyin.")
+                        Text(isEN ? "Try new foods one at a time, 3 days apart." : "Yeni besinleri tek tek ve 3 gun arayla deneyin.")
                             .font(.kinnaBody(11))
                             .foregroundStyle(.kMid)
                             .lineSpacing(2)
@@ -344,15 +410,15 @@ struct AddFoodSheet: View {
                 .padding(.bottom, 20)
             }
             .background(Color.kCream.ignoresSafeArea())
-            .navigationTitle("Yeni Besin")
+            .navigationTitle(isEN ? "New Food" : "Yeni Besin")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Vazgeç") { dismiss() }
+                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
                         .foregroundStyle(.kMid)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Kaydet") { saveFood() }
+                    Button(isEN ? "Save" : "Kaydet") { saveFood() }
                         .fontWeight(.semibold)
                         .foregroundStyle(.kTerra)
                         .disabled(foodName.trimmingCharacters(in: .whitespaces).isEmpty)
