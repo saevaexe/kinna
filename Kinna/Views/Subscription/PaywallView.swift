@@ -43,6 +43,18 @@ struct PaywallView: View {
         : "Bu build'de premium satın alma henüz ayarlanmış değil. Abonelikleri test etmek için RevenueCat public app key ekleyin."
     }
 
+    private var noOfferingMessage: String {
+        isEN
+        ? "Subscriptions are temporarily unavailable right now. Please try again in a moment."
+        : "Abonelikler şu anda geçici olarak kullanılamıyor. Biraz sonra tekrar dene."
+    }
+
+    private var missingPlanMessage: String {
+        isEN
+        ? "A subscription plan could not be selected. Please refresh and try again."
+        : "Bir abonelik planı seçilemedi. Sayfayı yenileyip tekrar dene."
+    }
+
     private var monthlyPackage: Package? {
         offering?.availablePackages.first { $0.packageType == .monthly }
     }
@@ -506,8 +518,10 @@ struct PaywallView: View {
             LegalWebView(page: page)
         }
         .task {
-            await loadOffering()
             await subscriptionManager.checkSubscriptionStatus()
+            if !subscriptionManager.hasFullAccess {
+                await loadOffering()
+            }
         }
         .onChange(of: subscriptionManager.hasFullAccess) { _, hasAccess in
             Task {
@@ -675,8 +689,12 @@ struct PaywallView: View {
             let offerings = try await Purchases.shared.offerings()
             offering = offerings.current
             selectedPlan = yearlyPackage ?? monthlyPackage ?? offering?.availablePackages.first
+
+            if offering?.availablePackages.isEmpty != false {
+                errorMessage = noOfferingMessage
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = friendlyPaywallErrorMessage(from: error, fallback: error.localizedDescription)
         }
     }
 
@@ -687,7 +705,11 @@ struct PaywallView: View {
             return
         }
 
-        guard let selectedPlan else { return }
+        guard let selectedPlan else {
+            errorMessage = missingPlanMessage
+            successMessage = nil
+            return
+        }
         isPurchasing = true
         defer { isPurchasing = false }
         errorMessage = nil
@@ -696,7 +718,10 @@ struct PaywallView: View {
         let purchaseSucceeded = await subscriptionManager.purchase(selectedPlan)
         await syncVaccineReminders()
         if !purchaseSucceeded && !subscriptionManager.hasFullAccess {
-            errorMessage = subscriptionManager.lastErrorMessage
+            errorMessage = friendlyPaywallErrorMessage(
+                from: nil,
+                fallback: subscriptionManager.lastErrorMessage
+            )
         }
     }
 
@@ -721,9 +746,12 @@ struct PaywallView: View {
         }
 
         if !restoreSucceeded && !subscriptionManager.hasFullAccess {
-            errorMessage = subscriptionManager.lastErrorMessage ?? (isEN
+            errorMessage = friendlyPaywallErrorMessage(
+                from: nil,
+                fallback: subscriptionManager.lastErrorMessage ?? (isEN
                 ? "No active subscription could be restored."
                 : "Aktif bir abonelik geri yüklenemedi.")
+            )
         }
     }
 
@@ -739,6 +767,29 @@ struct PaywallView: View {
             scheduledRecords: vaccinationRecords,
             hasFullAccess: subscriptionManager.hasFullAccess
         )
+    }
+
+    private func friendlyPaywallErrorMessage(from error: Error?, fallback: String?) -> String {
+        let rawMessage = (fallback ?? error?.localizedDescription ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let lowercased = rawMessage.lowercased()
+
+        if lowercased.contains("network")
+            || lowercased.contains("internet")
+            || lowercased.contains("offline")
+            || lowercased.contains("timed out")
+        {
+            return isEN
+            ? "We couldn't reach the App Store. Check your connection and try again."
+            : "App Store'a ulaşılamadı. Bağlantını kontrol edip tekrar dene."
+        }
+
+        if rawMessage.isEmpty {
+            return isEN
+            ? "Something went wrong while checking subscriptions. Please try again."
+            : "Abonelikler kontrol edilirken bir sorun oluştu. Lütfen tekrar dene."
+        }
+
+        return rawMessage
     }
 }
 

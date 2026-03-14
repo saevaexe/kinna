@@ -1,5 +1,6 @@
-import SwiftUI
+import StoreKit
 import SwiftData
+import SwiftUI
 
 enum HomeGuidancePlanner {
     enum VaccineCardState: Equatable {
@@ -272,8 +273,13 @@ struct HomeDashboardView: View {
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("parentRole") private var parentRoleRaw = "mother"
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
+    @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
+    @Query(sort: \GrowthRecord.createdAt, order: .reverse) private var growthRecords: [GrowthRecord]
     @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
+    @Query(sort: \AllergyLog.createdAt, order: .reverse) private var allergyLogs: [AllergyLog]
+    @Query private var progressRecords: [MilestoneProgress]
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(\.requestReview) private var requestReview
     @State private var showPaywall = false
 
     private var baby: Baby? { babies.first }
@@ -283,6 +289,47 @@ struct HomeDashboardView: View {
 
     private var motivationQuotes: [String] {
         roleProfile.motivationQuotes(isEnglish: isEN)
+    }
+
+    private var babyLogs: [DailyLog] {
+        guard let baby else { return [] }
+        return logs.filter { $0.babyID == nil || $0.babyID == baby.id }
+    }
+
+    private var babyGrowthRecords: [GrowthRecord] {
+        guard let baby else { return [] }
+        return growthRecords.filter { $0.babyID == nil || $0.babyID == baby.id }
+    }
+
+    private var reviewPromptMetrics: ReviewPromptMetrics {
+        let meaningfulDates = babyLogs.map(\.date)
+            + babyGrowthRecords.map(\.measuredAt)
+            + allergyLogs.map(\.introducedDate)
+            + vaccinationRecords.compactMap { record in
+                record.isManual == true ? (record.administeredDate ?? record.createdAt) : nil
+            }
+            + progressRecords.compactMap(\.completedAt)
+
+        let engagedDays = Set(meaningfulDates.map { Calendar.current.startOfDay(for: $0) }).count
+
+        return ReviewPromptMetrics(
+            engagedDayCount: engagedDays,
+            meaningfulActionCount: meaningfulDates.count,
+            firstMeaningfulActivityAt: meaningfulDates.min()
+        )
+    }
+
+    private var reviewPromptEvaluationKey: String {
+        let babyKey = baby?.id.uuidString ?? "none"
+        return [
+            babyKey,
+            String(babyLogs.count),
+            String(babyGrowthRecords.count),
+            String(allergyLogs.count),
+            String(vaccinationRecords.filter { $0.isManual == true }.count),
+            String(progressRecords.count),
+            String(showPaywall)
+        ].joined(separator: "-")
     }
 
     var body: some View {
@@ -380,6 +427,9 @@ struct HomeDashboardView: View {
                         .foregroundStyle(.kMid)
                 }
             }
+        }
+        .task(id: reviewPromptEvaluationKey) {
+            await maybeRequestReview()
         }
     }
 
@@ -737,10 +787,25 @@ struct HomeDashboardView: View {
         let accent: Color
         let priority: Int
     }
+
+    @MainActor
+    private func maybeRequestReview() async {
+        guard baby != nil, !showPaywall else { return }
+
+        guard ReviewPromptManager.shouldRequestReview(metrics: reviewPromptMetrics) else {
+            return
+        }
+
+        try? await Task.sleep(nanoseconds: 700_000_000)
+        guard !showPaywall else { return }
+
+        requestReview()
+        ReviewPromptManager.recordRequest()
+    }
 }
 
 #Preview {
     HomeView()
-        .modelContainer(for: [Baby.self, DailyLog.self, GrowthRecord.self, VaccinationRecord.self, AllergyLog.self], inMemory: true)
+        .modelContainer(for: [Baby.self, DailyLog.self, GrowthRecord.self, VaccinationRecord.self, AllergyLog.self, MilestoneProgress.self], inMemory: true)
         .environment(SubscriptionManager.shared)
 }

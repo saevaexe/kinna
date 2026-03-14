@@ -8,11 +8,11 @@ Last sync: 2026-03-14
 
 - Build succeeds for iOS Simulator.
 - Sprint 1 ✅, Sprint 2 ✅, Sprint 3 ✅, Sprint 4 ✅, Sprint 5 ✅, Sprint 6 ✅, Sprint 7 ✅.
-- Sprint 8 kısmen tamamlandı, Sprint 9a, 9b ve 9c tamamlandı.
+- Sprint 8 kısmen tamamlandı, Sprint 9a, 9b, 9c ve 9d tamamlandı.
 - Tüm ticari kararlar (Adapty raporu) koda yansıtıldı.
 - Paywall v2 tamamlandı: auto-renewal disclosure, "Bugün ücret alınmaz", feature sıralaması, Premium/Pro tutarlılığı, abone state ayrımı.
 - GitHub Pages canlı: https://saevaexe.github.io/kinna/
-- Sprint 9a, 9b ve 9c local durumda tamamlandı; commit/push bekliyor.
+- Sprint 9a, 9b, 9c ve 9d local durumda tamamlandı; commit/push bekliyor.
 
 ### Feature Status Snapshot
 
@@ -32,7 +32,7 @@ Last sync: 2026-03-14
 | Parent Role | ✅ Persist + role-aware Home + notification tonu | Sprint 9c derinleştirmesi tamamlandı |
 | Restore Purchases | ✅ Fix uygulandı | SubscriptionManager'a delegated |
 | Settings Subscription UI | ✅ | Pro→Premium isimlendirme, NavigationLink→PaywallView(navigation), abone/non-abone state |
-| Tests | ✅ 22 test | Data integrity + policy enforcement + growth chart engine + sleep insights |
+| Tests | ✅ 25 test | Data integrity + policy enforcement + growth chart engine + sleep insights + review prompt logic |
 | Legal (Terms + Privacy) | ✅ In-app views + GitHub Pages | SFSafariViewController, AppConstants.Legal URLs |
 | Paywall Optimizasyonu | ✅ v2 | Dinamik per-day price, %tasarruf, aylık karşılık, subscription terms, auto-renewal disclosure, "Bugün ücret alınmaz", feature sıralaması (aşı üste), Pro→Premium tutarlılığı, abone/non-abone state ayrımı |
 | GitHub Pages | ✅ | saevaexe.github.io/kinna/ (privacy, terms, support, landing) |
@@ -101,8 +101,8 @@ Last sync: 2026-03-14
 2. ~~GrowthRecord model for weight / height~~ ✅
 3. ~~Review milestone features month by month~~ ✅
 4. ~~Improve daily notes~~ ⚠️ (note tipi var, content strategy açık)
-5. Rework the Home "This month" section — **AÇIK**
-6. Define father persona notifications and changes — **AÇIK**
+5. ~~Rework the Home "This month" section~~ ✅
+6. ~~Define father persona notifications and changes~~ ✅
 
 ## Sprint Plan
 
@@ -293,13 +293,15 @@ Kalan:
 - `Ayarlar`dan rol değişince Home ve bekleyen bildirimlerin yeni role göre yeniden senkronlanması
 - Veri modeli değiştirilmedi; presentation layer yaklaşımı korundu
 
-#### 9d. Subscription Polish
+#### 9d. Subscription Polish — ✅ TAMAMLANDI
 **Karar:** RevenueCat kenar durumları ve App Store review prompt davranışı tamamlanır.
 
-**Scope:**
-- RevenueCat hata guard / edge-case handling gözden geçirme
-- Uygun zamanda App Store review prompt tetikleme
-- Prompt, kullanıcı ilk değer döngüsünü tamamladıktan sonra düşünülür
+**Tamamlanan scope:**
+- Paywall tarafında no-offering / missing-plan / network hata guard'ları
+- Aktif abonelikte gereksiz offering yükleme denemesinin kaldırılması
+- Home üzerinde veri bazlı App Store review prompt mantığı
+- Prompt için tek-seferlik / versiyon-bazlı / cooldown'lı koruma
+- İlk değer döngüsü için minimum engaged day + meaningful action eşiği
 
 #### 9e. Emzirme Zamanlayıcı
 **Karar:** Hemen implement edilmez; önce net product spec gerekir.
@@ -589,8 +591,27 @@ These are already present in `SPEC.md`, but not required before MVP release:
 11. ~~Sprint 9a: Growth charts~~ ✅
 12. ~~Sprint 9b: Sleep summary~~ ✅
 13. **Sprint 8 remaining** — `.gitignore`, warning cleanup, MVVM alignment
-14. **Sprint 9 remaining** — subscription polish
-15. App Store Connect subscription approval + bölgesel fiyat tier ayarı (external).
+14. **Sprint 9 remaining** — emzirme zamanlayıcı spec
+15. **App Store Connect — Release Checklist:**
+
+### ASC Release Checklist
+
+| # | Adım | Durum |
+|---|---|---|
+| 1 | App oluştur (com.osmanseven.kinna) | ✅ |
+| 2 | Subscription group + 2 product (monthly + yearly, 7-day trial) | ✅ |
+| 3 | RevenueCat dashboard: app + products + entitlement (`pro`) + offering (`default`) | ✅ |
+| 4 | RevenueCat public API key → `SubscriptionManager.swift` | ✅ |
+| 5 | Sandbox test: purchase + restore + trial + expiry | ✅ |
+| 6 | Bölgesel fiyat tier ayarı (TR 0.55x, EU 1.2x, IN 0.6x) | ✅ |
+| 7 | Privacy nutrition label (Purchases only) | ✅ |
+| 8 | Metadata gir: title, subtitle, description, keywords | [ ] |
+| 9 | URLs gir: privacy, terms, support, marketing | [ ] |
+| 10 | Age rating: 4+ | [ ] |
+| 11 | Screenshots üret (6 ekran, 6.7" iPhone) | [ ] |
+| 12 | App Review notes yaz | [ ] |
+| 13 | Archive + Upload (Xcode → ASC) | [ ] |
+| 14 | Submit for Review | [ ] |
 
 ## Done Definition For MVP
 

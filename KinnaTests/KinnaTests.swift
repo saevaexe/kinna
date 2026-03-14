@@ -427,6 +427,75 @@ final class KinnaTests: XCTestCase {
         XCTAssertEqual(summary?.trend, .insufficientData)
     }
 
+    func testReviewPromptRequiresEnoughEngagementAndTime() {
+        let defaults = UserDefaults(suiteName: #function)!
+        defaults.removePersistentDomain(forName: #function)
+
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let metrics = ReviewPromptMetrics(
+            engagedDayCount: 3,
+            meaningfulActionCount: 5,
+            firstMeaningfulActivityAt: now.addingTimeInterval(-3 * 86_400)
+        )
+
+        XCTAssertTrue(
+            ReviewPromptManager.shouldRequestReview(
+                metrics: metrics,
+                now: now,
+                defaults: defaults,
+                currentVersion: "1.0"
+            )
+        )
+    }
+
+    func testReviewPromptSkipsWhenSameVersionAlreadyPrompted() {
+        let defaults = UserDefaults(suiteName: #function)!
+        defaults.removePersistentDomain(forName: #function)
+
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let metrics = ReviewPromptMetrics(
+            engagedDayCount: 4,
+            meaningfulActionCount: 7,
+            firstMeaningfulActivityAt: now.addingTimeInterval(-5 * 86_400)
+        )
+
+        ReviewPromptManager.recordRequest(
+            now: now.addingTimeInterval(-1_000),
+            defaults: defaults,
+            currentVersion: "1.0"
+        )
+
+        XCTAssertFalse(
+            ReviewPromptManager.shouldRequestReview(
+                metrics: metrics,
+                now: now,
+                defaults: defaults,
+                currentVersion: "1.0"
+            )
+        )
+    }
+
+    func testReviewPromptSkipsWhenUnderMinimumThreshold() {
+        let defaults = UserDefaults(suiteName: #function)!
+        defaults.removePersistentDomain(forName: #function)
+
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let metrics = ReviewPromptMetrics(
+            engagedDayCount: 1,
+            meaningfulActionCount: 2,
+            firstMeaningfulActivityAt: now.addingTimeInterval(-1 * 86_400)
+        )
+
+        XCTAssertFalse(
+            ReviewPromptManager.shouldRequestReview(
+                metrics: metrics,
+                now: now,
+                defaults: defaults,
+                currentVersion: "1.0"
+            )
+        )
+    }
+
     private func dataFileURL(named fileName: String) -> URL {
         let testFileURL = URL(fileURLWithPath: #filePath)
         let projectRoot = testFileURL

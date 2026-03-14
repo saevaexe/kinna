@@ -27,4 +27,12 @@ enum AppConstants {
         static let privacyURL = baseURL.appendingPathComponent("privacy.html")
         static let supportURL = baseURL.appendingPathComponent("support.html")
     }
+
+    enum ReviewPrompt {
+        static let minimumEngagedDays = 3
+        static let minimumMeaningfulActions = 4
+        static let minimumDaysSinceFirstActivity = 2
+        static let cooldownDays = 120
+        static let maximumPromptCount = 2
+    }
 }
