@@ -1,0 +1,130 @@
+:root {
+  --bg: #faf6f1;
+  --card: #ffffff;
+  --text: #2d2019;
+  --muted: #8a7e74;
+  --accent: #c4714a;
+  --accent-2: #7a9e8a;
+  --border: #e8e0d8;
+  --cream: #f5efe8;
+  --terra: #c4714a;
+  --sage: #7a9e8a;
+  --alert: #d44a3c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--terra);
+  letter-spacing: 0.3px;
+}
+
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  margin-left: 16px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+nav a:hover { color: var(--text); }
+
+.hero {
+  background: linear-gradient(145deg, rgba(196,113,74,0.08), rgba(122,158,138,0.06));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin-top: 0;
+  color: var(--terra);
+}
+
+h3 {
+  font-size: 1.05rem;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 16px;
+}
+
+.card-alert {
+  background: rgba(212,74,60,0.06);
+  border: 1px solid rgba(212,74,60,0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 16px;
+}
+
+.card-alert h2 {
+  color: var(--alert);
+}
+
+a { color: var(--terra); }
+a:hover { color: var(--accent-2); }
+
+ul { padding-left: 20px; }
+li { margin-bottom: 6px; }
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+footer {
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+footer a {
+  color: var(--muted);
+  margin: 0 8px;
+}
+
+@media (max-width: 480px) {
+  .container { padding: 24px 16px 60px; }
+  h1 { font-size: 1.6rem; }
+  header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  nav a { margin-left: 0; margin-right: 12px; }
+}
