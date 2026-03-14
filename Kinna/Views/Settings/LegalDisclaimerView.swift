@@ -53,7 +53,7 @@ struct LegalDisclaimerView: View {
                                 .font(.kinnaBodyMedium(12))
                                 .foregroundStyle(Color(hex: 0xC44A4A))
                             Text(isEN
-                                ? "If you believe your child needs immediate medical attention, call 112 or go to the nearest emergency room."
+                                ? "If you believe your child needs immediate medical attention, call your local emergency number or go to the nearest emergency room."
                                 : "Çocuğunuzun acil tıbbi müdahaleye ihtiyacı olduğunu düşünüyorsanız 112'yi arayın veya en yakın acil servise gidin.")
                                 .font(.kinnaBody(11))
                                 .foregroundStyle(.kMid)
@@ -186,7 +186,7 @@ private struct LegalSectionItem: Identifiable {
         number: "2",
         titleEN: "Consult Your Healthcare Provider",
         titleTR: "Sağlık Uzmanınıza Danışın",
-        bodyEN: "Always seek the advice of your pediatrician or other qualified health provider with any questions you may have regarding your child's health or medical condition. If you think your child may have a medical emergency, call your doctor or emergency services (112) immediately.",
+        bodyEN: "Always seek the advice of your pediatrician or other qualified health provider with any questions you may have regarding your child's health or medical condition. If you think your child may have a medical emergency, call your doctor or local emergency services immediately.",
         bodyTR: "Çocuğunuzun sağlığı veya tıbbi durumu hakkında herhangi bir sorunuz olduğunda her zaman çocuk doktorunuza veya nitelikli bir sağlık uzmanına danışın. Çocuğunuzun acil tıbbi müdahaleye ihtiyacı olduğunu düşünüyorsanız derhal doktorunuzu veya acil servisi (112) arayın."
     )
 
@@ -195,7 +195,7 @@ private struct LegalSectionItem: Identifiable {
         number: "3",
         titleEN: "Vaccination Schedule Disclaimer",
         titleTR: "Aşı Takvimi Sorumluluk Reddi",
-        bodyEN: "The vaccination schedule provided in Kinna follows the Republic of Turkey Ministry of Health Childhood Immunization Program and is calculated approximately based on your baby's date of birth. These dates are estimates only and may not apply to other countries' immunization programs.\n\nActual vaccination dates may vary. Always confirm your child's vaccination schedule with your pediatrician.",
+        bodyEN: "The vaccination schedule provided in Kinna is based on WHO guidelines. Vaccination schedules follow national immunization programs and may differ by country. Dates are calculated approximately based on your baby's date of birth and are estimates only.\n\nActual vaccination dates may vary. Always confirm your child's vaccination schedule with your pediatrician.",
         bodyTR: "Kinna'da sunulan aşı takvimi, T.C. Sağlık Bakanlığı Çocukluk Çağı Aşı Programı temel alınarak bebeğinizin doğum tarihine göre yaklaşık olarak hesaplanmaktadır. Bu tarihler yalnızca tahminidir.\n\nGerçek aşı tarihleri farklılık gösterebilir. Çocuğunuzun aşı takvimini her zaman aile hekiminiz veya çocuk doktorunuzla teyit edin."
     )
 
@@ -204,7 +204,7 @@ private struct LegalSectionItem: Identifiable {
         number: "4",
         titleEN: "Content Sources",
         titleTR: "İçerik Kaynakları",
-        bodyEN: "Our developmental content is prepared based on World Health Organization (WHO) guidelines. The vaccination schedule follows the Republic of Turkey Ministry of Health immunization program and may differ from schedules in other countries.\n\nWhile we strive to keep information accurate and up-to-date, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or suitability of the information.",
+        bodyEN: "Our developmental content is prepared based on World Health Organization (WHO) guidelines. Vaccination schedules follow national immunization programs and may differ by country.\n\nWhile we strive to keep information accurate and up-to-date, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or suitability of the information.",
         bodyTR: "İçeriklerimiz Dünya Sağlık Örgütü (WHO) rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır. Bilgilerin doğru ve güncel olması için çaba göstersek de bilgilerin eksiksizliği, doğruluğu, güvenilirliği veya uygunluğu hakkında açık veya zımni hiçbir garanti vermemekteyiz."
     )
 

@@ -22,6 +22,14 @@ enum VaccinationEngine {
         loadVaccinations().sorted { $0.monthAge < $1.monthAge }
     }
 
+    static func localizedName(_ nameTR: String, isEnglish: Bool) -> String {
+        guard isEnglish else { return nameTR }
+        if let item = allItems().first(where: { $0.nameTR == nameTR }) {
+            return item.nameEN
+        }
+        return nameTR
+    }
+
     private static func loadVaccinations() -> [VaccinationItem] {
         guard let url = Bundle.main.url(forResource: "vaccinations", withExtension: "json"),
               let data = try? Data(contentsOf: url),

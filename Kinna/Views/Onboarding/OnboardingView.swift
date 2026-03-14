@@ -222,7 +222,7 @@ struct OnboardingView: View {
             .lineSpacing(2)
             .padding(.bottom, 10)
 
-            Text(isEN ? "Turkey's first emotional baby guide.\nScientific, safe, personalized." : "Türkiye'nin ilk duygusal bebek rehberi.\nBilimsel, güvenli, sana özel.")
+            Text(isEN ? "Your personal baby guide.\nScientific, safe, personalized." : "Türkiye'nin ilk duygusal bebek rehberi.\nBilimsel, güvenli, sana özel.")
                 .font(.kinnaBody(12, weight: .light))
                 .foregroundStyle(.kMid)
                 .multilineTextAlignment(.center)
@@ -232,7 +232,7 @@ struct OnboardingView: View {
             HStack(spacing: 6) {
                 trustChip("🔬", isEN ? "WHO based" : "WHO temelli")
                 trustChip("🔒", isEN ? "On-device data" : "Veri cihazında")
-                trustChip("🇹🇷", isEN ? "TR vaccine plan" : "T.C. aşı planı")
+                trustChip(isEN ? "💉" : "🇹🇷", isEN ? "Vaccine plan" : "T.C. aşı planı")
             }
 
             Spacer()
@@ -973,12 +973,12 @@ struct OnboardingView: View {
             safetyBullet(
                 icon: "•",
                 text: isEN
-                ? "Content is built from WHO guidance and Turkey Ministry of Health vaccination protocols."
+                ? "Content is built from WHO guidance and national health protocols."
                 : "İçerik WHO rehberleri ve T.C. Sağlık Bakanlığı aşı protokolleri temel alınarak hazırlanır."
             )
             safetyBullet(
                 icon: "•",
-                text: isEN ? "In emergencies, call 112." : "Acil durumda 112'yi ara."
+                text: isEN ? "In emergencies, call your local emergency number." : "Acil durumda 112'yi ara."
             )
         }
         .padding(14)

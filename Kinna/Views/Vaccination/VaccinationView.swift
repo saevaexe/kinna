@@ -16,6 +16,10 @@ struct VaccinationView: View {
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
+    private func displayName(_ record: VaccinationRecord) -> String {
+        VaccinationEngine.localizedName(record.vaccineName, isEnglish: isEN)
+    }
+
     // TR mode: auto-generated schedule records
     private var scheduleRecords: [VaccinationRecord] {
         records.filter { $0.isManual != true }
@@ -48,9 +52,9 @@ struct VaccinationView: View {
     }
 
     private var nextHeroEntry: (name: String, date: Date, isManualDose: Bool)? {
-        let scheduleCandidate = nextVaccine.map { (name: $0.vaccineName, date: $0.scheduledDate, isManualDose: false) }
+        let scheduleCandidate = nextVaccine.map { (name: displayName($0), date: $0.scheduledDate, isManualDose: false) }
         let manualCandidate = upcomingManual.first.flatMap { record in
-            record.nextDoseDate.map { (name: record.vaccineName, date: $0, isManualDose: true) }
+            record.nextDoseDate.map { (name: displayName(record), date: $0, isManualDose: true) }
         }
 
         return [scheduleCandidate, manualCandidate]
@@ -357,7 +361,7 @@ struct VaccinationView: View {
                 VStack(spacing: 12) {
                     Text("💉")
                         .font(.system(size: 40))
-                    Text("Aşı takvimi oluşturmak için bebek profili ekleyin")
+                    Text(isEN ? "Add a baby profile to create a vaccine schedule" : "Aşı takvimi oluşturmak için bebek profili ekleyin")
                         .font(.kinnaBody(14))
                         .foregroundStyle(.kMid)
                         .multilineTextAlignment(.center)
@@ -368,7 +372,7 @@ struct VaccinationView: View {
 
             // Manual entries for TR too
             if !manualRecords.isEmpty {
-                sectionHeader("MANUEL KAYITLAR")
+                sectionHeader(isEN ? "MANUAL RECORDS" : "MANUEL KAYITLAR")
                 ForEach(manualRecords.sorted { ($0.administeredDate ?? $0.scheduledDate) > ($1.administeredDate ?? $1.scheduledDate) }) { record in
                     manualVaccineRow(record)
                 }
@@ -463,7 +467,7 @@ struct VaccinationView: View {
                 .foregroundStyle(.white.opacity(0.6))
                 .tracking(1.5)
 
-            Text(record.vaccineName)
+            Text(displayName(record))
                 .font(.kinnaDisplay(20))
                 .foregroundStyle(.white)
 
@@ -558,7 +562,7 @@ struct VaccinationView: View {
 
     private func heroCard(_ entry: (name: String, date: Date, isManualDose: Bool)) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(entry.isManualDose ? "SIRADAKİ DOZ" : "SIRADAKİ AŞI")
+            Text(isEN ? (entry.isManualDose ? "NEXT DOSE" : "NEXT VACCINE") : (entry.isManualDose ? "SIRADAKİ DOZ" : "SIRADAKİ AŞI"))
                 .font(.kinnaBodyMedium(10))
                 .foregroundStyle(.white.opacity(0.6))
                 .tracking(1.5)
@@ -571,7 +575,7 @@ struct VaccinationView: View {
                 .font(.kinnaBody(12))
                 .foregroundStyle(.white.opacity(0.7))
 
-            Text(entry.isManualDose ? "📍 Sonraki dozu planla" : "📍 Randevu al")
+            Text(isEN ? (entry.isManualDose ? "📍 Schedule next dose" : "📍 Book appointment") : (entry.isManualDose ? "📍 Sonraki dozu planla" : "📍 Randevu al"))
                 .font(.kinnaBodyMedium(10))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 10)
@@ -631,7 +635,7 @@ struct VaccinationView: View {
             }
 
             // Name
-            Text(record.vaccineName)
+            Text(displayName(record))
                 .font(.kinnaBodyMedium(13))
                 .foregroundStyle(record.isCompleted ? .kLight : .kChar)
                 .strikethrough(record.isCompleted)

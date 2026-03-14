@@ -721,7 +721,7 @@ struct TrackingView: View {
             Text(item.date, format: .dateTime.hour().minute())
                 .font(.kinnaBody(10))
                 .foregroundStyle(.kLight)
-                .frame(width: 36, alignment: .leading)
+                .frame(width: 56, alignment: .leading)
 
             // Dot
             Circle()

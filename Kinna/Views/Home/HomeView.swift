@@ -25,8 +25,9 @@ enum HomeGuidancePlanner {
         let entry: VaccineEntry?
     }
 
-    static func nextVaccineEntry(records: [VaccinationRecord]) -> VaccineEntry? {
-        let nextSchedule = records
+    static func nextVaccineEntry(records: [VaccinationRecord], isEnglish: Bool = false) -> VaccineEntry? {
+        // EN mode uses manual-only tracker; schedule records are TR-specific
+        let nextSchedule: VaccinationRecord? = isEnglish ? nil : records
             .filter { $0.isManual != true && !$0.isCompleted }
             .sorted { $0.scheduledDate < $1.scheduledDate }
             .first
@@ -37,9 +38,9 @@ enum HomeGuidancePlanner {
             .first
 
         let candidates = [
-            nextSchedule.map { VaccineEntry(name: $0.vaccineName, date: $0.scheduledDate, isManualDose: false) },
+            nextSchedule.map { VaccineEntry(name: VaccinationEngine.localizedName($0.vaccineName, isEnglish: isEnglish), date: $0.scheduledDate, isManualDose: false) },
             nextManualDose.flatMap { record in
-                record.nextDoseDate.map { VaccineEntry(name: record.vaccineName, date: $0, isManualDose: true) }
+                record.nextDoseDate.map { VaccineEntry(name: VaccinationEngine.localizedName(record.vaccineName, isEnglish: isEnglish), date: $0, isManualDose: true) }
             }
         ]
         .compactMap { $0 }
@@ -56,7 +57,7 @@ enum HomeGuidancePlanner {
     ) -> VaccineCardModel {
         let startOfToday = calendar.startOfDay(for: referenceDate)
 
-        guard let nextEntry = nextVaccineEntry(records: records) else {
+        guard let nextEntry = nextVaccineEntry(records: records, isEnglish: isEnglish) else {
             return VaccineCardModel(
                 state: .quiet,
                 title: isEnglish ? "No vaccine due this month" : "Bu ay aşı görünmüyor",
@@ -396,7 +397,7 @@ struct HomeDashboardView: View {
 
                     // WHO reference
                     Text(isEN
-                         ? "Our content is based on WHO guidelines and Republic of Turkey Ministry of Health protocols."
+                         ? "Our content is based on WHO guidelines and national health protocols."
                          : "İçeriklerimiz WHO rehberleri ve T.C. Sağlık Bakanlığı protokolleri temel alınarak hazırlanmıştır.")
                         .font(.kinnaBody(9))
                         .foregroundStyle(.kMuted)
