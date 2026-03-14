@@ -54,6 +54,10 @@ struct TrackingView: View {
         SleepInsightEngine.summary(logs: babyLogs)
     }
 
+    private var breastfeedingTimerSummary: BreastfeedingTimerSummary? {
+        BreastfeedingTimerEngine.summary(logs: babyLogs)
+    }
+
     private var diaperCount: Int {
         todayLogs.filter { $0.type == .diaper }.count
     }
@@ -135,11 +139,9 @@ struct TrackingView: View {
                     GridItem(.flexible(), spacing: 10),
                     GridItem(.flexible(), spacing: 10),
                 ], spacing: 10) {
-                    trackingTile(
-                        emoji: "🍼", label: isEN ? "FEEDING" : "EMZİRME",
-                        value: "\(feedingCount)", unit: isEN ? "times" : "kez",
-                        barColor: .kSage, barProgress: min(CGFloat(feedingCount) / 8.0, 1.0)
-                    )
+                    TimelineView(.periodic(from: .now, by: 60)) { context in
+                        feedingTile(referenceDate: context.date)
+                    }
                     trackingTile(
                         emoji: "😴", label: isEN ? "SLEEP" : "UYKU",
                         value: String(format: "%.1f", sleepHours), unit: isEN ? "hours" : "saat",
@@ -441,6 +443,62 @@ struct TrackingView: View {
             }
             .buttonStyle(.plain)
             .padding(12)
+        }
+    }
+
+    private func feedingTile(referenceDate: Date) -> some View {
+        let summary = BreastfeedingTimerEngine.summary(logs: babyLogs, referenceDate: referenceDate)
+
+        return VStack(alignment: .leading, spacing: 0) {
+            Text("🍼")
+                .font(.system(size: 22))
+                .padding(.bottom, 8)
+
+            Text(isEN ? "FEEDING" : "EMZİRME")
+                .font(.kinnaBodyMedium(10))
+                .foregroundStyle(.kLight)
+                .tracking(1)
+                .padding(.bottom, 4)
+
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text("\(feedingCount)")
+                    .font(.kinnaDisplay(22))
+                    .foregroundStyle(.kChar)
+                Text(isEN ? "times" : "kez")
+                    .font(.kinnaBody(11))
+                    .foregroundStyle(.kMid)
+            }
+            .padding(.bottom, 6)
+
+            Text(feedingSubtitleText(for: summary))
+                .font(.kinnaBodyMedium(10))
+                .foregroundStyle(summary == nil ? .kLight : .kSageDark)
+                .lineLimit(2)
+                .padding(.bottom, 8)
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(Color.kPale)
+                        .frame(height: 3)
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(Color.kSage)
+                        .frame(width: geo.size.width * min(CGFloat(feedingCount) / 8.0, 1.0), height: 3)
+                }
+            }
+            .frame(height: 3)
+        }
+        .padding(16)
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.kPale, lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            preselectedType = .feeding
+            showAddSheet = true
         }
     }
 
@@ -761,6 +819,47 @@ struct TrackingView: View {
         } else {
             return values.isEmpty ? "WHO referans görünümü" : "Son ölçüm: \(values)"
         }
+    }
+
+    private func elapsedIntervalText(_ interval: TimeInterval) -> String {
+        let totalMinutes = max(0, Int(interval / 60))
+        let days = totalMinutes / (24 * 60)
+        let hours = (totalMinutes % (24 * 60)) / 60
+        let minutes = totalMinutes % 60
+
+        if isEN {
+            if days > 0 {
+                return "\(days)d \(hours)h"
+            }
+
+            if hours > 0 {
+                return "\(hours)h \(minutes)m"
+            }
+
+            return "\(minutes)m"
+        }
+
+        if days > 0 {
+            return "\(days) gün \(hours) sa"
+        }
+
+        if hours > 0 {
+            return "\(hours) sa \(minutes) dk"
+        }
+
+        return "\(minutes) dk"
+    }
+
+    private func feedingSubtitleText(for summary: BreastfeedingTimerSummary?) -> String {
+        guard let summary else {
+            return isEN ? "Tap to save the first breast milk log." : "İlk anne sütü kaydını ekle"
+        }
+
+        if isEN {
+            return "Last feed \(elapsedIntervalText(summary.elapsedSinceLatest)) ago"
+        }
+
+        return "Son emzirme \(elapsedIntervalText(summary.elapsedSinceLatest)) önce"
     }
 
     private enum TrackingTimelineItem: Identifiable {

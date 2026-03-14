@@ -427,6 +427,36 @@ final class KinnaTests: XCTestCase {
         XCTAssertEqual(summary?.trend, .insufficientData)
     }
 
+    func testBreastfeedingTimerPicksLatestBreastMilkLog() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 15, minute: 0))!
+
+        let logs = [
+            feedingLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 9, minute: 0))!, type: .bottle),
+            feedingLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 10, minute: 0))!, type: .breast),
+            feedingLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 12, minute: 30))!, type: .solid),
+            feedingLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 13, minute: 15))!, type: .breast)
+        ]
+
+        let summary = BreastfeedingTimerEngine.summary(logs: logs, referenceDate: now)
+
+        XCTAssertEqual(summary?.latestLogDate, calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 13, minute: 15))!)
+        XCTAssertEqual(summary?.elapsedSinceLatest ?? 0, 6_300, accuracy: 0.001)
+    }
+
+    func testBreastfeedingTimerReturnsNilWithoutBreastMilkLogs() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+        let logs = [
+            feedingLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 9, minute: 0))!, type: .bottle),
+            feedingLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 12, minute: 30))!, type: .solid)
+        ]
+
+        XCTAssertNil(BreastfeedingTimerEngine.summary(logs: logs))
+    }
+
     func testReviewPromptRequiresEnoughEngagementAndTime() {
         let defaults = UserDefaults(suiteName: #function)!
         defaults.removePersistentDomain(forName: #function)
@@ -512,6 +542,12 @@ final class KinnaTests: XCTestCase {
     private func sleepLog(on date: Date, hours: Double) -> DailyLog {
         let log = DailyLog(date: date, type: .sleep)
         log.sleepDuration = hours * 3600
+        return log
+    }
+
+    private func feedingLog(on date: Date, type: DailyLog.FeedingType) -> DailyLog {
+        let log = DailyLog(date: date, type: .feeding)
+        log.feedingType = type
         return log
     }
 }

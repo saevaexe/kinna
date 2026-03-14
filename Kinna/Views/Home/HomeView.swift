@@ -69,7 +69,12 @@ enum HomeGuidancePlanner {
             )
         }
 
-        let dateText = nextEntry.date.formatted(.dateTime.day().month(.wide))
+        let dateText = nextEntry.date.formatted(
+            .dateTime
+                .locale(Locale(identifier: isEnglish ? "en_US_POSIX" : "tr_TR"))
+                .day()
+                .month(.wide)
+        )
         let isOverdue = nextEntry.date < startOfToday
         let isThisMonth = calendar.isDate(nextEntry.date, equalTo: referenceDate, toGranularity: .month)
             && calendar.isDate(nextEntry.date, equalTo: referenceDate, toGranularity: .year)

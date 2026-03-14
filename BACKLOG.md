@@ -8,11 +8,11 @@ Last sync: 2026-03-14
 
 - Build succeeds for iOS Simulator.
 - Sprint 1 ✅, Sprint 2 ✅, Sprint 3 ✅, Sprint 4 ✅, Sprint 5 ✅, Sprint 6 ✅, Sprint 7 ✅.
-- Sprint 8 kısmen tamamlandı, Sprint 9a, 9b, 9c ve 9d tamamlandı.
+- Sprint 8 kısmen tamamlandı, Sprint 9a, 9b, 9c, 9d ve 9e tamamlandı.
 - Tüm ticari kararlar (Adapty raporu) koda yansıtıldı.
 - Paywall v2 tamamlandı: auto-renewal disclosure, "Bugün ücret alınmaz", feature sıralaması, Premium/Pro tutarlılığı, abone state ayrımı.
 - GitHub Pages canlı: https://saevaexe.github.io/kinna/
-- Sprint 9a, 9b, 9c ve 9d local durumda tamamlandı; commit/push bekliyor.
+- Sprint 9a, 9b, 9c, 9d ve 9e local durumda tamamlandı; commit/push bekliyor.
 
 ### Feature Status Snapshot
 
@@ -32,7 +32,7 @@ Last sync: 2026-03-14
 | Parent Role | ✅ Persist + role-aware Home + notification tonu | Sprint 9c derinleştirmesi tamamlandı |
 | Restore Purchases | ✅ Fix uygulandı | SubscriptionManager'a delegated |
 | Settings Subscription UI | ✅ | Pro→Premium isimlendirme, NavigationLink→PaywallView(navigation), abone/non-abone state |
-| Tests | ✅ 25 test | Data integrity + policy enforcement + growth chart engine + sleep insights + review prompt logic |
+| Tests | ✅ 27 test | Data integrity + policy enforcement + growth chart engine + sleep insights + review prompt logic + breastfeeding timer |
 | Legal (Terms + Privacy) | ✅ In-app views + GitHub Pages | SFSafariViewController, AppConstants.Legal URLs |
 | Paywall Optimizasyonu | ✅ v2 | Dinamik per-day price, %tasarruf, aylık karşılık, subscription terms, auto-renewal disclosure, "Bugün ücret alınmaz", feature sıralaması (aşı üste), Pro→Premium tutarlılığı, abone/non-abone state ayrımı |
 | GitHub Pages | ✅ | saevaexe.github.io/kinna/ (privacy, terms, support, landing) |
@@ -303,15 +303,54 @@ Kalan:
 - Prompt için tek-seferlik / versiyon-bazlı / cooldown'lı koruma
 - İlk değer döngüsü için minimum engaged day + meaningful action eşiği
 
-#### 9e. Emzirme Zamanlayıcı
-**Karar:** Hemen implement edilmez; önce net product spec gerekir.
+#### 9e. Emzirme Zamanlayıcı — ✅ TAMAMLANDI
+**Karar:** İlk sürüm gerçek stopwatch değil; mevcut `DailyLog` modeline oturan kompakt bir **emzirme aralığı sayacı** olarak implement edildi.
 
-**Önce cevaplanacaklar:**
-- Sadece son emzirme üzerinden sayaç mı?
-- Reminder mı, timer mı, yoksa analiz yüzeyi mi?
-- Tek aksiyon mu, sol/sağ göğüs ayrımı var mı?
+**Neden bu yön:**
+- Mevcut veri modeli `feedingType == .breast` ile noktasal kayıt tutuyor; süre (`duration`) veya sol/sağ taraf bilgisi yok.
+- Bu yüzden en risksiz MVP, **son anne sütü kaydından beri geçen süreyi** göstermek.
+- Yeni SwiftData migration gerektirmez.
 
-**Not:** Scope netleşmeden implementasyona geçilmez.
+**Sprint 9e MVP output:**
+- `Takip` ekranına yeni bir kompakt kart:
+  - başlık: `Emzirme Zamanlayıcı`
+  - ana metrik: son anne sütü kaydından beri geçen süre (`1 sa 40 dk` gibi)
+  - alt açıklama:
+    - kayıt varsa: `Son anne sütü kaydına göre`
+    - kayıt yoksa: `İlk anne sütü kaydını eklediğinde sayaç görünür`
+- Kart üstünde küçük durum dili:
+  - nötr, medikal claim yok
+  - örnek: `Son kayıt bugün 13:20`
+- CTA:
+  - `Şimdi kaydet`
+  - tap → `AddLogSheet(initialType: .feeding)` açılır ve `Anne sütü` önseçili gelir
+- Sayaç ekranda dakikalık tazelenir
+- `BreastfeedingTimerEngine` ile helper katmanı ve unit testler eklendi
+
+**Bu sprintte YAPILMAYACAK:**
+- gerçek start/stop timer session modeli
+- sol/sağ göğüs ayrımı
+- süre takibi
+- reminder scheduling
+- analiz skoru veya medikal yorum
+
+**v2 / sonraki genişleme:**
+- `left / right / both` breast side
+- duration
+- “next feed reminder” preset’leri
+- daha derin emzirme analizi
+
+**Codex implementation notu:**
+- Yeni model migration YOK
+- Hesap sadece `DailyLog` içinde:
+  - `type == .feeding`
+  - `feedingType == .breast`
+- Yeni yardımcı:
+  - `latestBreastfeedingLog`
+  - `breastfeedingElapsedText`
+- `TrackingView` içine yeni kart eklenir; günlük hızlı kayıtların yakınına yerleştirilir
+- `AddLogSheet` anne sütü ile açıldığında `feedingType = .breast` olarak gelsin
+- Kart görünürlüğü `Ayarlar > Büyüme Eğrisi` benzeri bir tercih değil; varsayılan görünür ve günlük kullanıma yakın tutulur
 
 ## Sprint Skill Matrix
 
@@ -591,7 +630,7 @@ These are already present in `SPEC.md`, but not required before MVP release:
 11. ~~Sprint 9a: Growth charts~~ ✅
 12. ~~Sprint 9b: Sleep summary~~ ✅
 13. **Sprint 8 remaining** — `.gitignore`, warning cleanup, MVVM alignment
-14. **Sprint 9 remaining** — emzirme zamanlayıcı spec
+14. **Sprint 9 remaining** — subscription edge-case polish dışı açık iş yok
 15. **App Store Connect — Release Checklist:**
 
 ### ASC Release Checklist
@@ -605,9 +644,9 @@ These are already present in `SPEC.md`, but not required before MVP release:
 | 5 | Sandbox test: purchase + restore + trial + expiry | ✅ |
 | 6 | Bölgesel fiyat tier ayarı (TR 0.55x, EU 1.2x, IN 0.6x) | ✅ |
 | 7 | Privacy nutrition label (Purchases only) | ✅ |
-| 8 | Metadata gir: title, subtitle, description, keywords | [ ] |
-| 9 | URLs gir: privacy, terms, support, marketing | [ ] |
-| 10 | Age rating: 4+ | [ ] |
+| 8 | Metadata gir: title, subtitle, description, keywords (ASO optimized) | ✅ |
+| 9 | URLs gir: privacy, terms, support, marketing | ✅ |
+| 10 | Age rating: 4+ | ✅ |
 | 11 | Screenshots üret (6 ekran, 6.7" iPhone) | [ ] |
 | 12 | App Review notes yaz | [ ] |
 | 13 | Archive + Upload (Xcode → ASC) | [ ] |
