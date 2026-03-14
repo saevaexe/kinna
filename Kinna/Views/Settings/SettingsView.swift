@@ -3,8 +3,11 @@ import SwiftData
 
 struct SettingsView: View {
     @AppStorage("notificationEnabled") private var notificationEnabled = true
+    @AppStorage("showGrowthChartsInTracking") private var showGrowthChartsInTracking = true
     @AppStorage("parentName") private var parentName = ""
+    @AppStorage("parentRole") private var parentRoleRaw = "mother"
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
+    @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @State private var presentedLegalPage: LegalWebPage?
     @State private var showPaywall = false
@@ -37,6 +40,19 @@ struct SettingsView: View {
                         .padding(.bottom, 16)
                 }
 
+                // Parent role
+                settingsSection(isEN ? "My Role" : "Rolüm") {
+                    settingsRow(icon: "person.fill", title: isEN ? "Role" : "Rol") {
+                        Picker("", selection: $parentRoleRaw) {
+                            Text(isEN ? "Mother" : "Anne").tag("mother")
+                            Text(isEN ? "Father" : "Baba").tag("father")
+                            Text(isEN ? "Caregiver" : "Bakıcı").tag("caregiver")
+                        }
+                        .tint(.kTerra)
+                    }
+                }
+                .padding(.bottom, 10)
+
                 // Notifications
                 settingsSection(String(localized: "settings_notifications", defaultValue: "Notifications")) {
                     settingsRow(icon: "bell.fill", title: String(localized: "settings_daily_reminder", defaultValue: "Daily Reminder")) {
@@ -58,6 +74,17 @@ struct SettingsView: View {
                                     }
                                 }
                             }
+                    }
+                }
+                .padding(.bottom, 10)
+
+                settingsSection(isEN ? "Tracking" : "Takip") {
+                    settingsRow(
+                        icon: "chart.line.uptrend.xyaxis",
+                        title: isEN ? "Growth Charts" : "Büyüme Eğrisi"
+                    ) {
+                        Toggle("", isOn: $showGrowthChartsInTracking)
+                            .tint(.kSage)
                     }
                 }
                 .padding(.bottom, 10)
@@ -178,6 +205,11 @@ struct SettingsView: View {
                 notificationEnabled = false
             }
         }
+        .onChange(of: parentRoleRaw) { _, _ in
+            Task {
+                await syncRoleAwareNotifications()
+            }
+        }
         .sheet(item: $presentedLegalPage) { page in
             LegalWebView(page: page)
         }
@@ -209,6 +241,20 @@ struct SettingsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    private func syncRoleAwareNotifications() async {
+        await NotificationManager.shared.checkAuthorization()
+
+        if notificationEnabled && NotificationManager.shared.isAuthorized {
+            NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
+        }
+
+        await NotificationManager.shared.syncVaccineReminders(
+            birthDate: baby?.birthDate,
+            scheduledRecords: vaccinationRecords,
+            hasFullAccess: subscriptionManager.hasFullAccess
+        )
     }
 
     // MARK: - Profile Card

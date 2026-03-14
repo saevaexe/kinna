@@ -4,15 +4,15 @@ This file consolidates product roadmap items from `SPEC.md`, implementation cons
 
 ## Current State
 
-Last sync: 2026-03-14 (04:30)
+Last sync: 2026-03-14
 
 - Build succeeds for iOS Simulator.
-- Sprint 1 ✅, Sprint 2 ✅ (content), Sprint 3 ✅ (growth tracking, gating).
-- Sprint 4 (persona differentiation) kısmen başladı (parent role persist + copy).
+- Sprint 1 ✅, Sprint 2 ✅, Sprint 3 ✅, Sprint 4 ✅, Sprint 5 ✅, Sprint 6 ✅, Sprint 7 ✅.
+- Sprint 8 kısmen tamamlandı, Sprint 9a, 9b ve 9c tamamlandı.
 - Tüm ticari kararlar (Adapty raporu) koda yansıtıldı.
 - Paywall v2 tamamlandı: auto-renewal disclosure, "Bugün ücret alınmaz", feature sıralaması, Premium/Pro tutarlılığı, abone state ayrımı.
 - GitHub Pages canlı: https://saevaexe.github.io/kinna/
-- 21 dosya, +3025 satır uncommitted Codex değişikliği (henüz commit edilmedi).
+- Sprint 9a, 9b ve 9c local durumda tamamlandı; commit/push bekliyor.
 
 ### Feature Status Snapshot
 
@@ -20,19 +20,19 @@ Last sync: 2026-03-14 (04:30)
 |---|---|---|
 | Onboarding | ✅ 5 step (rework) | Welcome → Role → Family Info → Safety Note → Value Summary → Paywall |
 | Milestones (0-24 ay) | ✅ | Content review ✅ (WHO, CDC, T.C. Sağlık Bakanlığı) |
-| Aşı Takvimi (18 kayıt) | ✅ Hibrit (TR auto + EN manual) | Otomatik hatırlatma trigger eksik |
+| Aşı Takvimi (18 kayıt) | ✅ Hibrit (TR auto + EN manual) | Otomatik hatırlatma trigger ✅ |
 | Günlük Takip | ✅ Beslenme, uyku, bez, not | — |
 | Güvenlik Uyarıları | ✅ JSON + engine + Home guidance card | Ayrı safety ekranı yok (yeterli MVP için) |
 | Ek Gıda Günlüğü | ✅ | 5 gıda free limiti ✅ |
-| GrowthRecord | ✅ Model + input + tracking tile + timeline | WHO persentil grafikleri yok (Faz 2) |
+| GrowthRecord | ✅ Model + input + tracking tile + timeline + WHO eğrileri | Premium gated growth charts eklendi |
 | Paywall | ✅ Custom SwiftUI, 7 gün trial | Onboarding soft paywall ✅, per-day price ✅, tasarruf oranı ✅, legal linkler ✅, auto-renewal disclosure ✅, "Bugün ücret alınmaz" ✅, abone state UI ✅ |
 | Premium Gating | ✅ 7/7 implement | Tüm kurallar kodda |
 | Lokalizasyon (TR+EN) | ✅ | — |
 | RevenueCat | ✅ | Sandbox verified, ASC approval pending |
-| Parent Role | ✅ Persist + role-aware Home copy | Baba persona bildirim stratejisi eksik |
+| Parent Role | ✅ Persist + role-aware Home + notification tonu | Sprint 9c derinleştirmesi tamamlandı |
 | Restore Purchases | ✅ Fix uygulandı | SubscriptionManager'a delegated |
 | Settings Subscription UI | ✅ | Pro→Premium isimlendirme, NavigationLink→PaywallView(navigation), abone/non-abone state |
-| Tests | ✅ 7 yeni test | Data integrity + policy enforcement |
+| Tests | ✅ 22 test | Data integrity + policy enforcement + growth chart engine + sleep insights |
 | Legal (Terms + Privacy) | ✅ In-app views + GitHub Pages | SFSafariViewController, AppConstants.Legal URLs |
 | Paywall Optimizasyonu | ✅ v2 | Dinamik per-day price, %tasarruf, aylık karşılık, subscription terms, auto-renewal disclosure, "Bugün ücret alınmaz", feature sıralaması (aşı üste), Pro→Premium tutarlılığı, abone/non-abone state ayrımı |
 | GitHub Pages | ✅ | saevaexe.github.io/kinna/ (privacy, terms, support, landing) |
@@ -51,11 +51,11 @@ Last sync: 2026-03-14 (04:30)
 
 ### Remaining Open Issues
 
-1. ~~Aşı otomatik hatırlatma trigger'ı~~ → Sprint 6b (KARARLANDI)
-2. ~~Multi-baby model~~ → Sprint 6a: MVP = single-baby (KARARLANDI)
+1. ~~Aşı otomatik hatırlatma trigger'ı~~ ✅ Sprint 6b' de tamamlandı
+2. ~~Multi-baby model~~ ✅ Sprint 6a: MVP = single-baby olarak kilitlendi
 3. ~~Onboarding "I have account"~~ → Sprint 5'te çözüldü ✅
-4. ~~Baba persona bildirim stratejisi~~ → Sprint 7b (KARARLANDI)
-5. **WHO persentil grafikleri** — Faz 2
+4. ~~Baba persona bildirim stratejisi~~ ✅ Sprint 7b temel ton/copy katmanı tamamlandı
+5. ~~WHO persentil grafikleri~~ ✅ Sprint 9a tamamlandı
 6. ~~Milestone content review~~ ✅
 7. **App Store Connect subscription approval** — external blocker
 8. ~~Codex uncommitted changes~~ ✅ (`d337885` + `4ab7e6d`)
@@ -75,18 +75,18 @@ Last sync: 2026-03-14 (04:30)
 6. ~~Review milestone content month by month.~~ ✅ (WHO, CDC, Sağlık Bakanlığı kaynaklarından doğrulandı)
 7. ~~Fix bundled font loading.~~ ✅
 
-### Tier 2 — ✅ Büyük ölçüde TAMAMLANDI
+### Tier 2 — ✅ TAMAMLANDI
 
 8. ~~Introduce GrowthRecord SwiftData model.~~ ✅ (model + input + tile + timeline)
-9. Define single-baby vs multi-baby model explicitly. **← AÇIK** (UI hâlâ `babies.first`)
-10. Complete vaccination reminder behavior. **← AÇIK** (method var, auto-trigger yok)
+9. ~~Define single-baby vs multi-baby model explicitly.~~ ✅ (MVP = single-baby)
+10. ~~Complete vaccination reminder behavior.~~ ✅ (auto-trigger + backfill)
 
-### Tier 3 — ⚠️ Kısmen TAMAMLANDI
+### Tier 3 — ✅ Büyük ölçüde TAMAMLANDI
 
 11. ~~Improve daily notes.~~ ⚠️ (note log tipi eklendi, content strategy açık)
-12. Rework the Home "This month" section. **← AÇIK**
+12. ~~Rework the Home "This month" section.~~ ✅
 13. ~~Persist and use parent role from onboarding.~~ ✅ (role-aware copy)
-14. Define father persona behavior more explicitly. **← AÇIK**
+14. ~~Define father persona behavior more explicitly.~~ ✅ (presentation layer)
 
 ### Tier 4 — ⚠️ Kısmen TAMAMLANDI
 
@@ -119,22 +119,13 @@ Tamamlanan: milestones 0-24 ay, vaccinations 18 kayıt (TR hibrit), safety_alert
 Kalan: aşı otomatik hatırlatma trigger.
 ~~Milestone content medikal review~~ ✅ — resmi kaynaklardan (WHO, CDC, T.C. Sağlık Bakanlığı) araştırılıp doğrulandı.
 
-### Sprint 3 — Data Model And Tracking Foundations ✅ Büyük Ölçüde TAMAMLANDI
+### Sprint 3 — Data Model And Tracking Foundations ✅ TAMAMLANDI
 
-Tamamlanan: GrowthRecord model + input + tile + timeline, placeholder metrics kaldırıldı, 7 test eklendi.
+Tamamlanan: GrowthRecord model + input + tile + timeline, placeholder metrics kaldırıldı, WHO büyüme eğrileri premium gated olarak eklendi, test kapsamı genişletildi.
 
-Kalan:
-- Single-baby vs multi-baby model kararı (UI hâlâ `babies.first`)
-- WHO persentil grafikleri (Faz 2)
+### Sprint 4 — Home Experience And Persona Differentiation ✅ TAMAMLANDI
 
-### Sprint 4 — Home Experience And Persona Differentiation ⚠️ KISMEN
-
-Tamamlanan: parent role persist + role-aware Home copy, note log tipi.
-
-Kalan:
-- Daily notes content strategy (age-based? persona-based? rotating editorial?)
-- Home "This month" section rework
-- Father persona bildirim stratejisi ve ton farklılaştırması
+Tamamlanan: parent role persist, role-aware Home copy, Home "This month" rework, father persona tone/copy katmanı, note log tipi.
 
 ### Sprint 5 — Onboarding Rework — ✅ TAMAMLANDI (2026-03-14)
 
@@ -256,13 +247,69 @@ Yeni flow (5 adım): Welcome → Role → Family Info → Safety Note → Value 
 
 **Implementasyon:** HomeView ve NotificationManager'da `parentRole` kontrolü, role-aware string seçimi.
 
-### Sprint 8 — Hardening — BAŞLANMADI
+### Sprint 8 — Hardening — KISMEN TAMAMLANDI (2026-03-14)
 
-- `.gitignore`'a `build/` ve `design/` eklenmesi (bağımsız, küçük iş)
-- Reduce release-risk logs (font warnings, simulator warnings)
-- Test genişletme (onboarding flow test, value summary test, vaccine reminder test)
-- MVVM alignment — ağır ekranlar için ViewModel çıkarma (Home, Tracking)
+Tamamlanan:
+- Test genişletme (Home vaccine planner, reminder scheduling, policy regressions)
 - Genel UI consistency pass
+- Subscription logging temizliği
+- Notification permission edge-case fix
+
+Kalan:
+- `.gitignore`'a `build/` ve `design/` eklenmesi (bağımsız, küçük iş)
+- Release-risk warning cleanup (simulator / runtime gürültüsü)
+- MVVM alignment — ağır ekranlar için ViewModel çıkarma (özellikle Home, Tracking)
+
+### Sprint 9 — Insight Layer + Post-MVP Polish — KISMEN TAMAMLANDI (2026-03-14)
+
+#### 9a. Büyüme Eğrisi (WHO persentil) — ✅ TAMAMLANDI
+**Durum:** Premium gated growth charts eklendi.
+
+**Tamamlanan scope:**
+- WHO weight-for-age / length-for-age referans eğrileri
+- `GrowthRecord` verisini chart üstünde gösterim
+- Yaşa ve cinsiyete göre doğru dataset seçimi
+- Premium gating
+- `Takip` içinde gizlenebilir kart + `Ayarlar`dan görünürlük toggle'ı
+- Mobilde sadeleştirilmiş grafik: alt sınır / orta çizgi / üst sınır + kullanıcı noktaları
+
+#### 9b. Uyku Analizi Özeti — ✅ TAMAMLANDI
+**Durum:** Tracking içinde kompakt uyku özeti kartı eklendi.
+
+**Tamamlanan scope:**
+- Son 7 gün içindeki takip edilen uyku kayıtlarından ortalama süre
+- Basit trend özeti (artan / azalan / stabil / veri yetersiz)
+- Tracking içinde kompakt özet kartı + mini günlük bar görünümü
+- Veri az olduğunda daha dürüst copy (`1 gün`, `birkaç gün daha ekle`)
+- Medikal claim yok, sadece gözlemsel içgörü
+
+#### 9c. Baba Modu Derinleştirme — ✅ TAMAMLANDI
+**Durum:** Home ve bildirim katmanında role-aware copy derinleştirildi.
+
+**Tamamlanan scope:**
+- Notification title/body varyantları (günlük reminder + aşı reminder)
+- Home guidance action satırlarında role-aware farkların genişletilmesi
+- Motivasyon alıntıları, yaş kartı alt metni, `Bu ay için` intro ve premium CTA'nın role-aware hale getirilmesi
+- `Ayarlar`dan rol değişince Home ve bekleyen bildirimlerin yeni role göre yeniden senkronlanması
+- Veri modeli değiştirilmedi; presentation layer yaklaşımı korundu
+
+#### 9d. Subscription Polish
+**Karar:** RevenueCat kenar durumları ve App Store review prompt davranışı tamamlanır.
+
+**Scope:**
+- RevenueCat hata guard / edge-case handling gözden geçirme
+- Uygun zamanda App Store review prompt tetikleme
+- Prompt, kullanıcı ilk değer döngüsünü tamamladıktan sonra düşünülür
+
+#### 9e. Emzirme Zamanlayıcı
+**Karar:** Hemen implement edilmez; önce net product spec gerekir.
+
+**Önce cevaplanacaklar:**
+- Sadece son emzirme üzerinden sayaç mı?
+- Reminder mı, timer mı, yoksa analiz yüzeyi mi?
+- Tek aksiyon mu, sol/sağ göğüs ayrımı var mı?
+
+**Not:** Scope netleşmeden implementasyona geçilmez.
 
 ## Sprint Skill Matrix
 
@@ -374,9 +421,8 @@ Suggested prompts:
 
 ## P1 Product Gaps
 
-- ~~Introduce a `GrowthRecord` SwiftData model for weight / height tracking.~~ ⚠️ Kısmen tamamlandı.
-  - Model var, input UI var, tracking tile ve timeline'a bağlı.
-  - Eksik: WHO persentil grafikleri (Faz 2).
+- ~~Introduce a `GrowthRecord` SwiftData model for weight / height tracking.~~ ✅ Done.
+  - Model, input UI, tracking tile, timeline ve WHO büyüme eğrileri mevcut.
 
 - ~~Persist and use parent role from onboarding.~~ ✅ Done.
   - `@AppStorage("parentRole")` ile persist ediliyor.
@@ -387,9 +433,8 @@ Suggested prompts:
   - DailyLog/GrowthRecord'da babyID var, VaccinationRecord/AllergyLog'da yok — v2'de düzeltilecek.
   - Detay: Sprint 6a.
 
-- ~~Complete vaccination reminder behavior.~~ → KARARLANDI: Auto vaccine reminders.
+- ~~Complete vaccination reminder behavior.~~ ✅ Done.
   - 3 gün önce + aşı günü sabahı, premium gate, 4 tetikleme noktası, stabil identifier.
-  - Detay: Sprint 6b.
 
 - ~~Replace placeholder metrics in tracking.~~ ⚠️ Kısmen tamamlandı.
   - GrowthRecord modeli + input + tracking tile + timeline entegrasyonu yapıldı.
@@ -403,17 +448,15 @@ Suggested prompts:
   - WHO, CDC, T.C. Sağlık Bakanlığı kaynaklarından doğrulandı.
   - 0-24 ay, 8 band, social/language/cognitive/motor kategorileri.
 
-- ~~Rework the Home "This month" section.~~ → KARARLANDI: 3 editorial modül.
+- ~~Rework the Home "This month" section.~~ ✅ Done.
   - Milestone odağı + yaklaşan aşı + dönen rehber kartı.
-  - Detay: Sprint 7a.
 
 - ~~Harden onboarding flow.~~ → Sprint 5 Onboarding Rework olarak yeniden tanımlandı.
   - 7 → 5 adım, "I have account" kaldırılıyor, Value Summary ekleniyor.
   - Detaylı spec: Sprint 5 bölümüne bkz.
 
-- ~~Define father persona behavior more explicitly.~~ → KARARLANDI: Presentation layer farkı.
-  - Veri şeması değişmez, role-aware copy xcstrings'te `_mother`/`_father` suffix.
-  - Detay: Sprint 7b.
+- ~~Define father persona behavior more explicitly.~~ ✅ Done.
+  - Presentation layer farkı, role-aware Home / notification tone.
 
 - Align implementation with the stated MVVM architecture.
   - Current code is mostly view-centric with lightweight engines and managers.
@@ -421,7 +464,7 @@ Suggested prompts:
 
 ## P1 Quality
 
-- ~~Add meaningful tests for product logic.~~ ✅ 7 test eklendi.
+- ~~Add meaningful tests for product logic.~~ ✅ 19 test mevcut.
   - Milestone data coverage (0-24 ay band check)
   - GrowthRecord persistence
   - DailyLog note type
@@ -540,11 +583,14 @@ These are already present in `SPEC.md`, but not required before MVP release:
 5. ~~Codex değişikliklerini commit et.~~ ✅ (`d337885` + `4ab7e6d`)
 6. ~~Sprint 5: Onboarding rework~~ ✅ — 7→5 adım + Value Summary
 7. ~~Sprint 6a: Single-baby lock~~ ✅
-8. **Sprint 6b: Auto vaccine reminders** — implement edildi, yarın bildirim testi bekleniyor
-9. **Sprint 7a: Home "This month" rework** — KARARLANDI, Codex'e verilecek
-10. **Sprint 7b: Father persona tone/copy** — KARARLANDI, Codex'e verilecek
-11. **Sprint 8: Hardening** — .gitignore, log temizliği, test genişletme, MVVM
-12. App Store Connect subscription approval + bölgesel fiyat tier ayarı (external).
+8. ~~Sprint 6b: Auto vaccine reminders~~ ✅
+9. ~~Sprint 7a: Home "This month" rework~~ ✅
+10. ~~Sprint 7b: Father persona tone/copy~~ ✅
+11. ~~Sprint 9a: Growth charts~~ ✅
+12. ~~Sprint 9b: Sleep summary~~ ✅
+13. **Sprint 8 remaining** — `.gitignore`, warning cleanup, MVVM alignment
+14. **Sprint 9 remaining** — subscription polish
+15. App Store Connect subscription approval + bölgesel fiyat tier ayarı (external).
 
 ## Done Definition For MVP
 
@@ -556,7 +602,7 @@ MVP should be considered ready only when:
 - ~~At least one premium behavior is actually enforced.~~ ✅ (7/7 gating)
 - ~~Milestone, vaccination, and safety datasets match the announced MVP scope.~~ ✅ (0-24 ay)
 - ~~Parent persona copy no longer contradicts selected onboarding role.~~ ✅
-- Tracking, vaccination, and food records are stored in a model that matches the intended user scope. **← AÇIK** (multi-baby karar)
+- ~~Tracking, vaccination, and food records are stored in a model that matches the intended user scope.~~ ✅ (MVP = single-baby)
 - ~~Critical flows are covered by basic automated tests.~~ ✅ (7 test)
 - App Store Connect subscription approval completed. **← AÇIK**
 - Bölgesel fiyat tier'ları ayarlandı (TR, EU, Hindistan). **← AÇIK**

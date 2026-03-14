@@ -2,18 +2,23 @@ import SwiftUI
 import SwiftData
 
 struct TrackingView: View {
+    @AppStorage("showGrowthChartsInTracking") private var showGrowthChartsInTracking = true
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
     @Query(sort: \GrowthRecord.measuredAt, order: .reverse) private var growthRecords: [GrowthRecord]
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @State private var showAddSheet = false
     @State private var showAddGrowthSheet = false
+    @State private var showGrowthCharts = false
     @State private var showPaywall = false
     @State private var preselectedType: DailyLog.LogType = .feeding
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
     private var baby: Baby? { babies.first }
+    private var canAccessGrowthCharts: Bool {
+        MonetizationPolicy.canAccessGrowthCharts(hasFullAccess: subscriptionManager.hasFullAccess)
+    }
 
     private var babyLogs: [DailyLog] {
         guard let baby else { return logs }
@@ -43,6 +48,10 @@ struct TrackingView: View {
             .compactMap { $0.sleepDuration }
             .reduce(0, +)
         return totalSeconds / 3600
+    }
+
+    private var sleepSummary: SleepInsightSummary? {
+        SleepInsightEngine.summary(logs: babyLogs)
     }
 
     private var diaperCount: Int {
@@ -183,6 +192,16 @@ struct TrackingView: View {
                 }
                 .padding(.bottom, 16)
 
+                if baby != nil && showGrowthChartsInTracking {
+                    growthChartsCard
+                        .padding(.bottom, 16)
+                }
+
+                if let sleepSummary {
+                    sleepSummaryCard(summary: sleepSummary)
+                        .padding(.bottom, 16)
+                }
+
                 // Timeline
                 if !todayTimelineItems.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
@@ -296,6 +315,13 @@ struct TrackingView: View {
             AddGrowthSheet()
                 .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showGrowthCharts) {
+            NavigationStack {
+                if let baby {
+                    GrowthChartsView(baby: baby, records: babyGrowthRecords)
+                }
+            }
+        }
         .sheet(isPresented: $showPaywall) {
             NavigationStack {
                 PaywallView()
@@ -337,6 +363,246 @@ struct TrackingView: View {
                     .stroke(Color.kPale, lineWidth: 1)
             )
         }
+    }
+
+    private var growthChartsCard: some View {
+        ZStack(alignment: .topTrailing) {
+            HStack(alignment: .top, spacing: 14) {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.kTerraPale)
+                    .frame(width: 52, height: 52)
+                    .overlay {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(.kTerra)
+                    }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(isEN ? "Growth charts" : "Büyüme eğrisi")
+                        .font(.kinnaBodyMedium(13))
+                        .foregroundStyle(.kChar)
+
+                    Text(canAccessGrowthCharts
+                         ? (isEN
+                            ? "See weight and height against WHO reference curves."
+                            : "Tartı ve boy ölçümlerini WHO referans eğrilerinde gör.")
+                         : (isEN
+                            ? "Unlock WHO growth charts with Premium."
+                            : "WHO büyüme eğrilerini Premium ile aç."))
+                        .font(.kinnaBody(11))
+                        .foregroundStyle(.kMid)
+                        .lineSpacing(3)
+
+                    if let latestGrowthRecord {
+                        Text(growthChartMetaText(for: latestGrowthRecord))
+                            .font(.kinnaBodyMedium(10))
+                            .foregroundStyle(.kSageDark)
+                    }
+                }
+
+                Spacer(minLength: 10)
+
+                Image(systemName: canAccessGrowthCharts ? "chevron.right" : "lock.fill")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(canAccessGrowthCharts ? .kLight : .kTerra)
+                    .padding(.top, 6)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.kPale, lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if canAccessGrowthCharts {
+                    showGrowthCharts = true
+                } else {
+                    showPaywall = true
+                }
+            }
+
+            Button {
+                showGrowthChartsInTracking = false
+            } label: {
+                Text(isEN ? "Hide" : "Gizle")
+                    .font(.kinnaBodyMedium(10))
+                    .foregroundStyle(.kLight)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.kWarm)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.kPale, lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
+            .padding(12)
+        }
+    }
+
+    private func sleepSummaryCard(summary: SleepInsightSummary) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(hex: 0xE6EDF7))
+                .frame(width: 52, height: 52)
+                .overlay {
+                    Text("😴")
+                        .font(.system(size: 21))
+                }
+
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(isEN ? "Sleep summary" : "Uyku özeti")
+                            .font(.kinnaBodyMedium(13))
+                            .foregroundStyle(.kChar)
+
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(summary.averageTrackedHours.formatted(.number.precision(.fractionLength(1))))
+                                .font(.kinnaDisplay(24))
+                                .foregroundStyle(.kChar)
+                            Text(isEN ? "hours" : "saat")
+                                .font(.kinnaBody(11))
+                                .foregroundStyle(.kMid)
+                        }
+                    }
+
+                    Spacer()
+
+                    Text(sleepSummaryBadgeText(summary))
+                        .font(.kinnaBodyMedium(10))
+                        .foregroundStyle(.kLight)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(Color.kWarm)
+                        .clipShape(Capsule())
+                }
+
+                Text(sleepSummaryDetailText(summary))
+                    .font(.kinnaBody(11))
+                    .foregroundStyle(.kMid)
+                    .lineSpacing(3)
+
+                sleepBars(summary.dailyHours)
+
+                HStack(spacing: 8) {
+                    Image(systemName: sleepTrendIcon(summary.trend))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0x6F8FB3))
+
+                    Text(sleepTrendText(summary.trend))
+                        .font(.kinnaBodyMedium(10))
+                        .foregroundStyle(Color(hex: 0x6F8FB3))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.kPale, lineWidth: 1)
+        )
+    }
+
+    private func sleepBars(_ dailyHours: [SleepDailyHours]) -> some View {
+        let maxHours = max(dailyHours.map(\.hours).max() ?? 0, 1)
+
+        return HStack(alignment: .bottom, spacing: 6) {
+            ForEach(dailyHours) { item in
+                VStack(spacing: 6) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(item.hours > 0 ? Color(hex: 0x8BA7C7) : Color.kPale)
+                        .frame(height: max(8, CGFloat(item.hours / maxHours) * 34))
+
+                    Text(shortDayLabel(for: item.date))
+                        .font(.kinnaBody(9))
+                        .foregroundStyle(.kLight)
+                }
+                .frame(maxWidth: .infinity, alignment: .bottom)
+            }
+        }
+        .frame(height: 54, alignment: .bottom)
+    }
+
+    private func sleepSummaryDetailText(_ summary: SleepInsightSummary) -> String {
+        if isEN {
+            if summary.trackedDaysCount == 1 {
+                return "Only 1 sleep entry in the last week. Add a few more to unlock a clearer weekly average."
+            }
+
+            return "Average across \(summary.trackedDaysCount) tracked days in the last week."
+        }
+
+        if summary.trackedDaysCount == 1 {
+            return "Son hafta içinde yalnızca 1 uyku kaydı var. Birkaç gün daha ekledikçe haftalık ortalama netleşir."
+        }
+
+        return "Son 7 günde takip ettiğin \(summary.trackedDaysCount) günün ortalaması."
+    }
+
+    private func sleepTrendText(_ trend: SleepTrend) -> String {
+        if isEN {
+            switch trend {
+            case .increasing:
+                return "Sleep time looks slightly higher than the previous days."
+            case .decreasing:
+                return "Sleep time looks slightly lower than the previous days."
+            case .stable:
+                return "Sleep rhythm looks fairly stable across tracked days."
+            case .insufficientData:
+                return "Add a few more sleep entries to reveal a clearer pattern."
+            }
+        }
+
+        switch trend {
+        case .increasing:
+            return "Son günlerde uyku süresi biraz daha yukarıda görünüyor."
+        case .decreasing:
+            return "Son günlerde uyku süresi biraz daha kısa görünüyor."
+        case .stable:
+            return "Takip edilen günlerde uyku ritmi oldukça benzer ilerliyor."
+        case .insufficientData:
+            return "Daha net bir örüntü için birkaç gün daha uyku kaydet."
+        }
+    }
+
+    private func sleepSummaryBadgeText(_ summary: SleepInsightSummary) -> String {
+        if isEN {
+            return "\(summary.trackedDaysCount) day\(summary.trackedDaysCount == 1 ? "" : "s")"
+        }
+
+        return "\(summary.trackedDaysCount) gün"
+    }
+
+    private func sleepTrendIcon(_ trend: SleepTrend) -> String {
+        switch trend {
+        case .increasing:
+            return "arrow.up.forward"
+        case .decreasing:
+            return "arrow.down.forward"
+        case .stable:
+            return "equal"
+        case .insufficientData:
+            return "sparkles"
+        }
+    }
+
+    private func shortDayLabel(for date: Date) -> String {
+        let weekday = Calendar.current.component(.weekday, from: date)
+
+        if isEN {
+            let labels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+            return labels[max(0, min(labels.count - 1, weekday - 1))]
+        }
+
+        let labels = ["Pz", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"]
+        return labels[max(0, min(labels.count - 1, weekday - 1))]
     }
 
     // MARK: - Tracking Tile
@@ -475,6 +741,26 @@ struct TrackingView: View {
     private func measurementText(_ value: Double?) -> String {
         guard let value else { return "—" }
         return value.formatted(.number.precision(.fractionLength(1)))
+    }
+
+    private func growthChartMetaText(for record: GrowthRecord) -> String {
+        var parts: [String] = []
+
+        if let weight = record.weightKilograms {
+            parts.append("\(measurementText(weight)) kg")
+        }
+
+        if let height = record.heightCentimeters {
+            parts.append("\(measurementText(height)) cm")
+        }
+
+        let values = parts.joined(separator: " • ")
+
+        if isEN {
+            return values.isEmpty ? "WHO reference view" : "Latest: \(values)"
+        } else {
+            return values.isEmpty ? "WHO referans görünümü" : "Son ölçüm: \(values)"
+        }
     }
 
     private enum TrackingTimelineItem: Identifiable {

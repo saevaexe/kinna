@@ -61,9 +61,11 @@ final class NotificationManager {
             storedValue: UserDefaults.standard.string(forKey: "parentRole") ?? ParentRoleProfile.mother.rawValue
         )
 
+        let rotationIndex = Calendar.current.ordinality(of: .day, in: .year, for: .now) ?? 0
+
         let content = UNMutableNotificationContent()
         content.title = roleProfile.dailyReminderTitle(isEnglish: isEnglish)
-        content.body = roleProfile.dailyReminderBody(isEnglish: isEnglish)
+        content.body = roleProfile.dailyReminderBody(isEnglish: isEnglish, rotationIndex: rotationIndex)
         content.sound = .default
 
         var dateComponents = DateComponents()
@@ -85,7 +87,7 @@ final class NotificationManager {
         )
 
         let content = UNMutableNotificationContent()
-        content.title = isEnglish ? "Vaccine Reminder" : "Aşı Hatırlatıcısı"
+        content.title = roleProfile.vaccineReminderTitle(isEnglish: isEnglish)
         content.body = roleProfile.vaccineReminderBody(
             vaccineName: vaccineName,
             leadDays: 0,
@@ -223,7 +225,10 @@ final class NotificationManager {
     }
 
     private static func vaccineReminderTitle(isEnglish: Bool) -> String {
-        isEnglish ? "Vaccine Reminder" : "Aşı Hatırlatıcısı"
+        let roleProfile = ParentRoleProfile(
+            storedValue: UserDefaults.standard.string(forKey: "parentRole") ?? ParentRoleProfile.mother.rawValue
+        )
+        return roleProfile.vaccineReminderTitle(isEnglish: isEnglish)
     }
 
     private static func vaccineReminderBody(vaccineName: String, leadDays: Int, isEnglish: Bool) -> String {

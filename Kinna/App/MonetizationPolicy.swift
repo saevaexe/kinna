@@ -38,6 +38,10 @@ enum MonetizationPolicy {
         hasFullAccess
     }
 
+    static func canAccessGrowthCharts(hasFullAccess: Bool) -> Bool {
+        hasFullAccess
+    }
+
     static func freeHistoryCutoffDate(
         referenceDate: Date = .now,
         calendar: Calendar = .current

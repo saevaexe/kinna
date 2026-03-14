@@ -112,6 +112,8 @@ final class KinnaTests: XCTestCase {
         XCTAssertTrue(MonetizationPolicy.canAddFoodLog(hasFullAccess: false, currentCount: 4))
         XCTAssertFalse(MonetizationPolicy.canAddFoodLog(hasFullAccess: false, currentCount: 5))
         XCTAssertFalse(MonetizationPolicy.canUseVaccineReminders(hasFullAccess: false))
+        XCTAssertFalse(MonetizationPolicy.canAccessGrowthCharts(hasFullAccess: false))
+        XCTAssertTrue(MonetizationPolicy.canAccessGrowthCharts(hasFullAccess: true))
     }
 
     func testFreeHistoryCutoffKeepsSevenDayWindow() {
@@ -310,6 +312,121 @@ final class KinnaTests: XCTestCase {
         )
     }
 
+    func testWHOWeightReferenceDataDecodesForTwentyFourMonths() throws {
+        let points = try GrowthReferenceEngine.loadReferencePoints(
+            from: dataFileURL(named: "who_weight_for_age_boys_0_24")
+        )
+
+        XCTAssertEqual(points.count, 731)
+        XCTAssertEqual(points.first?.day, 0)
+        XCTAssertEqual(points.last?.day, 730)
+        XCTAssertNotNil(points.first)
+        XCTAssertEqual(points.first?.p50 ?? 0, 3.346, accuracy: 0.001)
+    }
+
+    func testGrowthReferenceEngineMapsRecordsToChartPointsByAgeInDays() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let birthDate = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1, hour: 9))!
+        let records = [
+            GrowthRecord(
+                measuredAt: calendar.date(from: DateComponents(year: 2026, month: 1, day: 11, hour: 9))!,
+                weightKilograms: 4.2
+            ),
+            GrowthRecord(
+                measuredAt: calendar.date(from: DateComponents(year: 2026, month: 1, day: 21, hour: 9))!,
+                weightKilograms: 4.8
+            )
+        ]
+
+        let points = GrowthReferenceEngine.chartPoints(
+            records: records,
+            birthDate: birthDate,
+            metric: .weight,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(points.map(\.day), [10, 20])
+        XCTAssertEqual(points.map(\.value), [4.2, 4.8])
+    }
+
+    func testGrowthReferenceEngineClassifiesPercentileBand() throws {
+        let points = try GrowthReferenceEngine.loadReferencePoints(
+            from: dataFileURL(named: "who_weight_for_age_girls_0_24")
+        )
+
+        let band = GrowthReferenceEngine.band(for: 5.0, day: 60, referencePoints: points)
+
+        XCTAssertEqual(band, .p15To85)
+    }
+
+    func testGrowthReferenceEngineSkipsWHOComparisonForOtherGender() {
+        let birthDate = Calendar.current.date(byAdding: .month, value: -2, to: .now)!
+        let records = [GrowthRecord(measuredAt: .now, weightKilograms: 5.1)]
+
+        let summary = GrowthReferenceEngine.latestSummary(
+            records: records,
+            birthDate: birthDate,
+            metric: .weight,
+            gender: .other
+        )
+
+        XCTAssertNotNil(summary)
+        XCTAssertNil(summary?.band)
+    }
+
+    func testSleepInsightSummaryCalculatesTrackedAverage() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let referenceDate = calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 12))!
+
+        let logs = [
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 12, hour: 21))!, hours: 10),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 13, hour: 21))!, hours: 8),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 21))!, hours: 6)
+        ]
+
+        let summary = SleepInsightEngine.summary(logs: logs, referenceDate: referenceDate, calendar: calendar)
+
+        XCTAssertEqual(summary?.trackedDaysCount, 3)
+        XCTAssertEqual(summary?.averageTrackedHours ?? 0, 8, accuracy: 0.001)
+        XCTAssertEqual(summary?.dailyHours.count, 7)
+    }
+
+    func testSleepInsightTrendDetectsIncrease() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let referenceDate = calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 12))!
+
+        let logs = [
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 9, hour: 21))!, hours: 6),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 10, hour: 21))!, hours: 6.5),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 11, hour: 21))!, hours: 7),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 12, hour: 21))!, hours: 8.5),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 13, hour: 21))!, hours: 9),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 21))!, hours: 9.5)
+        ]
+
+        let summary = SleepInsightEngine.summary(logs: logs, referenceDate: referenceDate, calendar: calendar)
+
+        XCTAssertEqual(summary?.trend, .increasing)
+    }
+
+    func testSleepInsightTrendNeedsMoreDataWithFewTrackedDays() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let referenceDate = calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 12))!
+
+        let logs = [
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 13, hour: 21))!, hours: 8),
+            sleepLog(on: calendar.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 21))!, hours: 7.5)
+        ]
+
+        let summary = SleepInsightEngine.summary(logs: logs, referenceDate: referenceDate, calendar: calendar)
+
+        XCTAssertEqual(summary?.trend, .insufficientData)
+    }
+
     private func dataFileURL(named fileName: String) -> URL {
         let testFileURL = URL(fileURLWithPath: #filePath)
         let projectRoot = testFileURL
@@ -321,5 +438,11 @@ final class KinnaTests: XCTestCase {
             .appendingPathComponent("Resources")
             .appendingPathComponent("Data")
             .appendingPathComponent("\(fileName).json")
+    }
+
+    private func sleepLog(on date: Date, hours: Double) -> DailyLog {
+        let log = DailyLog(date: date, type: .sleep)
+        log.sleepDuration = hours * 3600
+        return log
     }
 }

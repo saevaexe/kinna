@@ -315,6 +315,196 @@ enum ParentRoleProfile: String {
         }
     }
 
+    // MARK: - Sprint 9c — Role-Aware Home & Notification Copy
+
+    func motivationQuotes(isEnglish: Bool) -> [String] {
+        if isEnglish {
+            switch self {
+            case .mother:
+                return [
+                    "\u{201C}Every bond you build with your baby shapes their brain architecture.\u{201D}",
+                    "\u{201C}The feeding rhythm you create strengthens lasting neural circuits.\u{201D}",
+                    "\u{201C}Small moments of closeness form deep attachment patterns.\u{201D}",
+                ]
+            case .father:
+                return [
+                    "\u{201C}Every playful moment builds new neural circuits in your baby\u{2019}s brain.\u{201D}",
+                    "\u{201C}Skin-to-skin contact shapes your baby\u{2019}s brain architecture from day one.\u{201D}",
+                    "\u{201C}Repeating sounds and words strengthens attachment patterns through your voice.\u{201D}",
+                ]
+            case .caregiver:
+                return [
+                    "\u{201C}A consistent routine builds the brain architecture your baby relies on.\u{201D}",
+                    "\u{201C}Every careful observation strengthens the neural circuits of trust.\u{201D}",
+                    "\u{201C}A safe, steady rhythm forms secure attachment patterns.\u{201D}",
+                ]
+            }
+        }
+
+        switch self {
+        case .mother:
+            return [
+                "\u{201C}Her gün bebeğinle kurduğun bağ, onun beyin mimarisini şekillendiriyor.\u{201D}",
+                "\u{201C}Beslenme ritmin, kalıcı nöral devreleri güçlendiriyor.\u{201D}",
+                "\u{201C}Küçük yakınlık anları, derin bağlanma kalıpları oluşturur.\u{201D}",
+            ]
+        case .father:
+            return [
+                "\u{201C}Her oyun anı, bebeğinin beyninde yeni nöral devreler kuruyor.\u{201D}",
+                "\u{201C}Ten tene temas, bebeğinin beyin mimarisini ilk günden şekillendiriyor.\u{201D}",
+                "\u{201C}Tekrar eden sesler ve kelimeler, sesinle bağlanma kalıplarını güçlendiriyor.\u{201D}",
+            ]
+        case .caregiver:
+            return [
+                "\u{201C}Tutarlı bir rutin, bebeğin güvendiği beyin mimarisini kurar.\u{201D}",
+                "\u{201C}Her dikkatli gözlem, güven nöral devrelerini güçlendirir.\u{201D}",
+                "\u{201C}Güvenli ve düzenli bir ritim, sağlam bağlanma kalıpları oluşturur.\u{201D}",
+            ]
+        }
+    }
+
+    func ageCardDescription(babyAgeInDays: Int, isEnglish: Bool) -> String {
+        if isEnglish {
+            switch self {
+            case .mother: return "\(babyAgeInDays) days of closeness and growing together"
+            case .father: return "\(babyAgeInDays) days of growing together"
+            case .caregiver: return "\(babyAgeInDays) days of care and growth"
+            }
+        }
+
+        switch self {
+        case .mother: return "\(babyAgeInDays) gündür yakınlık kuruyorsun"
+        case .father: return "\(babyAgeInDays) gündür birlikte büyüyorsunuz"
+        case .caregiver: return "\(babyAgeInDays) gündür bakımla büyüyor"
+        }
+    }
+
+    func thisMonthSectionIntro(isEnglish: Bool) -> String {
+        if isEnglish {
+            switch self {
+            case .mother:
+                return "This month\u{2019}s rhythm: feeding cues, developmental closeness, and one calm suggestion each day."
+            case .father:
+                return "Play ideas, bonding activities, and what to watch for this month."
+            case .caregiver:
+                return "Routine structure, observation points, and family coordination tips for this month."
+            }
+        }
+
+        switch self {
+        case .mother:
+            return "Bu ayın ritmi: beslenme ipuçları, gelişimsel yakınlık ve her gün sakin bir öneri."
+        case .father:
+            return "Bu ay için oyun fikirleri, bağ kurma aktiviteleri ve nelere dikkat etmeli."
+        case .caregiver:
+            return "Bu ay için rutin yapısı, gözlem noktaları ve aile koordinasyonu."
+        }
+    }
+
+    func premiumUnlockCTA(isEnglish: Bool) -> (title: String, body: String) {
+        if isEnglish {
+            switch self {
+            case .mother:
+                return (
+                    "Unlock the full monthly plan",
+                    "See all cards, track feeding rhythm and closeness patterns with Kinna Premium."
+                )
+            case .father:
+                return (
+                    "Unlock daily bonding ideas",
+                    "Open daily connection ideas and save unlimited milestones with Kinna Premium."
+                )
+            case .caregiver:
+                return (
+                    "Unlock the full care plan",
+                    "Access the full care plan and share detailed observations with Kinna Premium."
+                )
+            }
+        }
+
+        switch self {
+        case .mother:
+            return (
+                "Bu ayın tam planını aç",
+                "Tüm kartları gör, emzirme ve yakınlık ritmini Kinna Premium ile takip et."
+            )
+        case .father:
+            return (
+                "Günlük bağ kurma fikirlerini aç",
+                "Günlük bağ kurma önerilerini gör ve sınırsız kilometre taşı kaydet."
+            )
+        case .caregiver:
+            return (
+                "Tam bakım planına eriş",
+                "Detaylı bakım planını gör ve gözlemleri aileyle paylaş."
+            )
+        }
+    }
+
+    func dailyReminderBody(isEnglish: Bool, rotationIndex: Int) -> String {
+        let index = rotationIndex % 3
+
+        if isEnglish {
+            switch self {
+            case .mother:
+                switch index {
+                case 0: return "Open Kinna for one calm suggestion that supports your baby's rhythm today."
+                case 1: return "A small feeding connection idea is waiting for you in Kinna."
+                default: return "Kinna has a gentle sleep tip ready for tonight."
+                }
+            case .father:
+                switch index {
+                case 0: return "Open Kinna for one short play idea to try today."
+                case 1: return "A skin-to-skin reminder is waiting for you in Kinna."
+                default: return "Kinna has a sound repetition idea to strengthen your bond."
+                }
+            case .caregiver:
+                switch index {
+                case 0: return "Open Kinna for today's routine check-in."
+                case 1: return "A quick observation note prompt is ready in Kinna."
+                default: return "Kinna has a family summary suggestion for end of day."
+                }
+            }
+        }
+
+        switch self {
+        case .mother:
+            switch index {
+            case 0: return "Bugün bebeğinin ritmine iyi gelecek tek bir sakin öneri seni bekliyor."
+            case 1: return "Beslenme bağlantısını güçlendirecek küçük bir fikir Kinna'da hazır."
+            default: return "Bu akşam için yumuşak bir uyku ipucu Kinna'da seni bekliyor."
+            }
+        case .father:
+            switch index {
+            case 0: return "Bugün için kısa bir oyun fikri Kinna'da seni bekliyor."
+            case 1: return "Ten tene temas hatırlatması Kinna'da hazır."
+            default: return "Bağını güçlendirecek bir ses tekrarı önerisi Kinna'da."
+            }
+        case .caregiver:
+            switch index {
+            case 0: return "Bugünkü rutin check-in'i Kinna'da hazır."
+            case 1: return "Hızlı bir gözlem notu önerisi Kinna'da seni bekliyor."
+            default: return "Gün sonu aile özeti için bir öneri Kinna'da hazır."
+            }
+        }
+    }
+
+    func vaccineReminderTitle(isEnglish: Bool) -> String {
+        if isEnglish {
+            switch self {
+            case .mother: return "Vaccine Reminder"
+            case .father: return "Vaccine Plan Reminder"
+            case .caregiver: return "Vaccine Coordination Note"
+            }
+        }
+
+        switch self {
+        case .mother: return "Aşı Hatırlatması"
+        case .father: return "Aşı Planı Hatırlatması"
+        case .caregiver: return "Aşı Koordinasyon Notu"
+        }
+    }
+
     func vaccineReminderBody(vaccineName: String, leadDays: Int, isEnglish: Bool) -> String {
         if isEnglish {
             switch self {

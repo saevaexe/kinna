@@ -282,19 +282,7 @@ struct HomeDashboardView: View {
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
     private var motivationQuotes: [String] {
-        if isEN {
-            return [
-                "\u{201C}Every bond you build with your baby shapes their brain architecture.\u{201D}",
-                "\u{201C}The patience you show today builds tomorrow\u{2019}s strong neural circuits.\u{201D}",
-                "\u{201C}Small moments create lasting attachment patterns.\u{201D}",
-            ]
-        } else {
-            return [
-                "\u{201C}Her gün bebeğinle kurduğun bağ, onun beyin mimarisini şekillendiriyor.\u{201D}",
-                "\u{201C}Bugün gösterdiğin sabır, yarının güçlü nöral devrelerini kuruyor.\u{201D}",
-                "\u{201C}Küçük anlar, büyük bağlanma kalıpları oluşturur.\u{201D}",
-            ]
-        }
+        roleProfile.motivationQuotes(isEnglish: isEN)
     }
 
     var body: some View {
@@ -344,9 +332,7 @@ struct HomeDashboardView: View {
                                 .foregroundStyle(subscriptionManager.hasFullAccess ? .kSageDark : .kTerra)
                         }
 
-                        Text(isEN
-                             ? "A small plan shaped around this age: development, vaccines, and one daily guide."
-                             : "Bu yaş için küçük bir plan: gelişim, aşılar ve günlük tek bir rehber.")
+                        Text(roleProfile.thisMonthSectionIntro(isEnglish: isEN))
                             .font(.kinnaBody(11))
                             .foregroundStyle(.kMid)
                             .lineSpacing(2)
@@ -454,9 +440,7 @@ struct HomeDashboardView: View {
                     .font(.kinnaDisplay(36, weight: .light))
                     .foregroundStyle(.white)
 
-                Text(isEN
-                     ? "\(baby.ageInDays) days in your life"
-                     : "\(baby.ageInDays) gündür hayatınızda")
+                Text(roleProfile.ageCardDescription(babyAgeInDays: baby.ageInDays, isEnglish: isEN))
                     .font(.kinnaBody(12))
                     .foregroundStyle(.white.opacity(0.4))
 
@@ -587,12 +571,11 @@ struct HomeDashboardView: View {
                             }
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(isEN ? "Unlock the full monthly plan" : "Bu ayın tam planını aç")
+                            let cta = roleProfile.premiumUnlockCTA(isEnglish: isEN)
+                            Text(cta.title)
                                 .font(.kinnaBodyMedium(13))
                                 .foregroundStyle(.kChar)
-                            Text(isEN
-                                 ? "See all three cards every day and keep unlimited milestones with Kinna Premium."
-                                 : "Her gün üç kartın tamamını gör ve sınırsız milestone kaydetmek için Kinna Premium'a geç.")
+                            Text(cta.body)
                                 .font(.kinnaBody(11))
                                 .foregroundStyle(.kMid)
                                 .lineSpacing(2)
