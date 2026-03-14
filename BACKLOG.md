@@ -18,7 +18,7 @@ Last sync: 2026-03-14 (04:30)
 
 | Özellik | Durum | Not |
 |---|---|---|
-| Onboarding | ✅ 7 step | Parent role persist ✅ |
+| Onboarding | ✅ 5 step (rework) | Welcome → Role → Family Info → Safety Note → Value Summary → Paywall |
 | Milestones (0-24 ay) | ✅ | Content review ✅ (WHO, CDC, T.C. Sağlık Bakanlığı) |
 | Aşı Takvimi (18 kayıt) | ✅ Hibrit (TR auto + EN manual) | Otomatik hatırlatma trigger eksik |
 | Günlük Takip | ✅ Beslenme, uyku, bez, not | — |
@@ -53,7 +53,7 @@ Last sync: 2026-03-14 (04:30)
 
 1. **Aşı otomatik hatırlatma trigger'ı** — method var ama yaklaşan aşılar için auto-schedule yok
 2. **Multi-baby model** — records `babyID` var ama UI hâlâ `babies.first`
-3. **Onboarding "I have account"** — placeholder
+3. ~~Onboarding "I have account"~~ → Sprint 5'te çözülecek (kaldırılıyor)
 4. **Baba persona bildirim stratejisi** — parent role copy yapıldı, baba-spesifik bildirim/ton tanımlanmadı
 5. **WHO persentil grafikleri** — Faz 2
 6. ~~Milestone content review~~ ✅ — WHO, CDC, T.C. Sağlık Bakanlığı kaynaklarından doğrulandı
@@ -90,7 +90,7 @@ Last sync: 2026-03-14 (04:30)
 
 ### Tier 4 — ⚠️ Kısmen TAMAMLANDI
 
-15. Harden onboarding flow. **← AÇIK** ("I have account" placeholder)
+15. ~~Harden onboarding flow.~~ → Sprint 5 Onboarding Rework (KARARLANDI)
 16. ~~Add meaningful tests for product logic.~~ ✅ (7 test eklendi)
 17. Reduce release-risk logs. **← AÇIK**
 18. Align implementation with the stated MVVM architecture. **← AÇIK**
@@ -136,9 +136,70 @@ Kalan:
 - Home "This month" section rework
 - Father persona bildirim stratejisi ve ton farklılaştırması
 
-### Sprint 5 — Hardening — BAŞLANMADI
+### Sprint 5 — Onboarding Rework — ✅ TAMAMLANDI (2026-03-14)
 
-- Harden onboarding flow ("I have account" placeholder)
+Kaynak: Adapty raporu + onboarding completion rate optimizasyonu.
+
+**Karar: 7 adım → 5 adım + Value Summary + soft paywall**
+**Build ✅, Test ✅ (8/8), Görsel tur ✅**
+
+Mevcut flow (7 adım): Welcome → Role → User Name → Baby Info → Child Order → Disclaimer (4 kart) → Notification → Paywall
+Yeni flow (5 adım): Welcome → Role → Family Info → Safety Note → Value Summary → Paywall
+
+#### Adım adım spec:
+
+**Step 0 — Welcome**
+- Mevcut tasarım korunur
+- "I have an account, sign in" placeholder KALDIRILıR (OnboardingView.swift:136)
+- Yerine: "Restore purchases" linki veya tamamen sil
+
+**Step 1 — Role**
+- Mevcut haliyle kalır (anne/baba/bakıcı)
+
+**Step 2 — Family Info** (merge: eski Step 2 + Step 3)
+- Ebeveyn adı + bebek adı + doğum tarihi + cinsiyet TEK ADIMDA
+- ScrollView ile (çok alan var)
+- Privacy info box korunur
+
+**Step 3 — Safety Note** (compact: eski Step 5)
+- 4 kart → TEK compact disclaimer kartı
+- Checkbox korunur: "Kinna'nın bilgilendirme amaçlı olduğunu anlıyorum"
+- Detaylı disclaimer Settings'te zaten mevcut (LegalDisclaimerView)
+
+**Step 4 — Value Summary** ← YENİ (paywall'dan hemen önce)
+- Kişiselleştirilmiş: "{BabyName} {age} aylık. Bu ay seni neler bekliyor:"
+- 1x milestone odağı (milestones.json'dan bebek yaşına göre)
+- 1x yaklaşan aşı (VaccinationEngine'den hesaplanmış)
+- 1x kısa rehber/hatırlatma (safety_alerts veya home content'ten)
+- Bildirim izni BURADA istenir (notification previews ile)
+- "İzin ver" + "Şimdi değil" butonları
+
+**Sonra → Soft Paywall** (mevcut PaywallView, entryPoint: .onboarding)
+
+#### Kaldırılanlar:
+- **Child Order step** (OnboardingView.swift:425) — onboarding'den çıkar
+- `childOrder` @AppStorage ve veri modeli KORunur — sadece UI'dan kaldırılır
+- İleride Settings'e "Kaçıncı çocuğunuz?" olarak taşınabilir
+
+#### Neden:
+- 7 → 5 adım = daha yüksek onboarding completion rate
+- Child order şu an gerçek personalizasyon farkı yaratmıyor
+- Compact disclaimer = "yasal belge" hissi azalır
+- Value Summary = paywall'dan önce "bu sana özel" hissi → trial conversion artışı
+- Adapty: Gün 0'da %44.5 satın alma piki, kişiselleştirilmiş onboarding bunu maximize eder
+
+#### Codex implementation notu:
+- `totalSteps = 7` → `totalSteps = 5`
+- progressBar `1...6` → `1...4`
+- Step tag'leri yeniden numaralandırılacak
+- `childOrderStep` view'ı kaldırılacak (kod silinebilir)
+- `userNameStep` + `babyInfoStep` → tek `familyInfoStep`'e merge
+- `disclaimerStep` → compact `safetyNoteStep`
+- Yeni `valueSummaryStep` eklenir (milestone/aşı/rehber hesaplamaları)
+- `notificationStep` kaldırılır — bildirim izni valueSummaryStep içine taşınır
+
+### Sprint 6 — Hardening — BAŞLANMADI
+
 - Reduce release-risk logs
 - Broader product logic tests (7 test var, genişletilecek)
 - MVVM architecture alignment
@@ -287,9 +348,9 @@ Suggested prompts:
   - The current cards are a good placeholder, but this area should better reflect the app's unique value.
   - Decide stronger content modules such as milestone focus, safety tip, vaccine reminder, feeding transition, or daily activity idea.
 
-- Harden onboarding flow.
-  - "I have an account, sign in" is a placeholder.
-  - Notification opt-in currently schedules a daily reminder immediately after permission request; verify denied-path behavior.
+- ~~Harden onboarding flow.~~ → Sprint 5 Onboarding Rework olarak yeniden tanımlandı.
+  - 7 → 5 adım, "I have account" kaldırılıyor, Value Summary ekleniyor.
+  - Detaylı spec: Sprint 5 bölümüne bkz.
 
 - Define father persona behavior more explicitly.
   - Clarify father-specific notifications, tone, home content, and any UI/content differences from the default flow.
@@ -417,12 +478,12 @@ These are already present in `SPEC.md`, but not required before MVP release:
 2. ~~Define commercial behavior.~~ ✅
 3. ~~Close MVP scope mismatches.~~ ✅
 4. ~~Paywall v2 (auto-renewal, bugün ücret alınmaz, feature sıralaması, Pro→Premium).~~ ✅
-5. **Codex değişikliklerini commit et** — 21 dosya uncommitted.
-6. Define single-baby vs multi-baby model — ya MVP'yi tek bebeğe kilitle ya da relationship ekle.
-7. Aşı otomatik hatırlatma trigger'ı — yaklaşan aşılar için auto-schedule.
-8. Father persona bildirim/ton stratejisi.
-9. Home "This month" section rework.
-10. Onboarding "I have account" placeholder kaldır.
+5. ~~Codex değişikliklerini commit et.~~ ✅ (`d337885`)
+6. ~~Sprint 5: Onboarding rework~~ ✅ — 7→5 adım + Value Summary
+7. Define single-baby vs multi-baby model — ya MVP'yi tek bebeğe kilitle ya da relationship ekle.
+8. Aşı otomatik hatırlatma trigger'ı — yaklaşan aşılar için auto-schedule.
+9. Father persona bildirim/ton stratejisi.
+10. Home "This month" section rework.
 11. App Store Connect subscription approval + bölgesel fiyat tier ayarı.
 
 ## Done Definition For MVP
