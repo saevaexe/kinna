@@ -1,11 +1,16 @@
 import Foundation
 import Observation
+import OSLog
 import RevenueCat
 
 @MainActor
 @Observable
 final class SubscriptionManager {
     static let shared = SubscriptionManager()
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.osmanseven.kinna",
+        category: "Subscription"
+    )
 
     private(set) var isSubscribed = false
     private(set) var isTrialActive = false
@@ -65,7 +70,7 @@ final class SubscriptionManager {
             applyCustomerInfo(customerInfo)
         } catch {
             lastErrorMessage = error.localizedDescription
-            print("Failed to check subscription: \(error)")
+            logger.error("Failed to check subscription: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -91,7 +96,7 @@ final class SubscriptionManager {
             return await refreshCustomerInfoAfterTransaction(shouldSyncPurchases: false)
         } catch {
             lastErrorMessage = error.localizedDescription
-            print("Failed to purchase subscription: \(error)")
+            logger.error("Failed to purchase subscription: \(error.localizedDescription, privacy: .public)")
             return false
         }
     }
@@ -115,7 +120,7 @@ final class SubscriptionManager {
             return await refreshCustomerInfoAfterTransaction(shouldSyncPurchases: true)
         } catch {
             lastErrorMessage = error.localizedDescription
-            print("Failed to restore purchases: \(error)")
+            logger.error("Failed to restore purchases: \(error.localizedDescription, privacy: .public)")
             return false
         }
     }
@@ -155,7 +160,7 @@ final class SubscriptionManager {
                 }
             } catch {
                 lastErrorMessage = error.localizedDescription
-                print("Failed to refresh subscription state: \(error)")
+                logger.error("Failed to refresh subscription state: \(error.localizedDescription, privacy: .public)")
             }
         }
 

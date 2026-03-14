@@ -36,3 +36,9 @@ Package.resolved
 .idea/
 *.code-workspace
 .vscode/
+
+# Build artifacts
+build/
+
+# Design assets (source files)
+design/

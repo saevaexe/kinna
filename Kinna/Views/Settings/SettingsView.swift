@@ -2,12 +2,12 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-    @AppStorage("preferredTheme") private var preferredTheme = 0
     @AppStorage("notificationEnabled") private var notificationEnabled = true
     @AppStorage("parentName") private var parentName = ""
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @State private var presentedLegalPage: LegalWebPage?
+    @State private var showPaywall = false
 
     private var baby: Baby? { babies.first }
 
@@ -37,29 +37,25 @@ struct SettingsView: View {
                         .padding(.bottom, 16)
                 }
 
-                // Appearance
-                settingsSection(String(localized: "settings_appearance", defaultValue: "Appearance")) {
-                    settingsRow(icon: "paintpalette.fill", title: String(localized: "settings_theme", defaultValue: "Theme")) {
-                        Picker("", selection: $preferredTheme) {
-                            Text(String(localized: "settings_theme_system", defaultValue: "System")).tag(0)
-                            Text(String(localized: "settings_theme_light", defaultValue: "Light")).tag(1)
-                            Text(String(localized: "settings_theme_dark", defaultValue: "Dark")).tag(2)
-                        }
-                        .tint(.kMid)
-                    }
-                }
-                .padding(.bottom, 10)
-
                 // Notifications
                 settingsSection(String(localized: "settings_notifications", defaultValue: "Notifications")) {
                     settingsRow(icon: "bell.fill", title: String(localized: "settings_daily_reminder", defaultValue: "Daily Reminder")) {
                         Toggle("", isOn: $notificationEnabled)
                             .tint(.kSage)
                             .onChange(of: notificationEnabled) { _, newValue in
-                                if newValue {
-                                    NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
-                                } else {
-                                    NotificationManager.shared.cancelDailyReminder()
+                                Task {
+                                    if newValue {
+                                        let granted = await NotificationManager.shared.requestPermission()
+                                        if granted {
+                                            NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
+                                        } else {
+                                            await MainActor.run {
+                                                notificationEnabled = false
+                                            }
+                                        }
+                                    } else {
+                                        NotificationManager.shared.cancelDailyReminder()
+                                    }
                                 }
                             }
                     }
@@ -68,8 +64,8 @@ struct SettingsView: View {
 
                 // Subscription
                 settingsSection(String(localized: "settings_subscription", defaultValue: "Subscription")) {
-                    NavigationLink {
-                        PaywallView(entryPoint: .navigation)
+                    Button {
+                        showPaywall = true
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: subscriptionManager.hasFullAccess ? "checkmark.seal.fill" : "star.fill")
@@ -176,8 +172,20 @@ struct SettingsView: View {
         }
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await NotificationManager.shared.checkAuthorization()
+            if notificationEnabled && NotificationManager.shared.isDenied {
+                notificationEnabled = false
+            }
+        }
         .sheet(item: $presentedLegalPage) { page in
             LegalWebView(page: page)
+        }
+        .fullScreenCover(isPresented: $showPaywall) {
+            NavigationStack {
+                PaywallView()
+            }
+            .environment(subscriptionManager)
         }
     }
 

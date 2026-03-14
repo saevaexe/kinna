@@ -4,7 +4,7 @@ import SwiftData
 struct MilestonesView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(SubscriptionManager.self) private var subscriptionManager
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @Query private var progressRecords: [MilestoneProgress]
     @State private var selectedMonth = 0
     @State private var showPaywall = false
@@ -33,9 +33,9 @@ struct MilestonesView: View {
 
     private var upgradeHint: String {
         if isEN {
-            return "Free includes this month plus your first \(MonetizationPolicy.freeMilestoneTrackingLimit) saved milestones. Upgrade for every month and unlimited tracking."
+            return "Free includes all milestones for your baby's current month, plus your first \(MonetizationPolicy.freeMilestoneTrackingLimit) tracked milestones. Upgrade for every month and unlimited tracking."
         }
-        return "Ücretsiz planda yalnızca bu ay ve ilk \(MonetizationPolicy.freeMilestoneTrackingLimit) milestone kaydı dahildir. Tüm aylar ve sınırsız takip için Premium'a geç."
+        return "Ücretsiz planda bebeğinin bu ayındaki tüm taşlar açık. İlk \(MonetizationPolicy.freeMilestoneTrackingLimit) milestone kaydını işaretleyebilir, tüm aylar ve sınırsız takip için Premium'a geçebilirsin."
     }
 
     private func isMonthLocked(_ month: Int) -> Bool {
@@ -194,36 +194,6 @@ struct MilestonesView: View {
                     .padding(.bottom, 12)
                 }
 
-                if !subscriptionManager.hasFullAccess {
-                    HStack(spacing: 10) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.kTerra)
-
-                        Text(upgradeHint)
-                            .font(.kinnaBody(10))
-                            .foregroundStyle(.kMid)
-                            .lineSpacing(2)
-
-                        Spacer(minLength: 8)
-
-                        Button(isEN ? "Upgrade" : "Pro") {
-                            showPaywall = true
-                        }
-                        .font(.kinnaBodyMedium(10))
-                        .foregroundStyle(.kTerra)
-                    }
-                    .padding(12)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.kPale, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 12)
-                }
-
                 // Month selector
                 ScrollViewReader { proxy in
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -278,33 +248,36 @@ struct MilestonesView: View {
                 .padding(.bottom, 16)
 
                 if !subscriptionManager.hasFullAccess {
-                    HStack(spacing: 10) {
-                        Image(systemName: "lock.fill")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(.kTerra)
+                    Button {
+                        showPaywall = true
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.kTerra)
 
-                        Text(isEN
-                             ? "Free access stays on your baby's current month. Upgrade to browse every month."
-                             : "Ücretsiz planda yalnızca bebeğinin bu ayı açık. Tüm ayları görmek için Premium'a geç.")
-                            .font(.kinnaBody(10))
-                            .foregroundStyle(.kMid)
-                            .lineSpacing(2)
+                            Text(upgradeHint)
+                                .font(.kinnaBody(10))
+                                .foregroundStyle(.kMid)
+                                .lineSpacing(2)
+                                .multilineTextAlignment(.leading)
 
-                        Spacer(minLength: 8)
+                            Spacer(minLength: 8)
 
-                        Button(isEN ? "Premium" : "Premium") {
-                            showPaywall = true
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(.kLight)
                         }
-                        .font(.kinnaBodyMedium(10))
-                        .foregroundStyle(.kTerra)
+                        .contentShape(Rectangle())
+                        .padding(12)
+                        .background(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(Color.kPale, lineWidth: 1)
+                        )
                     }
-                    .padding(12)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.kPale, lineWidth: 1)
-                    )
+                    .buttonStyle(.plain)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 16)
                 }

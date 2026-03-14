@@ -15,7 +15,7 @@
 - **Analytics:** Apple Analytics only — 3rd party analytics SDK ekleme
 
 ## Fiyatlandırma
-- $4.99/mo, $39.99/yr, 3 gün trial
+- $4.99/mo, $39.99/yr, 7 gün trial
 
 ## Ton ve İçerik
 - Sıcak pediatrist tonu — bilimsel ama insani

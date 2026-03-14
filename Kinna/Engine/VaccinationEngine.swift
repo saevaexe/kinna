@@ -11,12 +11,15 @@ struct VaccinationItem: Codable, Identifiable {
 
 enum VaccinationEngine {
     static func schedule(birthDate: Date) -> [VaccinationItem] {
-        let items = loadVaccinations()
-        return items.sorted { $0.monthAge < $1.monthAge }
+        allItems()
     }
 
     static func scheduledDate(birthDate: Date, monthAge: Int) -> Date {
         Calendar.current.date(byAdding: .month, value: monthAge, to: birthDate) ?? birthDate
+    }
+
+    static func allItems() -> [VaccinationItem] {
+        loadVaccinations().sorted { $0.monthAge < $1.monthAge }
     }
 
     private static func loadVaccinations() -> [VaccinationItem] {

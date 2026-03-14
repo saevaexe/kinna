@@ -5,7 +5,7 @@ struct TrackingView: View {
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
     @Query(sort: \GrowthRecord.measuredAt, order: .reverse) private var growthRecords: [GrowthRecord]
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @State private var showAddSheet = false
     @State private var showAddGrowthSheet = false
     @State private var showPaywall = false
@@ -506,7 +506,7 @@ struct TrackingView: View {
 struct AddLogSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -517,6 +517,7 @@ struct AddLogSheet: View {
     @State private var diaperType: DailyLog.DiaperType = .wet
     @State private var note = ""
     @State private var logDate = Date()
+    private var placeholderColor: Color { .kMid.opacity(0.8) }
 
     private var canSave: Bool {
         if selectedType == .note {
@@ -636,7 +637,12 @@ struct AddLogSheet: View {
                                         .stroke(Color.kPale, lineWidth: 1.5)
                                 )
                         } else {
-                            TextField(isEN ? "Additional info..." : "Ek bilgi...", text: $note)
+                            TextField(
+                                "",
+                                text: $note,
+                                prompt: Text(isEN ? "Additional info..." : "Ek bilgi...")
+                                    .foregroundStyle(placeholderColor)
+                            )
                                 .font(.kinnaBody(14))
                                 .foregroundStyle(.kChar)
                                 .tint(.kTerra)
@@ -774,7 +780,7 @@ struct AddLogSheet: View {
 struct AddGrowthSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
 
     @State private var weightText = ""
     @State private var heightText = ""
@@ -782,6 +788,7 @@ struct AddGrowthSheet: View {
     @State private var measuredAt = Date()
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+    private var placeholderColor: Color { .kMid.opacity(0.8) }
 
     private var parsedWeight: Double? {
         parseMeasurement(weightText)
@@ -845,7 +852,12 @@ struct AddGrowthSheet: View {
 
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "NOTE (optional)" : "NOT (isteğe bağlı)")
-                        TextField(isEN ? "Doctor visit, home scale, etc." : "Doktor kontrolü, ev tartısı, vb.", text: $note)
+                        TextField(
+                            "",
+                            text: $note,
+                            prompt: Text(isEN ? "Doctor visit, home scale, etc." : "Doktor kontrolü, ev tartısı, vb.")
+                                .foregroundStyle(placeholderColor)
+                        )
                             .font(.kinnaBody(14))
                             .foregroundStyle(.kChar)
                             .tint(.kTerra)
@@ -900,7 +912,7 @@ struct AddGrowthSheet: View {
                 text: text,
                 prompt: Text(placeholder)
                     .font(.kinnaDisplay(24))
-                    .foregroundStyle(.kMuted.opacity(0.5))
+                    .foregroundStyle(placeholderColor)
             )
                 .font(.kinnaDisplay(24))
                 .foregroundStyle(.kChar)

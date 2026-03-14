@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import RevenueCat
 
 struct PaywallView: View {
@@ -11,6 +12,8 @@ struct PaywallView: View {
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
+    @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
     @State private var offering: Offering?
     @State private var selectedPlan: Package?
     @State private var isPurchasing = false
@@ -507,6 +510,9 @@ struct PaywallView: View {
             await subscriptionManager.checkSubscriptionStatus()
         }
         .onChange(of: subscriptionManager.hasFullAccess) { _, hasAccess in
+            Task {
+                await syncVaccineReminders()
+            }
             if hasAccess { dismiss() }
         }
         .onChange(of: subscriptionManager.lastErrorMessage) { _, newValue in
@@ -688,6 +694,7 @@ struct PaywallView: View {
         successMessage = nil
 
         let purchaseSucceeded = await subscriptionManager.purchase(selectedPlan)
+        await syncVaccineReminders()
         if !purchaseSucceeded && !subscriptionManager.hasFullAccess {
             errorMessage = subscriptionManager.lastErrorMessage
         }
@@ -705,6 +712,7 @@ struct PaywallView: View {
         successMessage = nil
 
         let restoreSucceeded = await subscriptionManager.restorePurchases()
+        await syncVaccineReminders()
         if restoreSucceeded && subscriptionManager.hasFullAccess {
             successMessage = hadActiveAccessBeforeRestore
                 ? (isEN ? "Your subscription is already active." : "Aboneliğiniz zaten aktif.")
@@ -723,6 +731,14 @@ struct PaywallView: View {
         successMessage = nil
         errorMessage = nil
         openURL(AppConstants.Subscription.manageSubscriptionsURL)
+    }
+
+    private func syncVaccineReminders() async {
+        await NotificationManager.shared.syncVaccineReminders(
+            birthDate: babies.first?.birthDate,
+            scheduledRecords: vaccinationRecords,
+            hasFullAccess: subscriptionManager.hasFullAccess
+        )
     }
 }
 

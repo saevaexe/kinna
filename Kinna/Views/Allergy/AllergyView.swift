@@ -5,7 +5,7 @@ struct AllergyView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \AllergyLog.introducedDate, order: .reverse) private var logs: [AllergyLog]
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @State private var showAddSheet = false
     @State private var showPaywall = false
 
@@ -373,6 +373,8 @@ struct AddFoodSheet: View {
                "Yumurta", "Yoğurt", "Pirinç", "Brokoli", "Armut", "Çilek"]
     }
 
+    private var placeholderColor: Color { .kMid.opacity(0.8) }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -380,7 +382,12 @@ struct AddFoodSheet: View {
                     // Food name
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "FOOD NAME" : "BESIN ADI")
-                        TextField(isEN ? "e.g., Carrot puree" : "örnek: Havuç püresi", text: $foodName)
+                        TextField(
+                            "",
+                            text: $foodName,
+                            prompt: Text(isEN ? "e.g., Carrot puree" : "örnek: Havuç püresi")
+                                .foregroundStyle(placeholderColor)
+                        )
                             .font(.kinnaBody(14))
                             .foregroundStyle(.kChar)
                             .tint(.kTerra)
@@ -468,7 +475,12 @@ struct AddFoodSheet: View {
                     if reaction != .none {
                         VStack(alignment: .leading, spacing: 6) {
                             fieldLabel(isEN ? "REACTION NOTE" : "REAKSIYON NOTU")
-                            TextField(isEN ? "Rash, vomiting, gas..." : "Kızarıklık, kusma, gaz...", text: $reactionNote)
+                            TextField(
+                                "",
+                                text: $reactionNote,
+                                prompt: Text(isEN ? "Rash, vomiting, gas..." : "Kızarıklık, kusma, gaz...")
+                                    .foregroundStyle(placeholderColor)
+                            )
                                 .font(.kinnaBody(14))
                                 .foregroundStyle(.kChar)
                                 .tint(.kTerra)

@@ -5,9 +5,12 @@ struct VaccinationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \VaccinationRecord.scheduledDate) private var records: [VaccinationRecord]
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @State private var showAddSheet = false
     @State private var showPaywall = false
+    @State private var showAllFutureRecords = false
+    @State private var recordPendingReschedule: VaccinationRecord?
+    @State private var rescheduledDate = Date()
 
     private var baby: Baby? { babies.first }
 
@@ -36,8 +39,24 @@ struct VaccinationView: View {
         scheduleRecords.filter { !$0.isCompleted && $0.scheduledDate > Calendar.current.date(byAdding: .month, value: 2, to: .now)! }
     }
 
+    private var visibleFutureRecords: [VaccinationRecord] {
+        showAllFutureRecords ? futureRecords : Array(futureRecords.prefix(2))
+    }
+
     private var nextVaccine: VaccinationRecord? {
         scheduleRecords.first { !$0.isCompleted }
+    }
+
+    private var nextHeroEntry: (name: String, date: Date, isManualDose: Bool)? {
+        let scheduleCandidate = nextVaccine.map { (name: $0.vaccineName, date: $0.scheduledDate, isManualDose: false) }
+        let manualCandidate = upcomingManual.first.flatMap { record in
+            record.nextDoseDate.map { (name: record.vaccineName, date: $0, isManualDose: true) }
+        }
+
+        return [scheduleCandidate, manualCandidate]
+            .compactMap { $0 }
+            .sorted { $0.date < $1.date }
+            .first
     }
 
     // Manual groupings (EN mode / both modes)
@@ -151,6 +170,69 @@ struct VaccinationView: View {
             }
             .environment(subscriptionManager)
         }
+        .sheet(isPresented: Binding(
+            get: { recordPendingReschedule != nil },
+            set: { newValue in
+                if !newValue {
+                    recordPendingReschedule = nil
+                }
+            }
+        )) {
+            NavigationStack {
+                VStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(recordPendingReschedule?.vaccineName ?? "")
+                            .font(.kinnaBodyMedium(16))
+                            .foregroundStyle(.kChar)
+
+                        Text(isEN
+                             ? "Move this vaccine to a new date instead of removing it from the plan."
+                             : "Bu aşıyı plandan silmek yerine yeni bir tarihe taşı.")
+                            .font(.kinnaBody(11))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+
+                    DatePicker(
+                        "",
+                        selection: $rescheduledDate,
+                        in: Date()...Date.distantFuture,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+
+                    Button(isEN ? "Save new date" : "Yeni tarihi kaydet") {
+                        saveReschedule()
+                    }
+                    .font(.kinnaBodyMedium(14))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(14)
+                    .background(Color.kChar)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .padding(20)
+                }
+                .background(Color.kCream.ignoresSafeArea())
+                .navigationTitle(isEN ? "Reschedule" : "Ertele")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(isEN ? "Cancel" : "Vazgeç") {
+                            recordPendingReschedule = nil
+                        }
+                    }
+                }
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: - EN Mode: Manual Tracker
@@ -217,7 +299,7 @@ struct VaccinationView: View {
     private var scheduleContent: some View {
         VStack(spacing: 0) {
             // Next vaccine hero card
-            if let next = nextVaccine {
+            if let next = nextHeroEntry {
                 heroCard(next)
                     .padding(.bottom, 16)
             }
@@ -233,15 +315,41 @@ struct VaccinationView: View {
             if !upcomingRecords.isEmpty {
                 sectionHeader("YAKLAŞAN")
                 ForEach(upcomingRecords) { record in
-                    let isNext = record.id == nextVaccine?.id
+                    let isNext = record.id == nextVaccine?.id && nextHeroEntry?.isManualDose != true
                     vaccineRow(record, status: isNext ? .next : .upcoming)
                 }
             }
 
             if !futureRecords.isEmpty {
                 sectionHeader("GELECEK")
-                ForEach(futureRecords) { record in
+                ForEach(visibleFutureRecords) { record in
                     vaccineRow(record, status: .future)
+                }
+
+                if futureRecords.count > visibleFutureRecords.count {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showAllFutureRecords = true
+                        }
+                    } label: {
+                        Text(isEN ? "Show more" : "Daha fazla göster")
+                            .font(.kinnaBodyMedium(11))
+                            .foregroundStyle(.kTerra)
+                            .padding(.top, 6)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else if futureRecords.count > 2 {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showAllFutureRecords = false
+                        }
+                    } label: {
+                        Text(isEN ? "Show less" : "Daha az göster")
+                            .font(.kinnaBodyMedium(11))
+                            .foregroundStyle(.kMid)
+                            .padding(.top, 6)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
 
@@ -448,22 +556,22 @@ struct VaccinationView: View {
 
     // MARK: - Schedule Hero Card (TR)
 
-    private func heroCard(_ record: VaccinationRecord) -> some View {
+    private func heroCard(_ entry: (name: String, date: Date, isManualDose: Bool)) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("SIRADAKİ AŞI")
+            Text(entry.isManualDose ? "SIRADAKİ DOZ" : "SIRADAKİ AŞI")
                 .font(.kinnaBodyMedium(10))
                 .foregroundStyle(.white.opacity(0.6))
                 .tracking(1.5)
 
-            Text(record.vaccineName)
+            Text(entry.name)
                 .font(.kinnaDisplay(20))
                 .foregroundStyle(.white)
 
-            Text(record.scheduledDate, format: .dateTime.day().month(.wide).year())
+            Text(entry.date, format: .dateTime.day().month(.wide).year())
                 .font(.kinnaBody(12))
                 .foregroundStyle(.white.opacity(0.7))
 
-            Text("📍 Randevu al")
+            Text(entry.isManualDose ? "📍 Sonraki dozu planla" : "📍 Randevu al")
                 .font(.kinnaBodyMedium(10))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 10)
@@ -514,12 +622,10 @@ struct VaccinationView: View {
                             Text("✓")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundStyle(.white)
-                        case .next, .upcoming:
+                        case .next, .upcoming, .future:
                             Text("→")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundStyle(.kTerra)
-                        case .future:
-                            EmptyView()
                         }
                     }
             }
@@ -542,13 +648,51 @@ struct VaccinationView: View {
                 .fill(Color.kPale)
                 .frame(height: 1)
         }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            if status != .done {
+                Button {
+                    startRescheduling(record)
+                } label: {
+                    Label(isEN ? "Reschedule" : "Ertele", systemImage: "calendar.badge.clock")
+                }
+                .tint(.kTerra)
+            }
+        }
+        .contextMenu {
+            if status != .done {
+                Button {
+                    startRescheduling(record)
+                } label: {
+                    Label(isEN ? "Reschedule" : "Ertele", systemImage: "calendar.badge.clock")
+                }
+            }
+        }
     }
 
     private func statusBadgeBg(_ status: VaccineStatus) -> Color {
         switch status {
         case .done: .kSageLight
-        case .next, .upcoming: .kTerraLight
-        case .future: .kPale
+        case .next, .upcoming, .future: .kTerraLight
+        }
+    }
+
+    private func startRescheduling(_ record: VaccinationRecord) {
+        rescheduledDate = max(record.scheduledDate, Calendar.current.startOfDay(for: .now))
+        recordPendingReschedule = record
+    }
+
+    private func saveReschedule() {
+        guard let record = recordPendingReschedule else { return }
+
+        record.scheduledDate = rescheduledDate
+        recordPendingReschedule = nil
+
+        Task {
+            await NotificationManager.shared.syncVaccineReminders(
+                birthDate: baby?.birthDate,
+                scheduledRecords: scheduleRecords,
+                hasFullAccess: subscriptionManager.hasFullAccess
+            )
         }
     }
 }
@@ -568,9 +712,23 @@ struct AddVaccineSheet: View {
     @State private var lotNumber = ""
     @State private var note = ""
     @State private var showPaywall = false
+    @State private var activeDatePicker: ActiveDatePicker?
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
     private var canUseReminder: Bool { MonetizationPolicy.canUseVaccineReminders(hasFullAccess: subscriptionManager.hasFullAccess) }
+    private var placeholderColor: Color { .kMid.opacity(0.8) }
+
+    private enum ActiveDatePicker: Identifiable {
+        case administered
+        case nextDose
+
+        var id: Int {
+            switch self {
+            case .administered: return 0
+            case .nextDose: return 1
+            }
+        }
+    }
 
     private let commonVaccines: [(en: String, tr: String)] = [
         ("Hepatitis B", "Hepatit B"),
@@ -594,9 +752,14 @@ struct AddVaccineSheet: View {
                     // Vaccine name
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "VACCINE NAME" : "AŞI ADI")
-                        TextField(isEN ? "e.g., DTaP 2nd dose" : "örnek: DTaP 2. doz", text: $vaccineName)
+                        TextField(
+                            "",
+                            text: $vaccineName,
+                            prompt: Text(isEN ? "e.g., DTaP 2nd dose" : "örnek: DTaP 2. doz")
+                                .foregroundStyle(placeholderColor)
+                        )
                             .font(.kinnaBody(14))
-                            .foregroundStyle(.kChar)
+                            .foregroundColor(.kChar)
                             .tint(.kTerra)
                             .padding(12)
                             .background(.white)
@@ -640,7 +803,9 @@ struct AddVaccineSheet: View {
                     // Administered date
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "DATE ADMINISTERED" : "YAPILDIĞI TARİH")
-                        ZStack {
+                        Button {
+                            activeDatePicker = .administered
+                        } label: {
                             HStack {
                                 Text(administeredDate.formatted(date: .abbreviated, time: .omitted))
                                     .font(.kinnaBody(14))
@@ -657,46 +822,33 @@ struct AddVaccineSheet: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.kPale, lineWidth: 1.5)
                             )
-
-                            DatePicker("", selection: $administeredDate, in: ...Date(), displayedComponents: .date)
-                                .labelsHidden()
-                                .datePickerStyle(.compact)
-                                .blendMode(.destinationOver)
-                                .opacity(0.015)
-                                .tint(.kTerra)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                         }
+                        .buttonStyle(.plain)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
                     // Next dose toggle
                     VStack(alignment: .leading, spacing: 8) {
-                        Toggle(isOn: Binding(
-                            get: { hasNextDose },
-                            set: { newValue in
-                                guard newValue else {
-                                    hasNextDose = false
-                                    return
+                        Button {
+                            handleReminderToggle()
+                        } label: {
+                            HStack(spacing: 12) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "bell.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(canUseReminder ? .kTerra : .kLight)
+                                    Text(isEN ? "Set next dose reminder" : "Sonraki doz hatırlatıcısı")
+                                        .font(.kinnaBody(13))
+                                        .foregroundStyle(canUseReminder ? .kChar : .kMid)
                                 }
 
-                                guard canUseReminder else {
-                                    showPaywall = true
-                                    return
-                                }
+                                Spacer()
 
-                                hasNextDose = true
+                                reminderToggle
                             }
-                        )) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "bell.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(canUseReminder ? .kTerra : .kLight)
-                                Text(isEN ? "Set next dose reminder" : "Sonraki doz hatırlatıcısı")
-                                    .font(.kinnaBody(13))
-                                    .foregroundStyle(canUseReminder ? .kChar : .kMid)
-                            }
+                            .contentShape(Rectangle())
                         }
-                        .tint(.kSage)
+                        .buttonStyle(.plain)
 
                         if hasNextDose {
                             VStack(alignment: .leading, spacing: 6) {
@@ -704,7 +856,9 @@ struct AddVaccineSheet: View {
                                     .font(.kinnaBody(12))
                                     .foregroundStyle(.kMid)
 
-                                ZStack {
+                                Button {
+                                    activeDatePicker = .nextDose
+                                } label: {
                                     HStack {
                                         Text(nextDoseDate.formatted(date: .abbreviated, time: .omitted))
                                             .font(.kinnaBody(14))
@@ -721,20 +875,8 @@ struct AddVaccineSheet: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .stroke(Color.kPale, lineWidth: 1.5)
                                     )
-
-                                    DatePicker(
-                                        "",
-                                        selection: $nextDoseDate,
-                                        in: Date()...,
-                                        displayedComponents: .date
-                                    )
-                                    .labelsHidden()
-                                    .datePickerStyle(.compact)
-                                    .blendMode(.destinationOver)
-                                    .opacity(0.015)
-                                    .tint(.kTerra)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                                 }
+                                .buttonStyle(.plain)
                             }
                         } else if !canUseReminder {
                             Button {
@@ -756,9 +898,14 @@ struct AddVaccineSheet: View {
                     // Doctor name (optional)
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "DOCTOR (OPTIONAL)" : "DOKTOR (OPSİYONEL)")
-                        TextField(isEN ? "Dr. Smith" : "Dr. Yılmaz", text: $doctorName)
+                        TextField(
+                            "",
+                            text: $doctorName,
+                            prompt: Text("Dr. Seven")
+                                .foregroundStyle(placeholderColor)
+                        )
                             .font(.kinnaBody(14))
-                            .foregroundStyle(.kChar)
+                            .foregroundColor(.kChar)
                             .tint(.kTerra)
                             .padding(12)
                             .background(.white)
@@ -772,9 +919,14 @@ struct AddVaccineSheet: View {
                     // Note (optional)
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "NOTE (OPTIONAL)" : "NOT (OPSİYONEL)")
-                        TextField(isEN ? "Any reactions, lot number, etc." : "Reaksiyon, lot numarası vb.", text: $note)
+                        TextField(
+                            "",
+                            text: $note,
+                            prompt: Text(isEN ? "Any reactions, lot number, etc." : "Reaksiyon, lot numarası vb.")
+                                .foregroundStyle(placeholderColor)
+                        )
                             .font(.kinnaBody(14))
-                            .foregroundStyle(.kChar)
+                            .foregroundColor(.kChar)
                             .tint(.kTerra)
                             .padding(12)
                             .background(.white)
@@ -796,6 +948,52 @@ struct AddVaccineSheet: View {
                     PaywallView()
                 }
                 .environment(subscriptionManager)
+            }
+            .sheet(item: $activeDatePicker) { picker in
+                NavigationStack {
+                    VStack(spacing: 0) {
+                        VStack(spacing: 0) {
+                            DatePicker(
+                                "",
+                                selection: dateBinding(for: picker),
+                                in: dateRange(for: picker),
+                                displayedComponents: .date
+                            )
+                            .datePickerStyle(.wheel)
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+
+                        Button(isEN ? "Done" : "Tamam") {
+                            activeDatePicker = nil
+                        }
+                        .font(.kinnaBodyMedium(14))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(14)
+                        .background(Color.kChar)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .padding(20)
+                    }
+                    .background(Color.kCream.ignoresSafeArea())
+                    .navigationTitle(datePickerTitle(for: picker))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(isEN ? "Done" : "Tamam") {
+                                activeDatePicker = nil
+                            }
+                        }
+                    }
+                }
+                .preferredColorScheme(.light)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -837,11 +1035,82 @@ struct AddVaccineSheet: View {
         dismiss()
     }
 
+    private func handleReminderToggle() {
+        guard !hasNextDose else {
+            hasNextDose = false
+            return
+        }
+
+        guard canUseReminder else {
+            showPaywall = true
+            return
+        }
+
+        hasNextDose = true
+    }
+
+    private func dateBinding(for picker: ActiveDatePicker) -> Binding<Date> {
+        switch picker {
+        case .administered:
+            return $administeredDate
+        case .nextDose:
+            return $nextDoseDate
+        }
+    }
+
+    private func dateRange(for picker: ActiveDatePicker) -> ClosedRange<Date> {
+        switch picker {
+        case .administered:
+            return Date.distantPast...Date()
+        case .nextDose:
+            return Date()...Date.distantFuture
+        }
+    }
+
+    private func datePickerTitle(for picker: ActiveDatePicker) -> String {
+        switch picker {
+        case .administered:
+            return isEN ? "Date administered" : "Yapıldığı tarih"
+        case .nextDose:
+            return isEN ? "Next dose date" : "Sonraki doz tarihi"
+        }
+    }
+
     private func fieldLabel(_ text: String) -> some View {
         Text(text)
             .font(.kinnaBodyMedium(10))
             .foregroundStyle(.kLight)
             .tracking(1)
+    }
+
+    private var reminderToggle: some View {
+        ZStack(alignment: hasNextDose ? .trailing : .leading) {
+            Capsule()
+                .fill(toggleTrackColor)
+                .overlay(
+                    Capsule()
+                        .stroke(toggleBorderColor, lineWidth: 1)
+                )
+
+            Circle()
+                .fill(.white)
+                .frame(width: 26, height: 26)
+                .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
+                .padding(3)
+        }
+        .frame(width: 54, height: 32)
+        .animation(.easeInOut(duration: 0.18), value: hasNextDose)
+        .accessibilityHidden(true)
+    }
+
+    private var toggleTrackColor: Color {
+        if hasNextDose { return .kSage }
+        return canUseReminder ? .kPale : .kTerraPale
+    }
+
+    private var toggleBorderColor: Color {
+        if hasNextDose { return .kSage }
+        return canUseReminder ? .kMuted.opacity(0.35) : .kTerraLight
     }
 }
 

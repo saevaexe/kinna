@@ -1,8 +1,170 @@
 import SwiftUI
 import SwiftData
 
+enum HomeGuidancePlanner {
+    enum VaccineCardState: Equatable {
+        case overdue
+        case upcoming
+        case next
+        case quiet
+    }
+
+    struct VaccineEntry: Equatable {
+        let name: String
+        let date: Date
+        let isManualDose: Bool
+    }
+
+    struct VaccineCardModel: Equatable {
+        let state: VaccineCardState
+        let title: String
+        let description: String
+        let hasUpcomingThisMonth: Bool
+        let isUrgent: Bool
+        let entry: VaccineEntry?
+    }
+
+    static func nextVaccineEntry(records: [VaccinationRecord]) -> VaccineEntry? {
+        let nextSchedule = records
+            .filter { $0.isManual != true && !$0.isCompleted }
+            .sorted { $0.scheduledDate < $1.scheduledDate }
+            .first
+
+        let nextManualDose = records
+            .filter { $0.isManual == true && $0.nextDoseDate != nil }
+            .sorted { ($0.nextDoseDate ?? .distantFuture) < ($1.nextDoseDate ?? .distantFuture) }
+            .first
+
+        let candidates = [
+            nextSchedule.map { VaccineEntry(name: $0.vaccineName, date: $0.scheduledDate, isManualDose: false) },
+            nextManualDose.flatMap { record in
+                record.nextDoseDate.map { VaccineEntry(name: record.vaccineName, date: $0, isManualDose: true) }
+            }
+        ]
+        .compactMap { $0 }
+        .sorted { $0.date < $1.date }
+
+        return candidates.first
+    }
+
+    static func vaccineCardModel(
+        records: [VaccinationRecord],
+        referenceDate: Date = .now,
+        calendar: Calendar = .current,
+        isEnglish: Bool
+    ) -> VaccineCardModel {
+        let startOfToday = calendar.startOfDay(for: referenceDate)
+
+        guard let nextEntry = nextVaccineEntry(records: records) else {
+            return VaccineCardModel(
+                state: .quiet,
+                title: isEnglish ? "No vaccine due this month" : "Bu ay aşı görünmüyor",
+                description: isEnglish
+                    ? "Your vaccine calendar looks quiet for now. We'll bring the next dose forward when it gets close."
+                    : "Aşı takvimi bu ay daha sakin. Bir sonraki dozu yaklaşınca öne çıkaracağız.",
+                hasUpcomingThisMonth: false,
+                isUrgent: false,
+                entry: nil
+            )
+        }
+
+        let dateText = nextEntry.date.formatted(.dateTime.day().month(.wide))
+        let isOverdue = nextEntry.date < startOfToday
+        let isThisMonth = calendar.isDate(nextEntry.date, equalTo: referenceDate, toGranularity: .month)
+            && calendar.isDate(nextEntry.date, equalTo: referenceDate, toGranularity: .year)
+        let isUrgent = nextEntry.date <= (calendar.date(byAdding: .day, value: 7, to: referenceDate) ?? nextEntry.date)
+
+        if isOverdue {
+            return VaccineCardModel(
+                state: .overdue,
+                title: isEnglish ? "Needs attention" : "İlgilenmen gereken aşı",
+                description: overdueDescription(
+                    vaccineName: nextEntry.name,
+                    dateText: dateText,
+                    isManualDose: nextEntry.isManualDose,
+                    isEnglish: isEnglish
+                ),
+                hasUpcomingThisMonth: true,
+                isUrgent: true,
+                entry: nextEntry
+            )
+        }
+
+        if isThisMonth {
+            return VaccineCardModel(
+                state: .upcoming,
+                title: isEnglish ? "Upcoming vaccine" : "Yaklaşan aşı",
+                description: plannedDescription(
+                    vaccineName: nextEntry.name,
+                    dateText: dateText,
+                    isManualDose: nextEntry.isManualDose,
+                    isEnglish: isEnglish
+                ),
+                hasUpcomingThisMonth: true,
+                isUrgent: isUrgent,
+                entry: nextEntry
+            )
+        }
+
+        return VaccineCardModel(
+            state: .next,
+            title: nextEntry.isManualDose
+                ? (isEnglish ? "Next dose" : "Sıradaki doz")
+                : (isEnglish ? "Next on the vaccine plan" : "Sıradaki aşı"),
+            description: plannedDescription(
+                vaccineName: nextEntry.name,
+                dateText: dateText,
+                isManualDose: nextEntry.isManualDose,
+                isEnglish: isEnglish
+            ),
+            hasUpcomingThisMonth: false,
+            isUrgent: false,
+            entry: nextEntry
+        )
+    }
+
+    private static func plannedDescription(
+        vaccineName: String,
+        dateText: String,
+        isManualDose: Bool,
+        isEnglish: Bool
+    ) -> String {
+        if isEnglish {
+            return isManualDose
+                ? "\(vaccineName) next dose is planned for \(dateText)."
+                : "\(vaccineName) is planned for \(dateText)."
+        }
+
+        return isManualDose
+            ? "\(vaccineName) için sonraki doz tarihi \(dateText)."
+            : "\(vaccineName) için planlanan tarih \(dateText)."
+    }
+
+    private static func overdueDescription(
+        vaccineName: String,
+        dateText: String,
+        isManualDose: Bool,
+        isEnglish: Bool
+    ) -> String {
+        if isEnglish {
+            return isManualDose
+                ? "\(vaccineName) next dose was expected on \(dateText)."
+                : "\(vaccineName) was planned for \(dateText)."
+        }
+
+        return isManualDose
+            ? "\(vaccineName) için sonraki doz tarihi \(dateText) idi."
+            : "\(vaccineName) için planlanan tarih \(dateText) idi."
+    }
+}
+
 struct HomeView: View {
     @State private var selectedTab = 0
+    @State private var homeStackID = UUID()
+    @State private var milestonesStackID = UUID()
+    @State private var trackingStackID = UUID()
+    @State private var vaccinationStackID = UUID()
+    @State private var foodsStackID = UUID()
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -23,14 +185,19 @@ struct HomeView: View {
                 switch selectedTab {
                 case 0:
                     NavigationStack { HomeDashboardView() }
+                        .id(homeStackID)
                 case 1:
                     NavigationStack { MilestonesView() }
+                        .id(milestonesStackID)
                 case 2:
                     NavigationStack { TrackingView() }
+                        .id(trackingStackID)
                 case 3:
                     NavigationStack { VaccinationView() }
+                        .id(vaccinationStackID)
                 case 4:
                     NavigationStack { AllergyView() }
+                        .id(foodsStackID)
                 default:
                     EmptyView()
                 }
@@ -46,7 +213,11 @@ struct HomeView: View {
                     ForEach(0..<tabs.count, id: \.self) { i in
                         Button {
                             withAnimation(.easeInOut(duration: 0.15)) {
-                                selectedTab = i
+                                if selectedTab == i {
+                                    resetStack(for: i)
+                                } else {
+                                    selectedTab = i
+                                }
                             }
                         } label: {
                             VStack(spacing: 4) {
@@ -76,17 +247,37 @@ struct HomeView: View {
         }
         .ignoresSafeArea(.keyboard)
     }
+
+    private func resetStack(for tab: Int) {
+        switch tab {
+        case 0:
+            homeStackID = UUID()
+        case 1:
+            milestonesStackID = UUID()
+        case 2:
+            trackingStackID = UUID()
+        case 3:
+            vaccinationStackID = UUID()
+        case 4:
+            foodsStackID = UUID()
+        default:
+            break
+        }
+    }
 }
 
 // MARK: - Home Dashboard
 
 struct HomeDashboardView: View {
+    @AppStorage("parentName") private var parentName = ""
     @AppStorage("parentRole") private var parentRoleRaw = "mother"
-    @Query private var babies: [Baby]
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @State private var showPaywall = false
 
     private var baby: Baby? { babies.first }
+    private var roleProfile: ParentRoleProfile { ParentRoleProfile(storedValue: parentRoleRaw) }
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -106,29 +297,6 @@ struct HomeDashboardView: View {
         }
     }
 
-    private var parentRoleLabel: String {
-        let role = parentRoleRaw.lowercased()
-        if isEN {
-            switch role {
-            case "father":
-                return "father"
-            case "caregiver":
-                return "caregiver"
-            default:
-                return "mother"
-            }
-        } else {
-            switch role {
-            case "father":
-                return "babası"
-            case "caregiver":
-                return "bakım vereni"
-            default:
-                return "annesi"
-            }
-        }
-    }
-
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -140,9 +308,15 @@ struct HomeDashboardView: View {
                             .foregroundStyle(.kLight)
                             .tracking(1)
 
-                        Text(isEN ? "\(baby.name)'s \(parentRoleLabel) 👋" : "\(baby.name)'ın \(parentRoleLabel) 👋")
+                        Text(isEN ? "\(baby.name)'s \(roleProfile.possessiveLabel(isEnglish: isEN)) 👋" : "\(baby.name)'ın \(roleProfile.possessiveLabel(isEnglish: isEN)) 👋")
                             .font(.kinnaDisplay(26))
                             .foregroundStyle(.kChar)
+
+                        Text(greetingSupportLine(for: baby))
+                            .font(.kinnaBody(11))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+                            .padding(.top, 2)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 20)
@@ -156,15 +330,26 @@ struct HomeDashboardView: View {
                         .padding(.bottom, 10)
 
                     // Section header
-                    HStack {
-                        Text(isEN ? "This month" : "Bu ay için")
-                            .font(.kinnaBodyMedium(13))
-                            .foregroundStyle(.kChar)
-                            .tracking(0.3)
-                        Spacer()
-                        Text(isEN ? "All →" : "Tümü →")
-                            .font(.kinnaBodyMedium(11))
-                            .foregroundStyle(.kSage)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(isEN ? "This month" : "Bu ay için")
+                                .font(.kinnaBodyMedium(13))
+                                .foregroundStyle(.kChar)
+                                .tracking(0.3)
+                            Spacer()
+                            Text(subscriptionManager.hasFullAccess
+                                 ? (isEN ? "3/3 open" : "3/3 açık")
+                                 : (isEN ? "1/3 open" : "1/3 açık"))
+                                .font(.kinnaBodyMedium(10))
+                                .foregroundStyle(subscriptionManager.hasFullAccess ? .kSageDark : .kTerra)
+                        }
+
+                        Text(isEN
+                             ? "A small plan shaped around this age: development, vaccines, and one daily guide."
+                             : "Bu yaş için küçük bir plan: gelişim, aşılar ve günlük tek bir rehber.")
+                            .font(.kinnaBody(11))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
                     }
                     .padding(.bottom, 12)
 
@@ -231,6 +416,22 @@ struct HomeDashboardView: View {
             default: return "İyi Geceler"
             }
         }
+    }
+
+    private func greetingSupportLine(for baby: Baby) -> String {
+        let trimmedName = parentName.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if isEN {
+            if trimmedName.isEmpty {
+                return roleProfile.homeLead(isEnglish: true)
+            }
+            return "\(trimmedName), \(roleProfile.homeLead(isEnglish: true).lowercased())"
+        }
+
+        if trimmedName.isEmpty {
+            return roleProfile.homeLead(isEnglish: false)
+        }
+        return "\(trimmedName), \(roleProfile.homeLead(isEnglish: false).lowercased())"
     }
 
     // MARK: - Age Card
@@ -316,33 +517,49 @@ struct HomeDashboardView: View {
 
     private func dailyCards(baby: Baby) -> some View {
         let items = guidanceItems(for: baby)
-
-        let visibleCount = min(
-            items.count,
-            MonetizationPolicy.visibleHomeGuidanceCardCount(hasFullAccess: subscriptionManager.hasFullAccess)
-        )
+        let visibleCount = min(items.count, MonetizationPolicy.visibleHomeGuidanceCardCount(hasFullAccess: subscriptionManager.hasFullAccess))
 
         return VStack(spacing: 10) {
             ForEach(Array(items.prefix(visibleCount).indices), id: \.self) { i in
-                HStack(spacing: 14) {
-                    // Icon
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(items[i].bg)
-                        .frame(width: 40, height: 40)
-                        .overlay {
-                            Text(items[i].emoji)
-                                .font(.system(size: 18))
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .top, spacing: 14) {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(items[i].bg)
+                            .frame(width: 40, height: 40)
+                            .overlay {
+                                Text(items[i].emoji)
+                                    .font(.system(size: 18))
+                            }
+
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(items[i].eyebrow.uppercased())
+                                .font(.kinnaBodyMedium(9))
+                                .foregroundStyle(.kMuted)
+                                .tracking(1.1)
+
+                            Text(items[i].title)
+                                .font(.kinnaBodyMedium(13))
+                                .foregroundStyle(.kChar)
+
+                            Text(items[i].desc)
+                                .font(.kinnaBody(11))
+                                .foregroundStyle(.kMid)
+                                .lineSpacing(2)
                         }
 
-                    // Text
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(items[i].title)
-                            .font(.kinnaBodyMedium(13))
-                            .foregroundStyle(.kChar)
-                        Text(items[i].desc)
-                            .font(.kinnaBody(11))
-                            .foregroundStyle(.kMid)
-                            .lineSpacing(2)
+                        Spacer()
+                    }
+
+                    if let action = items[i].action {
+                        HStack(spacing: 7) {
+                            Image(systemName: items[i].actionIcon)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(items[i].accent)
+                            Text(action)
+                                .font(.kinnaBodyMedium(10))
+                                .foregroundStyle(items[i].accent)
+                                .lineSpacing(2)
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -356,8 +573,8 @@ struct HomeDashboardView: View {
             }
 
             if !subscriptionManager.hasFullAccess && items.count > visibleCount {
-                NavigationLink {
-                    PaywallView(entryPoint: .navigation)
+                Button {
+                    showPaywall = true
                 } label: {
                     HStack(spacing: 14) {
                         RoundedRectangle(cornerRadius: 12)
@@ -370,12 +587,12 @@ struct HomeDashboardView: View {
                             }
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(isEN ? "Unlock full monthly guidance" : "Tüm aylık rehberliği aç")
+                            Text(isEN ? "Unlock the full monthly plan" : "Bu ayın tam planını aç")
                                 .font(.kinnaBodyMedium(13))
                                 .foregroundStyle(.kChar)
                             Text(isEN
-                                 ? "See all guidance cards and save unlimited milestones with Kinna Premium."
-                                 : "Tüm rehber kartlarını gör ve sınırsız milestone kaydetmek için Kinna Premium'a geç.")
+                                 ? "See all three cards every day and keep unlimited milestones with Kinna Premium."
+                                 : "Her gün üç kartın tamamını gör ve sınırsız milestone kaydetmek için Kinna Premium'a geç.")
                                 .font(.kinnaBody(11))
                                 .foregroundStyle(.kMid)
                                 .lineSpacing(2)
@@ -399,14 +616,21 @@ struct HomeDashboardView: View {
                 .buttonStyle(.plain)
             }
         }
+        .fullScreenCover(isPresented: $showPaywall) {
+            NavigationStack {
+                PaywallView()
+            }
+            .environment(subscriptionManager)
+        }
     }
 
     private func guidanceItems(for baby: Baby) -> [GuidanceCard] {
         [
             milestoneCard(for: baby),
-            safetyCard(for: baby),
-            vaccineCard(for: baby)
+            vaccineCard(for: baby),
+            dailyGuideCard(for: baby)
         ]
+        .sorted { $0.priority < $1.priority }
     }
 
     private func milestoneCard(for baby: Baby) -> GuidanceCard {
@@ -415,74 +639,120 @@ struct HomeDashboardView: View {
             return GuidanceCard(
                 emoji: "🧠",
                 bg: Color(hex: 0xEAF3EF),
-                title: isEN ? "Month \(month) focus" : "\(month). ay odağı",
-                desc: isEN ? milestone.descriptionEN : milestone.descriptionTR
+                eyebrow: isEN ? "Development focus" : "Gelişim odağı",
+                title: isEN ? "Month \(month) spotlight" : "\(month). ay odağı",
+                desc: isEN ? milestone.descriptionEN : milestone.descriptionTR,
+                action: roleProfile.milestoneAction(isEnglish: isEN),
+                actionIcon: "sparkles",
+                accent: .kSageDark,
+                priority: 1
             )
         }
 
         return GuidanceCard(
             emoji: "🧠",
             bg: Color(hex: 0xEAF3EF),
-            title: isEN ? "Development this month" : "Bu ay gelişim",
+            eyebrow: isEN ? "Development focus" : "Gelişim odağı",
+            title: isEN ? "This month's spotlight" : "Bu ayın odağı",
             desc: isEN
             ? "Watch for new social, language, and motor responses this month."
-            : "Bu ay yeni sosyal, dil ve motor tepkilere dikkat edin."
-        )
-    }
-
-    private func safetyCard(for baby: Baby) -> GuidanceCard {
-        if let alert = SafetyAlertEngine.alertsForAge(baby.ageInMonths).first {
-            return GuidanceCard(
-                emoji: "⚠️",
-                bg: .kTerraLight,
-                title: isEN ? alert.titleEN : alert.titleTR,
-                desc: isEN ? alert.descriptionEN : alert.descriptionTR
-            )
-        }
-
-        return GuidanceCard(
-            emoji: "⚠️",
-            bg: .kTerraLight,
-            title: isEN ? "Safety check" : "Güvenlik kontrolü",
-            desc: isEN
-            ? "Re-check your baby's sleep area, feeding seat, and transport setup this month."
-            : "Bu ay bebeğinizin uyku alanını, beslenme oturuşunu ve taşıma düzenini tekrar gözden geçirin."
+            : "Bu ay yeni sosyal, dil ve motor tepkilere dikkat edin.",
+            action: roleProfile.milestoneAction(isEnglish: isEN),
+            actionIcon: "sparkles",
+            accent: .kSageDark,
+            priority: 1
         )
     }
 
     private func vaccineCard(for baby: Baby) -> GuidanceCard {
-        let upcomingSchedule = vaccinationRecords
-            .filter { $0.isManual != true && !$0.isCompleted && $0.scheduledDate >= Calendar.current.startOfDay(for: .now) }
-            .sorted { $0.scheduledDate < $1.scheduledDate }
-            .first
+        let model = HomeGuidancePlanner.vaccineCardModel(
+            records: vaccinationRecords,
+            referenceDate: .now,
+            calendar: .current,
+            isEnglish: isEN
+        )
 
-        if let upcomingSchedule {
-            let dateText = upcomingSchedule.scheduledDate.formatted(.dateTime.day().month(.wide))
-            return GuidanceCard(
-                emoji: "💉",
-                bg: .kPale,
-                title: isEN ? "Next vaccine" : "Sıradaki aşı",
-                desc: isEN
-                ? "\(upcomingSchedule.vaccineName) is scheduled for \(dateText)."
-                : "\(upcomingSchedule.vaccineName) için planlanan tarih \(dateText)."
-            )
+        let emoji: String
+        let background: Color
+        let accent: Color
+        let actionIcon: String
+        let priority: Int
+
+        switch model.state {
+        case .overdue:
+            emoji = "⏰"
+            background = Color(hex: 0xFFF3EB)
+            accent = .kTerra
+            actionIcon = "exclamationmark.circle"
+            priority = 0
+        case .upcoming:
+            emoji = "💉"
+            background = .kPale
+            accent = .kTerra
+            actionIcon = model.isUrgent ? "bell.badge" : "calendar"
+            priority = model.isUrgent ? 0 : 1
+        case .next:
+            emoji = "🗓️"
+            background = .kPale
+            accent = .kTerra
+            actionIcon = "calendar"
+            priority = 2
+        case .quiet:
+            emoji = "✓"
+            background = Color.kSage.opacity(0.14)
+            accent = .kSageDark
+            actionIcon = "calendar.badge.checkmark"
+            priority = 2
         }
 
         return GuidanceCard(
-            emoji: "📖",
-            bg: .kPale,
-            title: isEN ? "Connection tip" : "Bağ kurma ipucu",
-            desc: isEN
-            ? "Talking to your baby with eye contact strengthens attachment."
-            : "Bebeğinizle göz teması kurarak konuşmak bağlanmayı güçlendirir."
+            emoji: emoji,
+            bg: background,
+            eyebrow: isEN ? "Vaccines" : "Aşı planı",
+            title: model.title,
+            desc: model.description,
+            action: roleProfile.vaccineAction(isEnglish: isEN, hasUpcomingThisMonth: model.hasUpcomingThisMonth),
+            actionIcon: actionIcon,
+            accent: accent,
+            priority: priority
+        )
+    }
+
+    private func dailyGuideCard(for baby: Baby) -> GuidanceCard {
+        let rotationSeed = (Calendar.current.ordinality(of: .day, in: .year, for: .now) ?? 0) + baby.ageInMonths
+        let template = roleProfile.dailyGuideTemplate(isEnglish: isEN, rotationIndex: rotationSeed)
+        let icons = ["🌿", "🌙", "🙂", "📝"]
+        let backgrounds = [
+            Color.kSage.opacity(0.14),
+            Color(hex: 0xEEF1F8),
+            Color(hex: 0xFEF0E7),
+            Color(hex: 0xF6F2EA)
+        ]
+        let index = rotationSeed % icons.count
+
+        return GuidanceCard(
+            emoji: icons[index],
+            bg: backgrounds[index],
+            eyebrow: isEN ? "Daily guide" : "Günün rehberi",
+            title: template.title,
+            desc: template.body,
+            action: template.action,
+            actionIcon: "sparkles",
+            accent: .kTerra,
+            priority: 3
         )
     }
 
     private struct GuidanceCard {
         let emoji: String
         let bg: Color
+        let eyebrow: String
         let title: String
         let desc: String
+        let action: String?
+        let actionIcon: String
+        let accent: Color
+        let priority: Int
     }
 }
 

@@ -51,14 +51,14 @@ Last sync: 2026-03-14 (04:30)
 
 ### Remaining Open Issues
 
-1. **Aşı otomatik hatırlatma trigger'ı** — method var ama yaklaşan aşılar için auto-schedule yok
-2. **Multi-baby model** — records `babyID` var ama UI hâlâ `babies.first`
-3. ~~Onboarding "I have account"~~ → Sprint 5'te çözülecek (kaldırılıyor)
-4. **Baba persona bildirim stratejisi** — parent role copy yapıldı, baba-spesifik bildirim/ton tanımlanmadı
+1. ~~Aşı otomatik hatırlatma trigger'ı~~ → Sprint 6b (KARARLANDI)
+2. ~~Multi-baby model~~ → Sprint 6a: MVP = single-baby (KARARLANDI)
+3. ~~Onboarding "I have account"~~ → Sprint 5'te çözüldü ✅
+4. ~~Baba persona bildirim stratejisi~~ → Sprint 7b (KARARLANDI)
 5. **WHO persentil grafikleri** — Faz 2
-6. ~~Milestone content review~~ ✅ — WHO, CDC, T.C. Sağlık Bakanlığı kaynaklarından doğrulandı
+6. ~~Milestone content review~~ ✅
 7. **App Store Connect subscription approval** — external blocker
-8. **Codex uncommitted changes** — 21 dosya, +3025 satır, commit edilmesi gerekiyor
+8. ~~Codex uncommitted changes~~ ✅ (`d337885` + `4ab7e6d`)
 
 ## Recommended Priority Order
 
@@ -198,11 +198,71 @@ Yeni flow (5 adım): Welcome → Role → Family Info → Safety Note → Value 
 - Yeni `valueSummaryStep` eklenir (milestone/aşı/rehber hesaplamaları)
 - `notificationStep` kaldırılır — bildirim izni valueSummaryStep içine taşınır
 
-### Sprint 6 — Hardening — BAŞLANMADI
+### Sprint 6 — Single-Baby Lock + Auto Vaccine Reminders — KARARLANDI (2026-03-14)
 
-- Reduce release-risk logs
-- Broader product logic tests (7 test var, genişletilecek)
-- MVVM architecture alignment
+#### 6a. Single-Baby Lock
+**Karar:** MVP = tek bebek. Multi-baby v2'ye ertelenir (iCloud sync + partner paylaşımı ile birlikte).
+
+**Mevcut durum:**
+- `babies.first` ile tek bebek varsayılıyor ✅
+- `DailyLog` ve `GrowthRecord`'da `babyID` var
+- `VaccinationRecord` ve `AllergyLog`'da baby ilişkisi YOK
+
+**Codex implementation:**
+- UI'da "bebek ekle" seçeneği eklenmeyecek
+- Mevcut `babies.first` pattern'i korunacak
+- İlişki eksikliği (VaccinationRecord, AllergyLog) v2'de düzeltilecek — şimdi dokunma
+- Settings'te bebek bilgisi düzenleme yeterli (yeni bebek ekleme yok)
+
+#### 6b. Auto Vaccine Reminders
+**Karar:** Yaklaşan aşılar için otomatik local notification schedule.
+
+**Spec:**
+- Her aşı için 2 notification: **3 gün önce** + **aşı günü sabahı (09:00)**
+- 18 aşı × 2 = 36 notification → iOS 64 pending limit içinde ✅
+- Premium gate: `MonetizationPolicy.canUseVaccineReminders` — free kullanıcıya hatırlatma gitmez
+- Identifier format: `vaccine-{vaccineName}-{3d|0d}` (stabil, reschedule-safe)
+
+**Schedule tetikleme noktaları:**
+1. Onboarding'de bebek kaydedildiğinde (ilk schedule)
+2. Premium açılınca (gate kalkınca backfill)
+3. Restore purchases sonrası (backfill)
+4. Bebek profili güncellenince (tarih değişirse reschedule)
+
+**Önemli:** Reschedule öncesi eski pending request'ler `removeAllPendingNotificationRequests(withIdentifiers:)` ile temizlenmeli. NotificationManager'a `scheduleVaccineReminders(birthDate:)` ve `removeVaccineReminders()` methodları eklenmeli.
+
+### Sprint 7 — Home Rework + Father Persona — KARARLANDI (2026-03-14)
+
+#### 7a. Home "This Month" Rework
+**Karar:** Placeholder'dan çıkar, 3 editorial modül.
+
+**Modüller:**
+1. **Milestone odağı kartı** — Bu ayın öne çıkan gelişim noktası (milestones.json'dan bebek yaşına göre)
+2. **Yaklaşan aşı kartı** — Varsa tarihiyle, yoksa "Bu ay aşı yok ✓"
+3. **Günün rehberi** — Yaşa göre rotate eden mikro-doz içerik (güvenlik, beslenme, oyun, uyku)
+
+**Premium gate:** Free → 1 kart/gün, Premium → tüm kartlar (mevcut MonetizationPolicy kuralı korunur).
+
+**Referans:** HomeView.swift:317 — mevcut placeholder modülleri bu yapıyla değiştirilecek.
+
+#### 7b. Father Persona Tone/Copy
+**Karar:** Presentation layer farkı — veri şeması değişmez, aynı milestone/veri, farklı destekleyici copy.
+
+**Yaklaşım:** MVP'de `motherTip`/`fatherTip` JSON field'ı EKLENMEZ. Bunun yerine:
+- Role'a göre notification body ve Home copy değişir (presentation layer)
+- Anne → emzirme/beslenme odaklı aksiyon önerisi
+- Baba → ten tene temas, oyun, bağlanma odaklı aksiyon önerisi
+- Copy farkları `Localizable.xcstrings`'te `_mother` / `_father` suffix'li key'ler ile
+
+**Implementasyon:** HomeView ve NotificationManager'da `parentRole` kontrolü, role-aware string seçimi.
+
+### Sprint 8 — Hardening — BAŞLANMADI
+
+- `.gitignore`'a `build/` ve `design/` eklenmesi (bağımsız, küçük iş)
+- Reduce release-risk logs (font warnings, simulator warnings)
+- Test genişletme (onboarding flow test, value summary test, vaccine reminder test)
+- MVVM alignment — ağır ekranlar için ViewModel çıkarma (Home, Tracking)
+- Genel UI consistency pass
 
 ## Sprint Skill Matrix
 
@@ -322,15 +382,14 @@ Suggested prompts:
   - `@AppStorage("parentRole")` ile persist ediliyor.
   - HomeView role-aware copy kullanıyor (mother/father/caregiver).
 
-- Define single-baby vs multi-baby model explicitly.
-  - Current UI effectively assumes one baby via `babies.first`.
-  - Logs and records are not linked to a specific baby.
-  - Either lock MVP to one baby clearly or add model relationships.
+- ~~Define single-baby vs multi-baby model explicitly.~~ → KARARLANDI: MVP = single-baby.
+  - `babies.first` pattern korunur, "bebek ekle" UI eklenmez.
+  - DailyLog/GrowthRecord'da babyID var, VaccinationRecord/AllergyLog'da yok — v2'de düzeltilecek.
+  - Detay: Sprint 6a.
 
-- Complete vaccination reminder behavior.
-  - Daily reminder exists.
-  - Manual next-dose reminder exists.
-  - Auto-generated TR schedule reminders are not fully wired as a complete reminder system.
+- ~~Complete vaccination reminder behavior.~~ → KARARLANDI: Auto vaccine reminders.
+  - 3 gün önce + aşı günü sabahı, premium gate, 4 tetikleme noktası, stabil identifier.
+  - Detay: Sprint 6b.
 
 - ~~Replace placeholder metrics in tracking.~~ ⚠️ Kısmen tamamlandı.
   - GrowthRecord modeli + input + tracking tile + timeline entegrasyonu yapıldı.
@@ -344,17 +403,17 @@ Suggested prompts:
   - WHO, CDC, T.C. Sağlık Bakanlığı kaynaklarından doğrulandı.
   - 0-24 ay, 8 band, social/language/cognitive/motor kategorileri.
 
-- Rework the Home "This month" section.
-  - The current cards are a good placeholder, but this area should better reflect the app's unique value.
-  - Decide stronger content modules such as milestone focus, safety tip, vaccine reminder, feeding transition, or daily activity idea.
+- ~~Rework the Home "This month" section.~~ → KARARLANDI: 3 editorial modül.
+  - Milestone odağı + yaklaşan aşı + dönen rehber kartı.
+  - Detay: Sprint 7a.
 
 - ~~Harden onboarding flow.~~ → Sprint 5 Onboarding Rework olarak yeniden tanımlandı.
   - 7 → 5 adım, "I have account" kaldırılıyor, Value Summary ekleniyor.
   - Detaylı spec: Sprint 5 bölümüne bkz.
 
-- Define father persona behavior more explicitly.
-  - Clarify father-specific notifications, tone, home content, and any UI/content differences from the default flow.
-  - Ensure persona-specific behavior is reflected in both copy and notification strategy.
+- ~~Define father persona behavior more explicitly.~~ → KARARLANDI: Presentation layer farkı.
+  - Veri şeması değişmez, role-aware copy xcstrings'te `_mother`/`_father` suffix.
+  - Detay: Sprint 7b.
 
 - Align implementation with the stated MVVM architecture.
   - Current code is mostly view-centric with lightweight engines and managers.
@@ -478,13 +537,14 @@ These are already present in `SPEC.md`, but not required before MVP release:
 2. ~~Define commercial behavior.~~ ✅
 3. ~~Close MVP scope mismatches.~~ ✅
 4. ~~Paywall v2 (auto-renewal, bugün ücret alınmaz, feature sıralaması, Pro→Premium).~~ ✅
-5. ~~Codex değişikliklerini commit et.~~ ✅ (`d337885`)
+5. ~~Codex değişikliklerini commit et.~~ ✅ (`d337885` + `4ab7e6d`)
 6. ~~Sprint 5: Onboarding rework~~ ✅ — 7→5 adım + Value Summary
-7. Define single-baby vs multi-baby model — ya MVP'yi tek bebeğe kilitle ya da relationship ekle.
-8. Aşı otomatik hatırlatma trigger'ı — yaklaşan aşılar için auto-schedule.
-9. Father persona bildirim/ton stratejisi.
-10. Home "This month" section rework.
-11. App Store Connect subscription approval + bölgesel fiyat tier ayarı.
+7. ~~Sprint 6a: Single-baby lock~~ ✅
+8. **Sprint 6b: Auto vaccine reminders** — implement edildi, yarın bildirim testi bekleniyor
+9. **Sprint 7a: Home "This month" rework** — KARARLANDI, Codex'e verilecek
+10. **Sprint 7b: Father persona tone/copy** — KARARLANDI, Codex'e verilecek
+11. **Sprint 8: Hardening** — .gitignore, log temizliği, test genişletme, MVVM
+12. App Store Connect subscription approval + bölgesel fiyat tier ayarı (external).
 
 ## Done Definition For MVP
 

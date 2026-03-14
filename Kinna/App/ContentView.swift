@@ -1,17 +1,11 @@
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @AppStorage("preferredTheme") private var preferredTheme = 0
     @Environment(SubscriptionManager.self) private var subscriptionManager
-
-    private var colorScheme: ColorScheme? {
-        switch preferredTheme {
-        case 1: .light
-        case 2: .dark
-        default: nil
-        }
-    }
+    @Query(sort: \Baby.createdAt) private var babies: [Baby]
+    @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
 
     var body: some View {
         Group {
@@ -21,7 +15,17 @@ struct ContentView: View {
                 HomeView()
             }
         }
-        .preferredColorScheme(colorScheme)
+        .task(id: vaccineReminderSyncKey) {
+            await NotificationManager.shared.syncVaccineReminders(
+                birthDate: babies.first?.birthDate,
+                scheduledRecords: vaccinationRecords,
+                hasFullAccess: subscriptionManager.hasFullAccess
+            )
+        }
+    }
+
+    private var vaccineReminderSyncKey: String {
+        "\(subscriptionManager.hasFullAccess)-\(babies.first?.birthDate.timeIntervalSinceReferenceDate ?? 0)"
     }
 }
 

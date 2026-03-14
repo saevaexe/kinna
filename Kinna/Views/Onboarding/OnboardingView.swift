@@ -25,6 +25,7 @@ struct OnboardingView: View {
     private var setupStepCount: Int { totalSteps - 1 }
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+    private var placeholderColor: Color { .kMid.opacity(0.8) }
 
     private var onboardingBirthDate: Date {
         var components = DateComponents()
@@ -72,6 +73,22 @@ struct OnboardingView: View {
         }
     }
 
+    private var parentNamePlaceholder: String {
+        if isEN {
+            switch selectedRole {
+            case .mother: return "Jane"
+            case .father: return "James"
+            case .caregiver: return "Alex"
+            }
+        }
+
+        switch selectedRole {
+        case .mother: return "Ayşe"
+        case .father: return "Osman"
+        case .caregiver: return "Derya"
+        }
+    }
+
     private var milestoneFocus: Milestone? {
         MilestoneEngine.milestonesForAge(onboardingAgeInMonths).first
     }
@@ -111,7 +128,6 @@ struct OnboardingView: View {
                 valueSummaryStep.tag(4)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .scrollDisabled(true)
             .animation(.easeInOut(duration: 0.3), value: currentStep)
         }
         .background(Color.kCream.ignoresSafeArea())
@@ -122,16 +138,22 @@ struct OnboardingView: View {
         .sheet(isPresented: $showBirthDatePicker) {
             NavigationStack {
                 VStack(spacing: 0) {
-                    DatePicker(
-                        "",
-                        selection: birthDateBinding,
-                        in: ...Date(),
-                        displayedComponents: .date
-                    )
-                    .datePickerStyle(.wheel)
-                    .labelsHidden()
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 12)
+                    VStack(spacing: 0) {
+                        DatePicker(
+                            "",
+                            selection: birthDateBinding,
+                            in: ...Date(),
+                            displayedComponents: .date
+                        )
+                        .datePickerStyle(.wheel)
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
 
                     darkButton(isEN ? "Done" : "Tamam") {
                         showBirthDatePicker = false
@@ -149,6 +171,7 @@ struct OnboardingView: View {
                     }
                 }
             }
+            .preferredColorScheme(.light)
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
         }
@@ -326,9 +349,15 @@ struct OnboardingView: View {
                     .padding(.bottom, 18)
 
                 fieldGroup(label: isEN ? "YOUR NAME" : "ADIN") {
-                    TextField(isEN ? "Jane" : "Ayşe", text: $nameInput)
+                    TextField(
+                        "",
+                        text: $nameInput,
+                        prompt: Text(parentNamePlaceholder)
+                            .foregroundStyle(placeholderColor)
+                    )
                         .font(.kinnaBody(14))
-                        .foregroundStyle(.kChar)
+                        .foregroundColor(.kChar)
+                        .tint(.kTerra)
                 }
                 .padding(.bottom, 4)
 
@@ -340,9 +369,15 @@ struct OnboardingView: View {
                     .padding(.bottom, 14)
 
                 fieldGroup(label: isEN ? "BABY'S NAME" : "BEBEĞİNİN ADI") {
-                    TextField("Ela", text: $babyName)
+                    TextField(
+                        "",
+                        text: $babyName,
+                        prompt: Text("Ela")
+                            .foregroundStyle(placeholderColor)
+                    )
                         .font(.kinnaBody(14))
-                        .foregroundStyle(.kChar)
+                        .foregroundColor(.kChar)
+                        .tint(.kTerra)
                 }
                 .padding(.bottom, 14)
 
@@ -398,6 +433,7 @@ struct OnboardingView: View {
                 .padding(.bottom, 32)
             }
             .padding(.horizontal, 24)
+            .padding(.bottom, 24)
         }
         .scrollDismissesKeyboard(.interactively)
     }
@@ -553,6 +589,13 @@ struct OnboardingView: View {
                         let granted = await NotificationManager.shared.requestPermission()
                         if granted {
                             NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
+                            let descriptor = FetchDescriptor<VaccinationRecord>()
+                            let records = (try? modelContext.fetch(descriptor)) ?? []
+                            await NotificationManager.shared.syncVaccineReminders(
+                                birthDate: onboardingBirthDate,
+                                scheduledRecords: records,
+                                hasFullAccess: subscriptionManager.hasFullAccess
+                            )
                         }
                         completeOnboarding()
                     }
@@ -600,14 +643,16 @@ struct OnboardingView: View {
         guard !trimmedBabyName.isEmpty else { return }
 
         let birthDate = onboardingBirthDate
-        let descriptor = FetchDescriptor<Baby>()
+        let descriptor = FetchDescriptor<Baby>(
+            sortBy: [SortDescriptor(\.createdAt)]
+        )
         let babies = (try? modelContext.fetch(descriptor)) ?? []
 
-        let alreadyExists = babies.contains {
-            $0.name == trimmedBabyName && Calendar.current.isDate($0.birthDate, inSameDayAs: birthDate)
-        }
-
-        if !alreadyExists {
+        if let existingBaby = babies.first {
+            existingBaby.name = trimmedBabyName
+            existingBaby.birthDate = birthDate
+            existingBaby.gender = selectedGender ?? .other
+        } else {
             let baby = Baby(
                 name: trimmedBabyName,
                 birthDate: birthDate,
@@ -618,15 +663,38 @@ struct OnboardingView: View {
 
         let vaccinationDescriptor = FetchDescriptor<VaccinationRecord>()
         let existingRecords = (try? modelContext.fetch(vaccinationDescriptor)) ?? []
-        let existingNames = Set(existingRecords.map { $0.vaccineName })
+        let autoRecords = existingRecords.filter { $0.isManual != true }
+        let existingNames = Set(autoRecords.map { $0.vaccineName })
+        let existingByName = Dictionary(uniqueKeysWithValues: autoRecords.map { ($0.vaccineName, $0) })
 
         let schedule = VaccinationEngine.schedule(birthDate: birthDate)
-        for item in schedule where !existingNames.contains(item.nameTR) {
-            let record = VaccinationRecord(
-                vaccineName: item.nameTR,
-                scheduledDate: VaccinationEngine.scheduledDate(birthDate: birthDate, monthAge: item.monthAge)
+        for item in schedule {
+            let scheduledDate = VaccinationEngine.scheduledDate(birthDate: birthDate, monthAge: item.monthAge)
+
+            if let existingRecord = existingByName[item.nameTR] {
+                if !existingRecord.isCompleted {
+                    existingRecord.scheduledDate = scheduledDate
+                }
+                continue
+            }
+
+            if !existingNames.contains(item.nameTR) {
+                let record = VaccinationRecord(
+                    vaccineName: item.nameTR,
+                    scheduledDate: scheduledDate
+                )
+                modelContext.insert(record)
+            }
+        }
+
+        let refreshedRecords = (try? modelContext.fetch(vaccinationDescriptor)) ?? existingRecords
+
+        Task {
+            await NotificationManager.shared.syncVaccineReminders(
+                birthDate: birthDate,
+                scheduledRecords: refreshedRecords,
+                hasFullAccess: subscriptionManager.hasFullAccess
             )
-            modelContext.insert(record)
         }
     }
 
