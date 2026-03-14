@@ -3,9 +3,11 @@ import SwiftData
 
 struct MilestonesView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query private var babies: [Baby]
     @Query private var progressRecords: [MilestoneProgress]
     @State private var selectedMonth = 0
+    @State private var showPaywall = false
 
     private var baby: Baby? { babies.first }
 
@@ -25,26 +27,49 @@ struct MilestonesView: View {
         milestones.filter { completedIDs.contains($0.id) }.count
     }
 
+    private var currentMonth: Int {
+        min(max(baby?.ageInMonths ?? 0, 0), 24)
+    }
+
+    private var upgradeHint: String {
+        if isEN {
+            return "Free includes this month plus your first \(MonetizationPolicy.freeMilestoneTrackingLimit) saved milestones. Upgrade for every month and unlimited tracking."
+        }
+        return "Ücretsiz planda yalnızca bu ay ve ilk \(MonetizationPolicy.freeMilestoneTrackingLimit) milestone kaydı dahildir. Tüm aylar ve sınırsız takip için Premium'a geç."
+    }
+
+    private func isMonthLocked(_ month: Int) -> Bool {
+        !MonetizationPolicy.canAccessMilestoneMonth(
+            hasFullAccess: subscriptionManager.hasFullAccess,
+            selectedMonth: month,
+            currentMonth: currentMonth
+        )
+    }
+
     private var ringContextTitle: String {
         let locale = Locale.current.language.languageCode?.identifier ?? "tr"
         if locale == "tr" {
             switch selectedMonth {
-            case 0...2: return "Bağlanma kalıpları destekleniyor"
-            case 3...5: return "Motor beceriler gelişiyor"
-            case 6...9: return "İletişim temelleri kuruluyor"
-            case 10...12: return "Keşfetme dönemi başlıyor"
-            case 13...18: return "Bağımsızlık adımları atılıyor"
-            case 19...24: return "Dil ve hayal gücü patlıyor"
+            case 0...2: return "Bağlanma ve sakinleşme temelleri"
+            case 3...4: return "Gülümseme ve baş kontrolü güçleniyor"
+            case 5...6: return "Ses oyunları ve yuvarlanma başlıyor"
+            case 7...9: return "İşaretler ve oturma becerisi belirginleşiyor"
+            case 10...12: return "İlk jestler ve ayakta durma dönemi"
+            case 13...15: return "Taklit ve ilk bağımsız adımlar"
+            case 16...18: return "Bağımsızlık ve basit oyun artıyor"
+            case 19...24: return "İki kelimelik ifadeler ve hareket temposu"
             default: return "Gelişim ilerlemeye devam ediyor"
             }
         } else {
             switch selectedMonth {
-            case 0...2: return "Building attachment patterns"
-            case 3...5: return "Motor skills developing"
-            case 6...9: return "Communication foundations forming"
-            case 10...12: return "Exploration period beginning"
-            case 13...18: return "Steps toward independence"
-            case 19...24: return "Language and imagination bloom"
+            case 0...2: return "Attachment and regulation foundations"
+            case 3...4: return "Smiles and head control are strengthening"
+            case 5...6: return "Sound play and rolling are emerging"
+            case 7...9: return "Signals and sitting skills are taking shape"
+            case 10...12: return "First gestures and standing practice"
+            case 13...15: return "Imitation and first independent steps"
+            case 16...18: return "Independence and simple play are growing"
+            case 19...24: return "Two-word phrases and faster movement"
             default: return "Development continues to progress"
             }
         }
@@ -54,22 +79,26 @@ struct MilestonesView: View {
         let locale = Locale.current.language.languageCode?.identifier ?? "tr"
         if locale == "tr" {
             switch selectedMonth {
-            case 0...2: return "Ses, gülümseme ve göz temasıyla etkileşimler bu ay kritik."
-            case 3...5: return "Nesneleri kavrama ve yuvarlanma gibi hareketler başlıyor."
-            case 6...9: return "İlk heceler ve işaret etme gibi iletişim becerileri gelişiyor."
-            case 10...12: return "Bağımsız hareket ve çevre keşfetme yoğunlaşıyor."
-            case 13...18: return "Yürüme, kaşık kullanma ve kelime hazinesi hızla genişliyor."
-            case 19...24: return "Koşma, iki kelimelik cümleler ve sembolik oyun dönemi."
+            case 0...2: return "Sakinleşme, karşılıklı gülümseme ve yüzüstü baş kaldırma en belirgin işaretlerdir."
+            case 3...4: return "Sese yönelme, agulama ve dirseklerle yükselme bu bantta öne çıkar."
+            case 5...6: return "Tanıdık kişileri ayırt etme, ses oyunları ve yuvarlanma bu dönemde sık görülür."
+            case 7...9: return "Tekrarlayan heceler, ayrılığa tepki ve desteksiz oturma belirginleşir."
+            case 10...12: return "Jestler, saklanan nesneyi arama ve tutunarak ilerleme hızlanır."
+            case 13...15: return "Taklit, yeni kelimeler ve kısa bağımsız yürüyüşler öne çıkar."
+            case 16...18: return "İşaret ederek paylaşma, yönerge izleme ve basit oyun kurma artar."
+            case 19...24: return "İki kelimelik ifadeler, koşma ve sosyal tepkiyi takip etme dönemi başlar."
             default: return "Her ay yeni gelişim aşamaları bebeğinizi bekliyor."
             }
         } else {
             switch selectedMonth {
-            case 0...2: return "Voice, smile, and eye contact interactions are critical this month."
-            case 3...5: return "Grasping objects and rolling movements are starting."
-            case 6...9: return "First syllables and pointing communication skills are developing."
-            case 10...12: return "Independent movement and environment exploration are intensifying."
-            case 13...18: return "Walking, spoon use, and vocabulary are expanding rapidly."
-            case 19...24: return "Running, two-word sentences, and pretend play emerge."
+            case 0...2: return "Calming, responsive smiles, and lifting the head during tummy time are the clearest signs here."
+            case 3...4: return "Turning toward voices, cooing, and pushing up on elbows become more visible."
+            case 5...6: return "Recognizing familiar people, sound play, and rolling show up more consistently."
+            case 7...9: return "Repeated syllables, separation reactions, and unsupported sitting become easier to notice."
+            case 10...12: return "Gestures, searching for hidden objects, and cruising along furniture accelerate."
+            case 13...15: return "Imitation, new words, and short independent walks stand out in this stage."
+            case 16...18: return "Pointing to share interest, following directions, and simple pretend play increase."
+            case 19...24: return "Two-word phrases, running, and reading social reactions become more apparent."
             default: return "New developmental milestones await your baby each month."
             }
         }
@@ -111,7 +140,7 @@ struct MilestonesView: View {
                         )
                     }
 
-                    if let baby {
+                    if baby != nil {
                         Text(isEN
                             ? "\(selectedMonth) months \u{00B7} \(completedCount) of \(milestones.count) completed"
                             : "\(selectedMonth). ay \u{00B7} \(milestones.count) taştan \(completedCount)'i tamamlandı"
@@ -165,19 +194,62 @@ struct MilestonesView: View {
                     .padding(.bottom, 12)
                 }
 
+                if !subscriptionManager.hasFullAccess {
+                    HStack(spacing: 10) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.kTerra)
+
+                        Text(upgradeHint)
+                            .font(.kinnaBody(10))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+
+                        Spacer(minLength: 8)
+
+                        Button(isEN ? "Upgrade" : "Pro") {
+                            showPaywall = true
+                        }
+                        .font(.kinnaBodyMedium(10))
+                        .foregroundStyle(.kTerra)
+                    }
+                    .padding(12)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.kPale, lineWidth: 1)
+                    )
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 12)
+                }
+
                 // Month selector
                 ScrollViewReader { proxy in
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(0..<25, id: \.self) { month in
+                                let isLocked = isMonthLocked(month)
                                 Button {
+                                    guard !isLocked else {
+                                        showPaywall = true
+                                        return
+                                    }
+
                                     withAnimation(.easeInOut(duration: 0.2)) {
                                         selectedMonth = month
                                     }
                                 } label: {
-                                    Text(isEN ? "Mo \(month)" : "\(month). ay")
-                                        .font(.kinnaBody(12))
-                                        .foregroundStyle(selectedMonth == month ? .white : .kMid)
+                                    HStack(spacing: 4) {
+                                        Text(isEN ? "Mo \(month)" : "\(month). ay")
+                                            .font(.kinnaBody(12))
+
+                                        if isLocked {
+                                            Image(systemName: "lock.fill")
+                                                .font(.system(size: 9, weight: .semibold))
+                                        }
+                                    }
+                                        .foregroundStyle(selectedMonth == month ? .white : (isLocked ? .kLight : .kMid))
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 6)
                                         .background(selectedMonth == month ? Color.kChar : .white)
@@ -205,6 +277,38 @@ struct MilestonesView: View {
                 }
                 .padding(.bottom, 16)
 
+                if !subscriptionManager.hasFullAccess {
+                    HStack(spacing: 10) {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.kTerra)
+
+                        Text(isEN
+                             ? "Free access stays on your baby's current month. Upgrade to browse every month."
+                             : "Ücretsiz planda yalnızca bebeğinin bu ayı açık. Tüm ayları görmek için Premium'a geç.")
+                            .font(.kinnaBody(10))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+
+                        Spacer(minLength: 8)
+
+                        Button(isEN ? "Premium" : "Premium") {
+                            showPaywall = true
+                        }
+                        .font(.kinnaBodyMedium(10))
+                        .foregroundStyle(.kTerra)
+                    }
+                    .padding(12)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.kPale, lineWidth: 1)
+                    )
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
+                }
+
                 // Milestone list
                 LazyVStack(spacing: 0) {
                     if milestones.isEmpty {
@@ -229,6 +333,12 @@ struct MilestonesView: View {
         }
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showPaywall) {
+            NavigationStack {
+                PaywallView()
+            }
+            .environment(subscriptionManager)
+        }
     }
 
     // MARK: - Milestone Row
@@ -305,7 +415,11 @@ struct MilestonesView: View {
                 return (Color(hex: 0xEAF3EF), .kSageDark, "Physical")
             case "sosyal", "sosyal-duygusal", "social":
                 return (.kTerraLight, .kTerra, "Social")
-            case "bilişsel", "dil", "dil-bilişsel", "language", "cognitive":
+            case "dil", "language":
+                return (Color(hex: 0xE8EEF7), Color(hex: 0x4F6B8A), "Language")
+            case "bilişsel", "cognitive":
+                return (Color(hex: 0xE8E4F0), Color(hex: 0x6B5C8F), "Cognitive")
+            case "dil-bilişsel":
                 return (Color(hex: 0xE8E4F0), Color(hex: 0x6B5C8F), "Language")
             default:
                 return (.kPale, .kMid, category)
@@ -316,7 +430,11 @@ struct MilestonesView: View {
                 return (Color(hex: 0xEAF3EF), .kSageDark, "Fiziksel")
             case "sosyal", "sosyal-duygusal", "social":
                 return (.kTerraLight, .kTerra, "Sosyal")
-            case "bilişsel", "dil", "dil-bilişsel", "language", "cognitive":
+            case "dil", "language":
+                return (Color(hex: 0xE8EEF7), Color(hex: 0x4F6B8A), "Dil")
+            case "bilişsel", "cognitive":
+                return (Color(hex: 0xE8E4F0), Color(hex: 0x6B5C8F), "Bilişsel")
+            case "dil-bilişsel":
                 return (Color(hex: 0xE8E4F0), Color(hex: 0x6B5C8F), "Dil")
             default:
                 return (.kPale, .kMid, category)
@@ -329,6 +447,15 @@ struct MilestonesView: View {
             if let existing = progressRecords.first(where: { $0.milestoneID == id }) {
                 modelContext.delete(existing)
             } else {
+                guard MonetizationPolicy.canSaveMilestone(
+                    hasFullAccess: subscriptionManager.hasFullAccess,
+                    currentTrackedCount: progressRecords.count,
+                    isAlreadyTracked: false
+                ) else {
+                    showPaywall = true
+                    return
+                }
+
                 let progress = MilestoneProgress(milestoneID: id, status: .completed)
                 modelContext.insert(progress)
             }
@@ -341,4 +468,5 @@ struct MilestonesView: View {
         MilestonesView()
     }
     .modelContainer(for: [Baby.self, MilestoneProgress.self], inMemory: true)
+    .environment(SubscriptionManager.shared)
 }

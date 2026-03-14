@@ -12,31 +12,135 @@
     "nameTR": "BCG (Tüberküloz)",
     "nameEN": "BCG (Tuberculosis)",
     "monthAge": 2,
-    "descriptionTR": "2. ayın sonunda yapılır.",
-    "descriptionEN": "Given at end of 2nd month."
+    "descriptionTR": "2. ayın sonunda uygulanır.",
+    "descriptionEN": "Given at the end of the 2nd month."
   },
   {
-    "id": "dtap_1",
-    "nameTR": "DTaP-IPV-Hib (1. doz)",
-    "nameEN": "DTaP-IPV-Hib (1st dose)",
+    "id": "pcv_1",
+    "nameTR": "KPA (1. doz)",
+    "nameEN": "PCV (1st dose)",
     "monthAge": 2,
-    "descriptionTR": "Difteri, Boğmaca, Tetanoz, Polio, Hemofilus İnfluenza tip B — 1. doz.",
-    "descriptionEN": "Diphtheria, Pertussis, Tetanus, Polio, Haemophilus Influenzae type B — 1st dose."
+    "descriptionTR": "Konjuge pnömokok aşısının 1. dozu 2. ayın sonunda uygulanır.",
+    "descriptionEN": "The 1st pneumococcal conjugate vaccine dose is given at the end of the 2nd month."
   },
   {
-    "id": "hepb_2",
-    "nameTR": "Hepatit B (2. doz)",
-    "nameEN": "Hepatitis B (2nd dose)",
-    "monthAge": 1,
-    "descriptionTR": "1. ayın sonunda yapılır.",
-    "descriptionEN": "Given at end of 1st month."
+    "id": "hexa_1",
+    "nameTR": "DaBT-İPA-Hib-HepB (1. doz)",
+    "nameEN": "DTaP-IPV-Hib-HepB (1st dose)",
+    "monthAge": 2,
+    "descriptionTR": "Altı bileşenli karma aşının 1. dozu 2. ayın sonunda uygulanır.",
+    "descriptionEN": "The 1st hexavalent combination vaccine dose is given at the end of the 2nd month."
   },
   {
-    "id": "dtap_2",
-    "nameTR": "DTaP-IPV-Hib (2. doz)",
-    "nameEN": "DTaP-IPV-Hib (2nd dose)",
+    "id": "pcv_2",
+    "nameTR": "KPA (2. doz)",
+    "nameEN": "PCV (2nd dose)",
     "monthAge": 4,
-    "descriptionTR": "Difteri, Boğmaca, Tetanoz, Polio, Hemofilus İnfluenza tip B — 2. doz.",
-    "descriptionEN": "Diphtheria, Pertussis, Tetanus, Polio, Haemophilus Influenzae type B — 2nd dose."
+    "descriptionTR": "Konjuge pnömokok aşısının 2. dozu 4. ayın sonunda uygulanır.",
+    "descriptionEN": "The 2nd pneumococcal conjugate vaccine dose is given at the end of the 4th month."
+  },
+  {
+    "id": "hexa_2",
+    "nameTR": "DaBT-İPA-Hib-HepB (2. doz)",
+    "nameEN": "DTaP-IPV-Hib-HepB (2nd dose)",
+    "monthAge": 4,
+    "descriptionTR": "Altı bileşenli karma aşının 2. dozu 4. ayın sonunda uygulanır.",
+    "descriptionEN": "The 2nd hexavalent combination vaccine dose is given at the end of the 4th month."
+  },
+  {
+    "id": "hexa_3",
+    "nameTR": "DaBT-İPA-Hib-HepB (3. doz)",
+    "nameEN": "DTaP-IPV-Hib-HepB (3rd dose)",
+    "monthAge": 6,
+    "descriptionTR": "Altı bileşenli karma aşının 3. dozu 6. ayın sonunda uygulanır.",
+    "descriptionEN": "The 3rd hexavalent combination vaccine dose is given at the end of the 6th month."
+  },
+  {
+    "id": "opa_1",
+    "nameTR": "OPA (1. doz)",
+    "nameEN": "OPV (1st dose)",
+    "monthAge": 6,
+    "descriptionTR": "Oral polio aşısının 1. dozu 6. ayın sonunda uygulanır.",
+    "descriptionEN": "The 1st oral polio vaccine dose is given at the end of the 6th month."
+  },
+  {
+    "id": "mmr_extra_1",
+    "nameTR": "KKK (ek doz)",
+    "nameEN": "MMR (additional dose)",
+    "monthAge": 9,
+    "descriptionTR": "KKK için ek doz 9. ayın sonunda uygulanır.",
+    "descriptionEN": "An additional MMR dose is given at the end of the 9th month."
+  },
+  {
+    "id": "pcv_booster",
+    "nameTR": "KPA (rapel)",
+    "nameEN": "PCV (booster)",
+    "monthAge": 12,
+    "descriptionTR": "Konjuge pnömokok aşısı rapel dozu 12. ayın sonunda uygulanır.",
+    "descriptionEN": "The pneumococcal conjugate vaccine booster is given at the end of the 12th month."
+  },
+  {
+    "id": "varicella_1",
+    "nameTR": "Suçiçeği",
+    "nameEN": "Varicella",
+    "monthAge": 12,
+    "descriptionTR": "Suçiçeği aşısı 12. ayın sonunda uygulanır.",
+    "descriptionEN": "Varicella vaccine is given at the end of the 12th month."
+  },
+  {
+    "id": "mmr_1",
+    "nameTR": "KKK (1. doz)",
+    "nameEN": "MMR (1st dose)",
+    "monthAge": 12,
+    "descriptionTR": "KKK aşısının 1. dozu 12. ayın sonunda uygulanır.",
+    "descriptionEN": "The 1st MMR dose is given at the end of the 12th month."
+  },
+  {
+    "id": "hexa_booster",
+    "nameTR": "DaBT-İPA-Hib-HepB (rapel)",
+    "nameEN": "DTaP-IPV-Hib-HepB (booster)",
+    "monthAge": 18,
+    "descriptionTR": "Altı bileşenli karma aşının rapel dozu 18. ayın sonunda uygulanır.",
+    "descriptionEN": "The hexavalent combination vaccine booster is given at the end of the 18th month."
+  },
+  {
+    "id": "opa_2",
+    "nameTR": "OPA (2. doz)",
+    "nameEN": "OPV (2nd dose)",
+    "monthAge": 18,
+    "descriptionTR": "Oral polio aşısının 2. dozu 18. ayın sonunda uygulanır.",
+    "descriptionEN": "The 2nd oral polio vaccine dose is given at the end of the 18th month."
+  },
+  {
+    "id": "hepa_1",
+    "nameTR": "Hepatit A (1. doz)",
+    "nameEN": "Hepatitis A (1st dose)",
+    "monthAge": 18,
+    "descriptionTR": "Hepatit A aşısının 1. dozu 18. ayın sonunda uygulanır.",
+    "descriptionEN": "The 1st hepatitis A dose is given at the end of the 18th month."
+  },
+  {
+    "id": "hepa_2",
+    "nameTR": "Hepatit A (2. doz)",
+    "nameEN": "Hepatitis A (2nd dose)",
+    "monthAge": 24,
+    "descriptionTR": "Hepatit A aşısının 2. dozu 24. ayın sonunda uygulanır.",
+    "descriptionEN": "The 2nd hepatitis A dose is given at the end of the 24th month."
+  },
+  {
+    "id": "mmr_2",
+    "nameTR": "KKK (2. doz)",
+    "nameEN": "MMR (2nd dose)",
+    "monthAge": 48,
+    "descriptionTR": "KKK aşısının 2. dozu 48. ayda uygulanır.",
+    "descriptionEN": "The 2nd MMR dose is given at 48 months."
+  },
+  {
+    "id": "dtap_ipv_booster",
+    "nameTR": "DaBT-İPA (rapel)",
+    "nameEN": "DTaP-IPV (booster)",
+    "monthAge": 48,
+    "descriptionTR": "DaBT-İPA rapel dozu 48. ayda uygulanır.",
+    "descriptionEN": "The DTaP-IPV booster is given at 48 months."
   }
 ]

@@ -3,9 +3,11 @@ import SwiftData
 
 struct VaccinationView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \VaccinationRecord.scheduledDate) private var records: [VaccinationRecord]
     @Query private var babies: [Baby]
     @State private var showAddSheet = false
+    @State private var showPaywall = false
 
     private var baby: Baby? { babies.first }
 
@@ -13,12 +15,12 @@ struct VaccinationView: View {
 
     // TR mode: auto-generated schedule records
     private var scheduleRecords: [VaccinationRecord] {
-        records.filter { !$0.isManual }
+        records.filter { $0.isManual != true }
     }
 
     // Manual entries (both TR and EN users can add these)
     private var manualRecords: [VaccinationRecord] {
-        records.filter { $0.isManual }
+        records.filter { $0.isManual == true }
     }
 
     // Schedule groupings (TR mode)
@@ -99,6 +101,11 @@ struct VaccinationView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 20)
 
+                if !subscriptionManager.hasFullAccess {
+                    reminderUpgradeCard
+                        .padding(.bottom, 16)
+                }
+
                 if isEN {
                     // EN MODE: Manual tracker
                     manualTrackerContent
@@ -136,6 +143,13 @@ struct VaccinationView: View {
         .sheet(isPresented: $showAddSheet) {
             AddVaccineSheet()
                 .presentationDetents([.medium, .large])
+                .environment(subscriptionManager)
+        }
+        .sheet(isPresented: $showPaywall) {
+            NavigationStack {
+                PaywallView()
+            }
+            .environment(subscriptionManager)
         }
     }
 
@@ -266,15 +280,47 @@ struct VaccinationView: View {
         } label: {
             Text(isEN ? "+ Log a vaccine" : "+ Aşı kaydı ekle")
                 .font(.kinnaBody(13))
-                .foregroundStyle(.kLight)
+                .foregroundStyle(.kChar)
                 .frame(maxWidth: .infinity)
                 .padding(14)
+                .background(Color.kWarm.opacity(0.7))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(Color.kPale, style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
+                        .strokeBorder(Color.kPale.opacity(0.9), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
                 )
         }
         .padding(.top, 8)
+    }
+
+    private var reminderUpgradeCard: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "bell.badge.fill")
+                .font(.system(size: 12))
+                .foregroundStyle(.kTerra)
+
+            Text(isEN
+                 ? "Vaccine reminders are part of Kinna Premium. Free can log vaccines, Premium can schedule next-dose reminders."
+                 : "Aşı hatırlatıcıları Kinna Premium'a dahildir. Ücretsiz planda aşı kaydı tutulur, Premium'da sonraki doz hatırlatıcısı eklenir.")
+                .font(.kinnaBody(10))
+                .foregroundStyle(.kMid)
+                .lineSpacing(2)
+
+            Spacer(minLength: 8)
+
+            Button(isEN ? "Premium" : "Premium") {
+                showPaywall = true
+            }
+            .font(.kinnaBodyMedium(10))
+            .foregroundStyle(.kTerra)
+        }
+        .padding(12)
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.kPale, lineWidth: 1)
+        )
     }
 
     // MARK: - Stat Card
@@ -367,11 +413,11 @@ struct VaccinationView: View {
                             .font(.kinnaBody(10))
                             .foregroundStyle(.kLight)
                     }
-                    if !record.doctorName.isEmpty {
+                    if let doctorName = record.doctorName, !doctorName.isEmpty {
                         Text("·")
                             .font(.kinnaBody(10))
                             .foregroundStyle(.kPale)
-                        Text(record.doctorName)
+                        Text(doctorName)
                             .font(.kinnaBody(10))
                             .foregroundStyle(.kLight)
                     }
@@ -512,6 +558,7 @@ struct VaccinationView: View {
 struct AddVaccineSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     @State private var vaccineName = ""
     @State private var administeredDate = Date()
@@ -520,8 +567,10 @@ struct AddVaccineSheet: View {
     @State private var doctorName = ""
     @State private var lotNumber = ""
     @State private var note = ""
+    @State private var showPaywall = false
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+    private var canUseReminder: Bool { MonetizationPolicy.canUseVaccineReminders(hasFullAccess: subscriptionManager.hasFullAccess) }
 
     private let commonVaccines: [(en: String, tr: String)] = [
         ("Hepatitis B", "Hepatit B"),
@@ -547,6 +596,8 @@ struct AddVaccineSheet: View {
                         fieldLabel(isEN ? "VACCINE NAME" : "AŞI ADI")
                         TextField(isEN ? "e.g., DTaP 2nd dose" : "örnek: DTaP 2. doz", text: $vaccineName)
                             .font(.kinnaBody(14))
+                            .foregroundStyle(.kChar)
+                            .tint(.kTerra)
                             .padding(12)
                             .background(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -589,34 +640,116 @@ struct AddVaccineSheet: View {
                     // Administered date
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "DATE ADMINISTERED" : "YAPILDIĞI TARİH")
-                        DatePicker("", selection: $administeredDate, in: ...Date(), displayedComponents: .date)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        ZStack {
+                            HStack {
+                                Text(administeredDate.formatted(date: .abbreviated, time: .omitted))
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kChar)
+                                Spacer()
+                                Image(systemName: "calendar")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.kTerra)
+                            }
+                            .padding(12)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.kPale, lineWidth: 1.5)
+                            )
+
+                            DatePicker("", selection: $administeredDate, in: ...Date(), displayedComponents: .date)
+                                .labelsHidden()
+                                .datePickerStyle(.compact)
+                                .blendMode(.destinationOver)
+                                .opacity(0.015)
+                                .tint(.kTerra)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
                     // Next dose toggle
                     VStack(alignment: .leading, spacing: 8) {
-                        Toggle(isOn: $hasNextDose) {
+                        Toggle(isOn: Binding(
+                            get: { hasNextDose },
+                            set: { newValue in
+                                guard newValue else {
+                                    hasNextDose = false
+                                    return
+                                }
+
+                                guard canUseReminder else {
+                                    showPaywall = true
+                                    return
+                                }
+
+                                hasNextDose = true
+                            }
+                        )) {
                             HStack(spacing: 6) {
                                 Image(systemName: "bell.fill")
                                     .font(.system(size: 12))
-                                    .foregroundStyle(.kTerra)
+                                    .foregroundStyle(canUseReminder ? .kTerra : .kLight)
                                 Text(isEN ? "Set next dose reminder" : "Sonraki doz hatırlatıcısı")
                                     .font(.kinnaBody(13))
-                                    .foregroundStyle(.kChar)
+                                    .foregroundStyle(canUseReminder ? .kChar : .kMid)
                             }
                         }
                         .tint(.kSage)
 
                         if hasNextDose {
-                            DatePicker(
-                                isEN ? "Next dose date" : "Sonraki doz tarihi",
-                                selection: $nextDoseDate,
-                                in: Date()...,
-                                displayedComponents: .date
-                            )
-                            .font(.kinnaBody(13))
-                            .foregroundStyle(.kChar)
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(isEN ? "Next dose date" : "Sonraki doz tarihi")
+                                    .font(.kinnaBody(12))
+                                    .foregroundStyle(.kMid)
+
+                                ZStack {
+                                    HStack {
+                                        Text(nextDoseDate.formatted(date: .abbreviated, time: .omitted))
+                                            .font(.kinnaBody(14))
+                                            .foregroundStyle(.kChar)
+                                        Spacer()
+                                        Image(systemName: "calendar.badge.plus")
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundStyle(.kTerra)
+                                    }
+                                    .padding(12)
+                                    .background(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.kPale, lineWidth: 1.5)
+                                    )
+
+                                    DatePicker(
+                                        "",
+                                        selection: $nextDoseDate,
+                                        in: Date()...,
+                                        displayedComponents: .date
+                                    )
+                                    .labelsHidden()
+                                    .datePickerStyle(.compact)
+                                    .blendMode(.destinationOver)
+                                    .opacity(0.015)
+                                    .tint(.kTerra)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                                }
+                            }
+                        } else if !canUseReminder {
+                            Button {
+                                showPaywall = true
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 10, weight: .semibold))
+                                    Text(isEN
+                                         ? "Unlock reminders with Kinna Premium"
+                                         : "Hatırlatıcıları Kinna Premium ile aç")
+                                        .font(.kinnaBodyMedium(11))
+                                }
+                                .foregroundStyle(.kTerra)
+                            }
                         }
                     }
 
@@ -625,6 +758,8 @@ struct AddVaccineSheet: View {
                         fieldLabel(isEN ? "DOCTOR (OPTIONAL)" : "DOKTOR (OPSİYONEL)")
                         TextField(isEN ? "Dr. Smith" : "Dr. Yılmaz", text: $doctorName)
                             .font(.kinnaBody(14))
+                            .foregroundStyle(.kChar)
+                            .tint(.kTerra)
                             .padding(12)
                             .background(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -639,6 +774,8 @@ struct AddVaccineSheet: View {
                         fieldLabel(isEN ? "NOTE (OPTIONAL)" : "NOT (OPSİYONEL)")
                         TextField(isEN ? "Any reactions, lot number, etc." : "Reaksiyon, lot numarası vb.", text: $note)
                             .font(.kinnaBody(14))
+                            .foregroundStyle(.kChar)
+                            .tint(.kTerra)
                             .padding(12)
                             .background(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -654,6 +791,12 @@ struct AddVaccineSheet: View {
             .background(Color.kCream.ignoresSafeArea())
             .navigationTitle(isEN ? "Log Vaccine" : "Aşı Kaydı")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showPaywall) {
+                NavigationStack {
+                    PaywallView()
+                }
+                .environment(subscriptionManager)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
@@ -684,7 +827,7 @@ struct AddVaccineSheet: View {
         modelContext.insert(record)
 
         // Schedule reminder for next dose
-        if hasNextDose {
+        if hasNextDose && canUseReminder {
             NotificationManager.shared.scheduleVaccinationReminder(
                 vaccineName: name,
                 date: nextDoseDate
@@ -707,4 +850,5 @@ struct AddVaccineSheet: View {
         VaccinationView()
     }
     .modelContainer(for: [VaccinationRecord.self, Baby.self], inMemory: true)
+    .environment(SubscriptionManager.shared)
 }

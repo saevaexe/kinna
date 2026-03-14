@@ -1,0 +1,68 @@
+[
+  {
+    "id": "safe_sleep_back_0_2",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "severity": "high",
+    "titleTR": "Sırtüstü uyku en güvenli pozisyondur",
+    "titleEN": "Back sleeping is the safest position",
+    "descriptionTR": "Bebeğini her uyku için sırtüstü yatır. Yatak düz ve sert olsun; yastık, battaniye ve oyuncak ekleme.",
+    "descriptionEN": "Place your baby on their back for every sleep. Use a firm, flat sleep surface and keep pillows, blankets, and toys out.",
+    "sourceURL": "https://safetosleep.nichd.nih.gov/reduce-risk/back-sleeping"
+  },
+  {
+    "id": "safe_sleep_surface_0_5",
+    "monthStart": 0,
+    "monthEnd": 5,
+    "severity": "high",
+    "titleTR": "Koltuk ve yetişkin yatağında uyutma risklidir",
+    "titleEN": "Couches and adult beds are unsafe for sleep",
+    "descriptionTR": "Bebeğini koltukta, kanepede veya yetişkin yatağında uyutma. En güvenlisi yalnızca beşik/park yatakta uyumaktır.",
+    "descriptionEN": "Do not let your baby sleep on a couch, armchair, or adult bed. A crib or bassinet is the safer sleep space.",
+    "sourceURL": "https://safetosleep.nichd.nih.gov/reduce-risk/safe-sleep-environment"
+  },
+  {
+    "id": "stop_swaddling_when_rolling_3_5",
+    "monthStart": 3,
+    "monthEnd": 5,
+    "severity": "high",
+    "titleTR": "Dönmeye başlıyorsa kundaklamayı bırak",
+    "titleEN": "Stop swaddling once rolling begins",
+    "descriptionTR": "Bebek dönmeye başladığında uykuda kundak kullanma. Bu, boğulma ve sıkışma riskini artırabilir.",
+    "descriptionEN": "Do not swaddle for sleep once your baby starts rolling. It can increase suffocation and entrapment risk.",
+    "sourceURL": "https://safetosleep.nichd.nih.gov/reduce-risk/back-sleeping"
+  },
+  {
+    "id": "solid_food_choking_6_8",
+    "monthStart": 6,
+    "monthEnd": 8,
+    "severity": "medium",
+    "titleTR": "Ek gıdada boğulma riskine dikkat",
+    "titleEN": "Watch for choking hazards with solids",
+    "descriptionTR": "Ek gıdaya geçerken yiyecekleri uygun kıvam ve küçük parçalarda ver. Bebeğin yerken dik otursun; arabada veya yürürken yeme verme.",
+    "descriptionEN": "When starting solids, serve foods in safe textures and small pieces. Keep your baby upright while eating and avoid feeding in a car seat or while moving.",
+    "sourceURL": "https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/choking-hazards.html"
+  },
+  {
+    "id": "rear_facing_car_seat_9_24",
+    "monthStart": 9,
+    "monthEnd": 24,
+    "severity": "medium",
+    "titleTR": "Arabada mümkün olduğunca ters yönde taşı",
+    "titleEN": "Keep rear-facing as long as possible",
+    "descriptionTR": "Boyut sınırına ulaşana kadar çocuğunu arka koltukta ters yönde oto koltuğunda taşı. Ön koltuk hava yastığı küçük çocuklar için tehlikelidir.",
+    "descriptionEN": "Keep your child in a rear-facing car seat in the back seat until they reach the seat's height or weight limit. Front air bags can seriously injure young children.",
+    "sourceURL": "https://www.cdc.gov/child-passenger-safety/prevention/index.html"
+  },
+  {
+    "id": "drowning_supervision_12_24",
+    "monthStart": 12,
+    "monthEnd": 24,
+    "severity": "high",
+    "titleTR": "Su kenarında bir an bile yalnız bırakma",
+    "titleEN": "Never leave a toddler alone near water",
+    "descriptionTR": "Küvet, havuz, deniz veya su birikintisi fark etmez; küçük çocuklar su çevresinde saniyeler içinde sessizce boğulabilir.",
+    "descriptionEN": "Never leave a young child alone near bathtubs, pools, beaches, or buckets of water. Drowning happens quickly and is often silent.",
+    "sourceURL": "https://www.cdc.gov/drowning/prevention/index.html"
+  }
+]

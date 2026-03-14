@@ -5,7 +5,9 @@ struct OnboardingView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("childOrder") private var childOrder = 1
+    @AppStorage("parentRole") private var storedParentRole = ParentRole.mother.rawValue
     @Environment(\.modelContext) private var modelContext
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     @State private var currentStep = 0
     @State private var selectedRole: ParentRole = .mother
@@ -16,6 +18,7 @@ struct OnboardingView: View {
     @State private var birthYear = Calendar.current.component(.year, from: Date())
     @State private var selectedGender: Baby.Gender? = nil
     @State private var disclaimerAccepted = false
+    @State private var showCompletionPaywall = false
 
     private let totalSteps = 7
 
@@ -41,6 +44,17 @@ struct OnboardingView: View {
             .animation(.easeInOut(duration: 0.3), value: currentStep)
         }
         .background(Color.kCream.ignoresSafeArea())
+        .onAppear {
+            selectedRole = ParentRole(rawValue: storedParentRole) ?? .mother
+        }
+        .fullScreenCover(isPresented: $showCompletionPaywall, onDismiss: {
+            hasCompletedOnboarding = true
+        }) {
+            NavigationStack {
+                PaywallView(entryPoint: .onboarding)
+            }
+            .environment(subscriptionManager)
+        }
     }
 
     // MARK: - Step 0: Welcome
@@ -190,7 +204,10 @@ struct OnboardingView: View {
 
             Spacer()
 
-            darkButton(isEN ? "Continue →" : "Devam →") { currentStep = 2 }
+            darkButton(isEN ? "Continue →" : "Devam →") {
+                storedParentRole = selectedRole.rawValue
+                currentStep = 2
+            }
                 .padding(.bottom, 32)
         }
         .padding(.horizontal, 24)
@@ -663,9 +680,11 @@ struct OnboardingView: View {
             // Permission button
             Button {
                 Task {
-                    _ = await NotificationManager.shared.requestPermission()
-                    NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
-                    hasCompletedOnboarding = true
+                    let granted = await NotificationManager.shared.requestPermission()
+                    if granted {
+                        NotificationManager.shared.scheduleDailyReminder(hour: 9, minute: 0)
+                    }
+                    completeOnboarding()
                 }
             } label: {
                 Text(isEN ? "Allow notifications 🔔" : "Bildirimlere izin ver 🔔")
@@ -685,7 +704,7 @@ struct OnboardingView: View {
             }
 
             Button {
-                hasCompletedOnboarding = true
+                completeOnboarding()
             } label: {
                 Text(isEN ? "Not now" : "Şimdi değil")
                     .font(.kinnaBody(13))
@@ -737,6 +756,11 @@ struct OnboardingView: View {
                 modelContext.insert(record)
             }
         }
+    }
+
+    private func completeOnboarding() {
+        storedParentRole = selectedRole.rawValue
+        showCompletionPaywall = true
     }
 
     // MARK: - Date Helpers

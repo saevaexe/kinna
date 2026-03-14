@@ -3,9 +3,11 @@ import SwiftData
 
 struct AllergyView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \AllergyLog.introducedDate, order: .reverse) private var logs: [AllergyLog]
     @Query private var babies: [Baby]
     @State private var showAddSheet = false
+    @State private var showPaywall = false
 
     private var baby: Baby? { babies.first }
 
@@ -14,6 +16,12 @@ struct AllergyView: View {
     private var totalCount: Int { logs.count }
     private var safeCount: Int { logs.filter { $0.reaction == .none }.count }
     private var cautionCount: Int { logs.filter { $0.reaction != .none }.count }
+    private var canAddFoodLog: Bool {
+        MonetizationPolicy.canAddFoodLog(
+            hasFullAccess: subscriptionManager.hasFullAccess,
+            currentCount: totalCount
+        )
+    }
 
     var body: some View {
         ScrollView {
@@ -50,6 +58,37 @@ struct AllergyView: View {
                     statCard(value: "\(cautionCount)", label: isEN ? "CAUTION" : "DİKKAT", valueColor: .kTerra)
                 }
                 .padding(.bottom, 16)
+
+                if !subscriptionManager.hasFullAccess {
+                    HStack(spacing: 10) {
+                        Image(systemName: "fork.knife.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.kTerra)
+
+                        Text(isEN
+                             ? "Free includes your first \(MonetizationPolicy.freeFoodLogLimit) food entries. Upgrade for unlimited food tracking."
+                             : "Ücretsiz planda ilk \(MonetizationPolicy.freeFoodLogLimit) besin kaydı dahildir. Sınırsız takip için Premium'a geç.")
+                            .font(.kinnaBody(10))
+                            .foregroundStyle(.kMid)
+                            .lineSpacing(2)
+
+                        Spacer(minLength: 8)
+
+                        Button(isEN ? "Premium" : "Premium") {
+                            showPaywall = true
+                        }
+                        .font(.kinnaBodyMedium(10))
+                        .foregroundStyle(.kTerra)
+                    }
+                    .padding(12)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.kPale, lineWidth: 1)
+                    )
+                    .padding(.bottom, 16)
+                }
 
                 // Food list
                 if !logs.isEmpty {
@@ -95,16 +134,27 @@ struct AllergyView: View {
 
                 // Add food button
                 Button {
+                    guard canAddFoodLog else {
+                        showPaywall = true
+                        return
+                    }
                     showAddSheet = true
                 } label: {
-                    Text(isEN ? "+ Add new food" : "+ Yeni besin ekle")
+                    Text(canAddFoodLog
+                         ? (isEN ? "+ Add new food" : "+ Yeni besin ekle")
+                         : (isEN ? "Unlock unlimited foods" : "Sınırsız besin takibini aç"))
                         .font(.kinnaBody(13))
-                        .foregroundStyle(.kLight)
+                        .foregroundStyle(canAddFoodLog ? .kChar : .kTerra)
                         .frame(maxWidth: .infinity)
                         .padding(14)
+                        .background(canAddFoodLog ? Color.kWarm.opacity(0.7) : .white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .strokeBorder(Color.kPale, style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
+                                .strokeBorder(
+                                    canAddFoodLog ? Color.kPale.opacity(0.9) : Color.kTerra,
+                                    style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])
+                                )
                         )
                 }
                 .padding(.top, 12)
@@ -117,6 +167,12 @@ struct AllergyView: View {
         .sheet(isPresented: $showAddSheet) {
             AddFoodSheet()
                 .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $showPaywall) {
+            NavigationStack {
+                PaywallView()
+            }
+            .environment(subscriptionManager)
         }
     }
 
@@ -166,9 +222,9 @@ struct AllergyView: View {
                     .font(.kinnaBodyMedium(13))
                     .foregroundStyle(.kChar)
 
-                Text(log.introducedDate, format: .dateTime.day().month(.abbreviated))
+                Text(foodTimestampText(log.introducedDate))
                     .font(.kinnaBody(10))
-                    .foregroundStyle(.kLight)
+                    .foregroundStyle(.kMid)
             }
 
             Spacer()
@@ -205,6 +261,15 @@ struct AllergyView: View {
             .padding(.vertical, 3)
             .background(bg)
             .clipShape(RoundedRectangle(cornerRadius: 100))
+    }
+
+    private func foodTimestampText(_ date: Date) -> String {
+        if Calendar.current.isDateInToday(date) {
+            let prefix = isEN ? "Today" : "Bugün"
+            return "\(prefix) • \(date.formatted(date: .omitted, time: .shortened))"
+        }
+
+        return date.formatted(.dateTime.day().month(.abbreviated).hour().minute())
     }
 
     private func foodEmoji(_ name: String) -> String {
@@ -317,6 +382,8 @@ struct AddFoodSheet: View {
                         fieldLabel(isEN ? "FOOD NAME" : "BESIN ADI")
                         TextField(isEN ? "e.g., Carrot puree" : "örnek: Havuç püresi", text: $foodName)
                             .font(.kinnaBody(14))
+                            .foregroundStyle(.kChar)
+                            .tint(.kTerra)
                             .padding(12)
                             .background(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -328,7 +395,7 @@ struct AddFoodSheet: View {
 
                     // Quick picks
                     VStack(alignment: .leading, spacing: 8) {
-                        fieldLabel(isEN ? "QUICK PICK" : "HIZLI SECIM")
+                        fieldLabel(isEN ? "QUICK PICK" : "HIZLI SEÇİM")
                         LazyVGrid(columns: [
                             GridItem(.flexible()), GridItem(.flexible()),
                             GridItem(.flexible()), GridItem(.flexible())
@@ -356,10 +423,34 @@ struct AddFoodSheet: View {
 
                     // Date
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel(isEN ? "INTRODUCTION DATE" : "TANITIM TARIHI")
-                        DatePicker("", selection: $introducedDate, in: ...Date(), displayedComponents: .date)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        fieldLabel(isEN ? "INTRODUCTION DATE" : "TANITIM TARİHİ")
+                        ZStack {
+                            HStack {
+                                Text(introducedDate.formatted(date: .abbreviated, time: .omitted))
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kChar)
+                                Spacer()
+                                Image(systemName: "calendar")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.kTerra)
+                            }
+                            .padding(12)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.kPale, lineWidth: 1.5)
+                            )
+
+                            DatePicker("", selection: $introducedDate, in: ...Date(), displayedComponents: .date)
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .blendMode(.destinationOver)
+                                .opacity(0.015)
+                                .tint(.kTerra)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
                     // Reaction
@@ -379,6 +470,8 @@ struct AddFoodSheet: View {
                             fieldLabel(isEN ? "REACTION NOTE" : "REAKSIYON NOTU")
                             TextField(isEN ? "Rash, vomiting, gas..." : "Kızarıklık, kusma, gaz...", text: $reactionNote)
                                 .font(.kinnaBody(14))
+                                .foregroundStyle(.kChar)
+                                .tint(.kTerra)
                                 .padding(12)
                                 .background(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -393,7 +486,7 @@ struct AddFoodSheet: View {
                     HStack(alignment: .top, spacing: 8) {
                         Text("📌")
                             .font(.system(size: 12))
-                        Text(isEN ? "Try new foods one at a time, 3 days apart." : "Yeni besinleri tek tek ve 3 gun arayla deneyin.")
+                        Text(isEN ? "Try new foods one at a time, 3 days apart." : "Yeni besinleri tek tek ve 3 gün arayla deneyin.")
                             .font(.kinnaBody(11))
                             .foregroundStyle(.kMid)
                             .lineSpacing(2)
@@ -474,4 +567,5 @@ struct AddFoodSheet: View {
         AllergyView()
     }
     .modelContainer(for: [AllergyLog.self, Baby.self], inMemory: true)
+    .environment(SubscriptionManager.shared)
 }

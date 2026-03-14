@@ -1,412 +1,642 @@
 [
   {
-    "id": "motor_0_1",
-    "monthStart": 0,
-    "monthEnd": 1,
-    "category": "motor",
-    "titleTR": "Başını kaldırma",
-    "titleEN": "Head lifting",
-    "descriptionTR": "Yüzüstü pozisyonda başını kısa süreliğine kaldırabilir.",
-    "descriptionEN": "Can briefly lift head while lying on tummy."
-  },
-  {
-    "id": "motor_0_2",
-    "monthStart": 0,
-    "monthEnd": 2,
-    "category": "motor",
-    "titleTR": "Refleks hareketler",
-    "titleEN": "Reflex movements",
-    "descriptionTR": "Emme, kavrama ve Moro refleksleri aktiftir.",
-    "descriptionEN": "Sucking, grasping, and Moro reflexes are active."
-  },
-  {
-    "id": "social_0_1",
+    "id": "social_0_2_calms_when_comforted",
     "monthStart": 0,
     "monthEnd": 2,
     "category": "social",
-    "titleTR": "Sosyal gülümseme",
-    "titleEN": "Social smile",
-    "descriptionTR": "Yüzünüze bakarak gülümsemeye başlar.",
-    "descriptionEN": "Begins to smile at faces."
+    "titleTR": "Konuşma ve temasla sakinleşme",
+    "titleEN": "Calms when comforted",
+    "descriptionTR": "Konuşulduğunda veya kucağa alındığında belirgin biçimde sakinleşir.",
+    "descriptionEN": "Calms down when spoken to or picked up."
   },
   {
-    "id": "social_0_2",
+    "id": "social_0_2_smiles_back",
     "monthStart": 0,
     "monthEnd": 2,
     "category": "social",
-    "titleTR": "Yüzlere odaklanma",
-    "titleEN": "Focusing on faces",
-    "descriptionTR": "Yakın mesafedeki yüzlere dikkatle bakar.",
-    "descriptionEN": "Stares attentively at nearby faces."
+    "titleTR": "Karşılık veren gülümseme",
+    "titleEN": "Smiles back",
+    "descriptionTR": "Siz gülümsediğinizde veya onunla konuştuğunuzda size gülümser.",
+    "descriptionEN": "Smiles when you talk to or smile at them."
   },
   {
-    "id": "language_0_1",
+    "id": "language_0_2_makes_sounds",
     "monthStart": 0,
     "monthEnd": 2,
     "category": "language",
-    "titleTR": "Seslere tepki",
-    "titleEN": "Responding to sounds",
-    "descriptionTR": "Yüksek seslere irkilme veya başını çevirme ile tepki verir.",
-    "descriptionEN": "Reacts to loud sounds by startling or turning head."
+    "titleTR": "Ağlama dışı sesler",
+    "titleEN": "Makes sounds beyond crying",
+    "descriptionTR": "Ağlama dışında kısa sesler ve mırıldanmalar çıkarır.",
+    "descriptionEN": "Makes sounds other than crying."
   },
   {
-    "id": "motor_3_1",
+    "id": "language_0_2_reacts_to_loud_sounds",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "language",
+    "titleTR": "Yüksek sese tepki",
+    "titleEN": "Reacts to loud sounds",
+    "descriptionTR": "Ani ve yüksek seslere irkilme ya da dikkatini yöneltme ile tepki verir.",
+    "descriptionEN": "Reacts to loud sounds."
+  },
+  {
+    "id": "cognitive_0_2_watches_you_move",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "cognitive",
+    "titleTR": "Hareket eden kişiyi izleme",
+    "titleEN": "Watches you move",
+    "descriptionTR": "Yakınındaki kişinin hareketlerini gözleriyle izler.",
+    "descriptionEN": "Watches a person as they move."
+  },
+  {
+    "id": "cognitive_0_2_looks_at_toy",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "cognitive",
+    "titleTR": "Oyuncağa odaklanma",
+    "titleEN": "Looks at a toy",
+    "descriptionTR": "Önündeki oyuncağa birkaç saniye dikkatini verebilir.",
+    "descriptionEN": "Looks at a toy for several seconds."
+  },
+  {
+    "id": "motor_0_2_lifts_head_on_tummy",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "motor",
+    "titleTR": "Yüzüstü başını kaldırma",
+    "titleEN": "Lifts head on tummy",
+    "descriptionTR": "Yüzüstü pozisyonda başını kısa süreliğine yukarı kaldırır.",
+    "descriptionEN": "Holds head up while on tummy."
+  },
+  {
+    "id": "motor_0_2_moves_arms_and_legs",
+    "monthStart": 0,
+    "monthEnd": 2,
+    "category": "motor",
+    "titleTR": "Kolları ve bacakları hareket ettirme",
+    "titleEN": "Moves arms and legs",
+    "descriptionTR": "Her iki kolunu ve bacağını canlı biçimde hareket ettirir.",
+    "descriptionEN": "Moves both arms and both legs."
+  },
+  {
+    "id": "social_3_4_smiles_for_attention",
     "monthStart": 3,
     "monthEnd": 4,
-    "category": "motor",
-    "titleTR": "Nesneleri kavrama",
-    "titleEN": "Grasping objects",
-    "descriptionTR": "Elindeki nesneleri kavrayıp tutabilir.",
-    "descriptionEN": "Can grasp and hold objects in hand."
+    "category": "social",
+    "titleTR": "İlgi için gülümseme",
+    "titleEN": "Smiles for attention",
+    "descriptionTR": "İlgi çekmek veya sürdürmek için gülümser.",
+    "descriptionEN": "Smiles on their own to get your attention."
   },
   {
-    "id": "motor_3_2",
+    "id": "social_3_4_chuckles_when_played_with",
     "monthStart": 3,
     "monthEnd": 4,
-    "category": "motor",
-    "titleTR": "Başını dik tutma",
-    "titleEN": "Steady head control",
-    "descriptionTR": "Dik pozisyonda başını sabit tutabilir.",
-    "descriptionEN": "Can hold head steady in an upright position."
+    "category": "social",
+    "titleTR": "Oyunla kıkırdama",
+    "titleEN": "Chuckles during play",
+    "descriptionTR": "Onu güldürmeye çalıştığınızda kıkırdar ya da kahkaha atar.",
+    "descriptionEN": "Chuckles when you try to make them laugh."
   },
   {
-    "id": "motor_3_3",
-    "monthStart": 3,
-    "monthEnd": 5,
-    "category": "motor",
-    "titleTR": "Yuvarlanma",
-    "titleEN": "Rolling over",
-    "descriptionTR": "Sırt üstünden yüzüstüne veya tam tersi yuvarlanır.",
-    "descriptionEN": "Rolls from back to tummy or tummy to back."
-  },
-  {
-    "id": "language_3_1",
+    "id": "language_3_4_coos",
     "monthStart": 3,
     "monthEnd": 4,
     "category": "language",
-    "titleTR": "Agulama",
-    "titleEN": "Cooing",
-    "descriptionTR": "Sesli agulama ve gıgıldama başlar.",
-    "descriptionEN": "Starts cooing and gurgling sounds."
+    "titleTR": "Agulama sesleri",
+    "titleEN": "Coos",
+    "descriptionTR": "Agulama ve yumuşak sesler çıkarır.",
+    "descriptionEN": "Makes cooing sounds like \"oooo\" or \"aahh.\""
   },
   {
-    "id": "social_3_1",
+    "id": "language_3_4_turns_toward_voice",
     "monthStart": 3,
-    "monthEnd": 5,
+    "monthEnd": 4,
+    "category": "language",
+    "titleTR": "Sese yönelme",
+    "titleEN": "Turns toward your voice",
+    "descriptionTR": "Sizi duyduğunda başını ya da bakışını size doğru çevirir.",
+    "descriptionEN": "Turns head toward the sound of your voice."
+  },
+  {
+    "id": "cognitive_3_4_opens_mouth_when_hungry",
+    "monthStart": 3,
+    "monthEnd": 4,
+    "category": "cognitive",
+    "titleTR": "Beslenme beklentisi",
+    "titleEN": "Opens mouth when hungry",
+    "descriptionTR": "Meme ya da biberonu gördüğünde ağzını açar.",
+    "descriptionEN": "Opens mouth when seeing breast or bottle if hungry."
+  },
+  {
+    "id": "cognitive_3_4_looks_at_hands",
+    "monthStart": 3,
+    "monthEnd": 4,
+    "category": "cognitive",
+    "titleTR": "Ellerini inceleme",
+    "titleEN": "Looks at hands with interest",
+    "descriptionTR": "Ellerine dikkatle bakar ve onları keşfetmeye başlar.",
+    "descriptionEN": "Looks at their hands with interest."
+  },
+  {
+    "id": "motor_3_4_holds_head_steady",
+    "monthStart": 3,
+    "monthEnd": 4,
+    "category": "motor",
+    "titleTR": "Baş kontrolü",
+    "titleEN": "Holds head steady",
+    "descriptionTR": "Desteklenirken başını daha dengeli biçimde dik tutabilir.",
+    "descriptionEN": "Holds head steady without support when you are holding them."
+  },
+  {
+    "id": "motor_3_4_pushes_up_on_elbows",
+    "monthStart": 3,
+    "monthEnd": 4,
+    "category": "motor",
+    "titleTR": "Dirseklerle yükselme",
+    "titleEN": "Pushes up on elbows",
+    "descriptionTR": "Yüzüstü iken dirseklerinden destek alarak gövdesini kaldırır.",
+    "descriptionEN": "Pushes up onto elbows while on tummy."
+  },
+  {
+    "id": "social_5_6_knows_familiar_people",
+    "monthStart": 5,
+    "monthEnd": 6,
+    "category": "social",
+    "titleTR": "Tanıdık kişileri ayırt etme",
+    "titleEN": "Knows familiar people",
+    "descriptionTR": "Tanıdığı kişileri yabancılardan ayırt etmeye başlar.",
+    "descriptionEN": "Knows familiar people."
+  },
+  {
+    "id": "social_5_6_laughs",
+    "monthStart": 5,
+    "monthEnd": 6,
     "category": "social",
     "titleTR": "Sesli gülme",
-    "titleEN": "Laughing out loud",
-    "descriptionTR": "Eğlenceli uyaranlara kahkaha ile tepki verir.",
-    "descriptionEN": "Responds to playful stimuli with laughter."
+    "titleEN": "Laughs",
+    "descriptionTR": "Oyun ve etkileşim sırasında sesli biçimde güler.",
+    "descriptionEN": "Likes to look at self in a mirror and laughs."
   },
   {
-    "id": "motor_5_1",
+    "id": "language_5_6_takes_turns_making_sounds",
     "monthStart": 5,
-    "monthEnd": 7,
-    "category": "motor",
-    "titleTR": "Desteksiz oturma",
-    "titleEN": "Sitting without support",
-    "descriptionTR": "Kısa süre desteksiz oturabilir.",
-    "descriptionEN": "Can sit briefly without support."
+    "monthEnd": 6,
+    "category": "language",
+    "titleTR": "Sırayla ses çıkarma",
+    "titleEN": "Takes turns making sounds",
+    "descriptionTR": "Siz ses çıkardığınızda buna karşılık vererek sırayla ses çıkarır.",
+    "descriptionEN": "Takes turns making sounds with you."
   },
   {
-    "id": "motor_5_2",
+    "id": "language_5_6_blows_raspberries",
+    "monthStart": 5,
+    "monthEnd": 6,
+    "category": "language",
+    "titleTR": "Dudakla ses yapma",
+    "titleEN": "Blows raspberries",
+    "descriptionTR": "Dudaklarıyla pıtır pıtır sesler çıkarır.",
+    "descriptionEN": "Blows raspberries and makes playful mouth sounds."
+  },
+  {
+    "id": "cognitive_5_6_mouths_objects",
+    "monthStart": 5,
+    "monthEnd": 6,
+    "category": "cognitive",
+    "titleTR": "Ağızla keşif",
+    "titleEN": "Explores objects with mouth",
+    "descriptionTR": "Oyuncakları ve nesneleri ağzına götürerek keşfeder.",
+    "descriptionEN": "Puts things in their mouth to explore them."
+  },
+  {
+    "id": "cognitive_5_6_reaches_for_toy",
+    "monthStart": 5,
+    "monthEnd": 6,
+    "category": "cognitive",
+    "titleTR": "İstediği oyuncağa uzanma",
+    "titleEN": "Reaches for a toy",
+    "descriptionTR": "İstediği oyuncağa uzanıp almaya çalışır.",
+    "descriptionEN": "Reaches to grab a toy they want."
+  },
+  {
+    "id": "motor_5_6_rolls_tummy_to_back",
     "monthStart": 5,
     "monthEnd": 6,
     "category": "motor",
-    "titleTR": "Ellerle keşfetme",
-    "titleEN": "Exploring with hands",
-    "descriptionTR": "Nesneleri bir elden diğerine aktarır ve ağzına götürür.",
-    "descriptionEN": "Transfers objects between hands and brings them to mouth."
+    "titleTR": "Yüzüstünden sırtüstüne dönme",
+    "titleEN": "Rolls tummy to back",
+    "descriptionTR": "Yüzüstü pozisyondan sırtüstüne dönebilir.",
+    "descriptionEN": "Rolls from tummy to back."
   },
   {
-    "id": "language_5_1",
+    "id": "motor_5_6_pushes_up_with_straight_arms",
     "monthStart": 5,
-    "monthEnd": 7,
-    "category": "language",
-    "titleTR": "Heceleme",
-    "titleEN": "Babbling",
-    "descriptionTR": "\"Ba-ba\", \"da-da\" gibi tekrarlayan heceler çıkarır.",
-    "descriptionEN": "Produces repetitive syllables like \"ba-ba\", \"da-da\"."
-  },
-  {
-    "id": "social_5_1",
-    "monthStart": 5,
-    "monthEnd": 8,
-    "category": "social",
-    "titleTR": "Yabancı kaygısı",
-    "titleEN": "Stranger anxiety",
-    "descriptionTR": "Tanımadığı kişilere karşı tedirginlik göstermeye başlar.",
-    "descriptionEN": "Begins to show wariness around unfamiliar people."
-  },
-  {
-    "id": "motor_7_1",
-    "monthStart": 7,
-    "monthEnd": 9,
+    "monthEnd": 6,
     "category": "motor",
-    "titleTR": "Emekleme",
-    "titleEN": "Crawling",
-    "descriptionTR": "Elleri ve dizleri üzerinde ileri doğru hareket eder.",
-    "descriptionEN": "Moves forward on hands and knees."
+    "titleTR": "Kollarla yükselme",
+    "titleEN": "Pushes up with straight arms",
+    "descriptionTR": "Yüzüstü iken düz kollarıyla gövdesini yukarı iter.",
+    "descriptionEN": "Pushes up with straight arms while on tummy."
   },
   {
-    "id": "motor_7_2",
-    "monthStart": 7,
-    "monthEnd": 9,
-    "category": "motor",
-    "titleTR": "Tutunarak ayağa kalkma",
-    "titleEN": "Pulling to stand",
-    "descriptionTR": "Mobilya veya desteğe tutunarak ayağa kalkar.",
-    "descriptionEN": "Pulls up to standing by holding onto furniture."
-  },
-  {
-    "id": "motor_7_3",
-    "monthStart": 7,
-    "monthEnd": 10,
-    "category": "motor",
-    "titleTR": "Pençe tutuş",
-    "titleEN": "Pincer grasp",
-    "descriptionTR": "Küçük nesneleri başparmak ve işaret parmağıyla tutar.",
-    "descriptionEN": "Picks up small objects using thumb and index finger."
-  },
-  {
-    "id": "language_7_1",
-    "monthStart": 7,
-    "monthEnd": 9,
-    "category": "language",
-    "titleTR": "Parmakla işaret etme",
-    "titleEN": "Pointing",
-    "descriptionTR": "İlgisini çeken nesneleri parmağıyla gösterir.",
-    "descriptionEN": "Points at objects of interest with finger."
-  },
-  {
-    "id": "language_7_2",
-    "monthStart": 7,
-    "monthEnd": 10,
-    "category": "language",
-    "titleTR": "Basit komutları anlama",
-    "titleEN": "Understanding simple commands",
-    "descriptionTR": "\"Hayır\" ve \"gel\" gibi basit sözcüklere tepki verir.",
-    "descriptionEN": "Responds to simple words like \"no\" and \"come\"."
-  },
-  {
-    "id": "social_7_1",
+    "id": "social_7_9_varied_facial_expressions",
     "monthStart": 7,
     "monthEnd": 9,
     "category": "social",
-    "titleTR": "Nesne kalıcılığı",
-    "titleEN": "Object permanence",
-    "descriptionTR": "Saklanan bir nesneyi aramaya başlar.",
-    "descriptionEN": "Starts to look for hidden objects."
+    "titleTR": "Farklı yüz ifadeleri",
+    "titleEN": "Shows varied facial expressions",
+    "descriptionTR": "Mutlu, üzgün, şaşkın gibi farklı ifadeler gösterir.",
+    "descriptionEN": "Shows several facial expressions such as happy, sad, or surprised."
   },
   {
-    "id": "social_7_2",
+    "id": "social_7_9_reacts_when_caregiver_leaves",
     "monthStart": 7,
-    "monthEnd": 10,
+    "monthEnd": 9,
     "category": "social",
-    "titleTR": "Ce-ee oyunu",
-    "titleEN": "Peek-a-boo",
-    "descriptionTR": "Ce-ee oyununu anlar ve tepki verir.",
-    "descriptionEN": "Understands and responds to peek-a-boo game."
+    "titleTR": "Ayrılığa tepki",
+    "titleEN": "Reacts when caregiver leaves",
+    "descriptionTR": "Bakım veren kişi uzaklaştığında tepki verir.",
+    "descriptionEN": "Looks when you call their name and reacts when you leave."
   },
   {
-    "id": "motor_10_1",
+    "id": "language_7_9_babbles_repeated_sounds",
+    "monthStart": 7,
+    "monthEnd": 9,
+    "category": "language",
+    "titleTR": "Tekrarlayan heceler",
+    "titleEN": "Babbles repeated sounds",
+    "descriptionTR": "\"Mamama\" ya da \"bababa\" gibi tekrarlayan heceler çıkarır.",
+    "descriptionEN": "Makes a lot of different sounds like \"mamamama\" and \"babababa.\""
+  },
+  {
+    "id": "language_7_9_lifts_arms_to_be_picked_up",
+    "monthStart": 7,
+    "monthEnd": 9,
+    "category": "language",
+    "titleTR": "Kucağa alınmak için işaret",
+    "titleEN": "Lifts arms to be picked up",
+    "descriptionTR": "Kucağa alınmak istediğinde kollarını yukarı kaldırır.",
+    "descriptionEN": "Lifts arms up to be picked up."
+  },
+  {
+    "id": "cognitive_7_9_looks_for_dropped_objects",
+    "monthStart": 7,
+    "monthEnd": 9,
+    "category": "cognitive",
+    "titleTR": "Düşen nesneyi arama",
+    "titleEN": "Looks for dropped objects",
+    "descriptionTR": "Elinden düşen nesnenin nereye gittiğini takip eder ve arar.",
+    "descriptionEN": "Looks for objects when dropped out of sight."
+  },
+  {
+    "id": "cognitive_7_9_bangs_objects_together",
+    "monthStart": 7,
+    "monthEnd": 9,
+    "category": "cognitive",
+    "titleTR": "Nesneleri birbirine vurma",
+    "titleEN": "Bangs objects together",
+    "descriptionTR": "İki nesneyi elinde tutup birbirine vurabilir.",
+    "descriptionEN": "Bangs two things together."
+  },
+  {
+    "id": "motor_7_9_gets_to_sitting",
+    "monthStart": 7,
+    "monthEnd": 9,
+    "category": "motor",
+    "titleTR": "Oturma pozisyonuna geçme",
+    "titleEN": "Gets to sitting",
+    "descriptionTR": "Kendi başına oturma pozisyonuna geçebilir.",
+    "descriptionEN": "Gets to a sitting position by themselves."
+  },
+  {
+    "id": "motor_7_9_sits_without_support",
+    "monthStart": 7,
+    "monthEnd": 9,
+    "category": "motor",
+    "titleTR": "Desteksiz oturma",
+    "titleEN": "Sits without support",
+    "descriptionTR": "Destek almadan sabit biçimde oturabilir.",
+    "descriptionEN": "Sits without support."
+  },
+  {
+    "id": "social_10_12_plays_social_games",
     "monthStart": 10,
     "monthEnd": 12,
-    "category": "motor",
-    "titleTR": "Tutunarak yürüme",
-    "titleEN": "Cruising",
-    "descriptionTR": "Mobilyalara tutunarak adım adım yürür.",
-    "descriptionEN": "Walks while holding onto furniture."
+    "category": "social",
+    "titleTR": "Sosyal oyunlara katılma",
+    "titleEN": "Plays social games",
+    "descriptionTR": "Ce-ee ya da el çırpma gibi basit sosyal oyunlara katılır.",
+    "descriptionEN": "Plays games with you like pat-a-cake."
   },
   {
-    "id": "motor_10_2",
-    "monthStart": 10,
-    "monthEnd": 13,
-    "category": "motor",
-    "titleTR": "İlk adımlar",
-    "titleEN": "First steps",
-    "descriptionTR": "Desteksiz birkaç adım atabilir.",
-    "descriptionEN": "Can take a few steps without support."
-  },
-  {
-    "id": "language_10_1",
+    "id": "language_10_12_waves_bye_bye",
     "monthStart": 10,
     "monthEnd": 12,
     "category": "language",
-    "titleTR": "İlk kelimeler",
-    "titleEN": "First words",
-    "descriptionTR": "\"Mama\", \"baba\" gibi anlamlı ilk kelimeleri söyler.",
-    "descriptionEN": "Says meaningful first words like \"mama\", \"dada\"."
+    "titleTR": "El sallama",
+    "titleEN": "Waves bye-bye",
+    "descriptionTR": "Vedalaşırken el sallamayı kullanır.",
+    "descriptionEN": "Waves \"bye-bye.\""
   },
   {
-    "id": "language_10_2",
+    "id": "language_10_12_calls_parent",
     "monthStart": 10,
     "monthEnd": 12,
     "category": "language",
-    "titleTR": "Jestlerle iletişim",
-    "titleEN": "Gesture communication",
-    "descriptionTR": "El sallama, baş sallama gibi jestleri kullanır.",
-    "descriptionEN": "Uses gestures like waving and head shaking."
+    "titleTR": "Ebeveyne isimle seslenme",
+    "titleEN": "Calls a parent by name",
+    "descriptionTR": "\"Anne\", \"baba\" ya da benzer özel bir adla size seslenir.",
+    "descriptionEN": "Calls a parent \"mama\" or \"dada\" or another special name."
   },
   {
-    "id": "social_10_1",
+    "id": "language_10_12_understands_no",
     "monthStart": 10,
     "monthEnd": 12,
-    "category": "social",
-    "titleTR": "Taklit etme",
-    "titleEN": "Imitation",
-    "descriptionTR": "Yetişkinlerin hareketlerini ve seslerini taklit eder.",
-    "descriptionEN": "Imitates adults' movements and sounds."
+    "category": "language",
+    "titleTR": "\"Hayır\"ı anlama",
+    "titleEN": "Understands no",
+    "descriptionTR": "\"Hayır\" dendiğinde kısa bir duraksama ya da tepki gösterir.",
+    "descriptionEN": "Understands \"no\" by pausing briefly or stopping."
   },
   {
-    "id": "social_10_2",
+    "id": "cognitive_10_12_puts_object_in_container",
     "monthStart": 10,
     "monthEnd": 12,
-    "category": "social",
-    "titleTR": "Ayrılık kaygısı",
-    "titleEN": "Separation anxiety",
-    "descriptionTR": "Ebeveynden ayrılırken üzüntü ve ağlama gösterir.",
-    "descriptionEN": "Shows distress and crying when separated from parent."
+    "category": "cognitive",
+    "titleTR": "Kabın içine nesne koyma",
+    "titleEN": "Puts an object in a container",
+    "descriptionTR": "Bir nesneyi kutu ya da kabın içine koyabilir.",
+    "descriptionEN": "Puts something in a container."
   },
   {
-    "id": "motor_13_1",
-    "monthStart": 13,
-    "monthEnd": 15,
+    "id": "cognitive_10_12_looks_for_hidden_objects",
+    "monthStart": 10,
+    "monthEnd": 12,
+    "category": "cognitive",
+    "titleTR": "Saklanan nesneyi arama",
+    "titleEN": "Looks for hidden objects",
+    "descriptionTR": "Sizin sakladığınız oyuncağı arar.",
+    "descriptionEN": "Looks for things they see you hide."
+  },
+  {
+    "id": "motor_10_12_pulls_to_stand_and_cruises",
+    "monthStart": 10,
+    "monthEnd": 12,
     "category": "motor",
-    "titleTR": "Bağımsız yürüme",
-    "titleEN": "Walking independently",
-    "descriptionTR": "Desteğe ihtiyaç duymadan güvenle yürür.",
-    "descriptionEN": "Walks confidently without needing support."
+    "titleTR": "Ayağa kalkma ve tutunarak ilerleme",
+    "titleEN": "Pulls to stand and cruises",
+    "descriptionTR": "Destek alarak ayağa kalkar ve mobilyalara tutunarak ilerler.",
+    "descriptionEN": "Pulls up to stand and walks while holding onto furniture."
   },
   {
-    "id": "motor_13_2",
-    "monthStart": 13,
-    "monthEnd": 18,
+    "id": "motor_10_12_pincer_grasp",
+    "monthStart": 10,
+    "monthEnd": 12,
     "category": "motor",
-    "titleTR": "Kaşıkla yeme denemesi",
-    "titleEN": "Trying to use a spoon",
-    "descriptionTR": "Kaşığı tutup ağzına götürmeye çalışır.",
-    "descriptionEN": "Tries to hold a spoon and bring it to mouth."
+    "titleTR": "Pense tutuş",
+    "titleEN": "Uses pincer grasp",
+    "descriptionTR": "Küçük yiyecekleri başparmak ve işaret parmağıyla alır.",
+    "descriptionEN": "Picks up small pieces of food with thumb and pointer finger."
   },
   {
-    "id": "motor_13_3",
-    "monthStart": 13,
-    "monthEnd": 18,
-    "category": "motor",
-    "titleTR": "Merdiven tırmanma",
-    "titleEN": "Climbing stairs",
-    "descriptionTR": "Emekleyerek veya tutunarak merdiven çıkmaya çalışır.",
-    "descriptionEN": "Attempts to climb stairs by crawling or holding on."
-  },
-  {
-    "id": "language_13_1",
-    "monthStart": 13,
-    "monthEnd": 18,
-    "category": "language",
-    "titleTR": "Kelime hazinesi genişlemesi",
-    "titleEN": "Vocabulary expansion",
-    "descriptionTR": "5-20 arası kelime kullanır ve yeni kelimeler öğrenir.",
-    "descriptionEN": "Uses 5-20 words and learns new ones."
-  },
-  {
-    "id": "language_13_2",
-    "monthStart": 13,
-    "monthEnd": 15,
-    "category": "language",
-    "titleTR": "Basit yönergeleri takip etme",
-    "titleEN": "Following simple instructions",
-    "descriptionTR": "\"Topu getir\" gibi tek adımlı yönergeleri anlar.",
-    "descriptionEN": "Understands one-step instructions like \"bring the ball\"."
-  },
-  {
-    "id": "social_13_1",
-    "monthStart": 13,
-    "monthEnd": 18,
-    "category": "social",
-    "titleTR": "Paralel oyun",
-    "titleEN": "Parallel play",
-    "descriptionTR": "Diğer çocukların yanında ama ayrı oynar.",
-    "descriptionEN": "Plays alongside but not directly with other children."
-  },
-  {
-    "id": "social_13_2",
+    "id": "social_13_15_copies_other_children",
     "monthStart": 13,
     "monthEnd": 15,
     "category": "social",
-    "titleTR": "Sevgi gösterme",
-    "titleEN": "Showing affection",
-    "descriptionTR": "Sarılma, öpme gibi sevgi ifadeleri gösterir.",
-    "descriptionEN": "Shows affection through hugging and kissing."
+    "titleTR": "Diğer çocukları taklit etme",
+    "titleEN": "Copies other children",
+    "descriptionTR": "Oyun sırasında diğer çocukların yaptıklarını taklit eder.",
+    "descriptionEN": "Copies other children while playing."
   },
   {
-    "id": "motor_18_1",
-    "monthStart": 18,
-    "monthEnd": 20,
+    "id": "social_13_15_shows_favorite_object",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "social",
+    "titleTR": "Sevdiği nesneyi gösterme",
+    "titleEN": "Shows a favorite object",
+    "descriptionTR": "Hoşlandığı oyuncağı ya da nesneyi size getirip gösterir.",
+    "descriptionEN": "Shows you an object they like."
+  },
+  {
+    "id": "language_13_15_tries_new_words",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "language",
+    "titleTR": "Yeni kelimeler deneme",
+    "titleEN": "Tries new words",
+    "descriptionTR": "\"Anne\" ve \"baba\" dışında bir iki kelimeyi söylemeye çalışır.",
+    "descriptionEN": "Tries to say one or two words besides \"mama\" or \"dada.\""
+  },
+  {
+    "id": "language_13_15_points_to_ask_for_help",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "language",
+    "titleTR": "Yardım istemek için işaret etme",
+    "titleEN": "Points to ask for help",
+    "descriptionTR": "İstediği bir şeye ulaşmak ya da yardım istemek için parmağıyla gösterir.",
+    "descriptionEN": "Points to ask for something or to get help."
+  },
+  {
+    "id": "cognitive_13_15_uses_objects_correctly",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "cognitive",
+    "titleTR": "Nesneleri amacına uygun kullanma",
+    "titleEN": "Uses objects correctly",
+    "descriptionTR": "Telefonu kulağına götürmek ya da kitabın sayfasını çevirmek gibi doğru kullanım gösterir.",
+    "descriptionEN": "Uses things correctly, like a phone or a cup."
+  },
+  {
+    "id": "cognitive_13_15_stacks_two_objects",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "cognitive",
+    "titleTR": "İki nesneyi üst üste koyma",
+    "titleEN": "Stacks two objects",
+    "descriptionTR": "İki küçük nesneyi üst üste koyabilir.",
+    "descriptionEN": "Stacks at least two small objects."
+  },
+  {
+    "id": "motor_13_15_takes_independent_steps",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "motor",
+    "titleTR": "Bağımsız adımlar",
+    "titleEN": "Takes independent steps",
+    "descriptionTR": "Desteksiz birkaç adım yürüyebilir.",
+    "descriptionEN": "Takes a few steps on their own."
+  },
+  {
+    "id": "motor_13_15_feeds_self_with_fingers",
+    "monthStart": 13,
+    "monthEnd": 15,
+    "category": "motor",
+    "titleTR": "Parmakla beslenme",
+    "titleEN": "Feeds self with fingers",
+    "descriptionTR": "Yiyecekleri parmaklarıyla alıp kendi kendine yiyebilir.",
+    "descriptionEN": "Uses fingers to feed themselves some food."
+  },
+  {
+    "id": "social_16_18_checks_back_with_caregiver",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "social",
+    "titleTR": "Uzaklaşıp geri kontrol etme",
+    "titleEN": "Checks back with caregiver",
+    "descriptionTR": "Sizden uzaklaşsa da yakınınızda olup olmadığınızı kontrol eder.",
+    "descriptionEN": "Moves away from you but looks to make sure you are close by."
+  },
+  {
+    "id": "social_16_18_points_to_show_interest",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "social",
+    "titleTR": "İlgisini paylaşmak için işaret etme",
+    "titleEN": "Points to show interest",
+    "descriptionTR": "İlginç bulduğu bir şeyi size göstermek için parmağıyla işaret eder.",
+    "descriptionEN": "Points to show you something interesting."
+  },
+  {
+    "id": "language_16_18_says_three_words",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "language",
+    "titleTR": "Üçten fazla kelime kullanma",
+    "titleEN": "Says three or more words",
+    "descriptionTR": "\"Anne\" ve \"baba\" dışında en az üç kelime kullanır.",
+    "descriptionEN": "Tries to say three or more words besides \"mama\" or \"dada.\""
+  },
+  {
+    "id": "language_16_18_follows_one_step_directions",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "language",
+    "titleTR": "Tek adımlı yönergeyi izleme",
+    "titleEN": "Follows one-step directions",
+    "descriptionTR": "El hareketi olmadan verilen tek adımlı yönergeleri anlayıp uygular.",
+    "descriptionEN": "Follows one-step directions without any gestures."
+  },
+  {
+    "id": "cognitive_16_18_copies_simple_chores",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "cognitive",
+    "titleTR": "Basit işleri taklit etme",
+    "titleEN": "Copies simple chores",
+    "descriptionTR": "Süpürme ya da bezle silme gibi basit ev işlerini taklit eder.",
+    "descriptionEN": "Copies you doing chores, like sweeping with a broom."
+  },
+  {
+    "id": "cognitive_16_18_simple_pretend_play",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "cognitive",
+    "titleTR": "Basit taklit oyunu",
+    "titleEN": "Simple pretend play",
+    "descriptionTR": "Oyuncak arabayı sürmek ya da bebeği beslemek gibi basit oyunlar kurar.",
+    "descriptionEN": "Plays with toys in a simple way, like pushing a toy car."
+  },
+  {
+    "id": "motor_16_18_walks_without_holding_on",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "motor",
+    "titleTR": "Desteksiz yürüme",
+    "titleEN": "Walks without holding on",
+    "descriptionTR": "Bir yere tutunmadan yürüyebilir.",
+    "descriptionEN": "Walks without holding onto anyone or anything."
+  },
+  {
+    "id": "motor_16_18_scribbles",
+    "monthStart": 16,
+    "monthEnd": 18,
+    "category": "motor",
+    "titleTR": "Karalama yapma",
+    "titleEN": "Scribbles",
+    "descriptionTR": "Kalem ya da boya ile karalamalar yapmaya başlar.",
+    "descriptionEN": "Scribbles on paper."
+  },
+  {
+    "id": "social_19_24_notices_others_upset",
+    "monthStart": 19,
+    "monthEnd": 24,
+    "category": "social",
+    "titleTR": "Başkasının üzüldüğünü fark etme",
+    "titleEN": "Notices when others are upset",
+    "descriptionTR": "Birinin üzgün ya da ağlıyor olduğunu fark eder.",
+    "descriptionEN": "Notices when others are hurt or upset."
+  },
+  {
+    "id": "social_19_24_looks_to_you_in_new_situations",
+    "monthStart": 19,
+    "monthEnd": 24,
+    "category": "social",
+    "titleTR": "Yeni durumda yüzünüze bakma",
+    "titleEN": "Looks to you in new situations",
+    "descriptionTR": "Yeni bir durumda nasıl davranacağını anlamak için yüzünüze bakar.",
+    "descriptionEN": "Looks at your face to see how to react in a new situation."
+  },
+  {
+    "id": "language_19_24_two_word_phrases",
+    "monthStart": 19,
+    "monthEnd": 24,
+    "category": "language",
+    "titleTR": "İki kelimelik ifadeler",
+    "titleEN": "Uses two-word phrases",
+    "descriptionTR": "\"Daha su\" ya da \"anne gel\" gibi iki kelimeyi birlikte kullanır.",
+    "descriptionEN": "Says at least two words together, like \"more milk.\""
+  },
+  {
+    "id": "language_19_24_points_to_body_parts",
+    "monthStart": 19,
+    "monthEnd": 24,
+    "category": "language",
+    "titleTR": "Vücut bölümlerini gösterme",
+    "titleEN": "Points to body parts",
+    "descriptionTR": "Sorulduğunda en az iki vücut bölümünü gösterebilir.",
+    "descriptionEN": "Points to at least two body parts when asked."
+  },
+  {
+    "id": "cognitive_19_24_uses_two_hands_for_tasks",
+    "monthStart": 19,
+    "monthEnd": 24,
+    "category": "cognitive",
+    "titleTR": "İki eli farklı amaçla kullanma",
+    "titleEN": "Uses two hands for different tasks",
+    "descriptionTR": "Bir eliyle nesneyi tutarken diğeriyle başka bir iş yapabilir.",
+    "descriptionEN": "Holds something in one hand while using the other hand for a different task."
+  },
+  {
+    "id": "cognitive_19_24_tries_switches_and_buttons",
+    "monthStart": 19,
+    "monthEnd": 24,
+    "category": "cognitive",
+    "titleTR": "Düğme ve anahtarları deneme",
+    "titleEN": "Tries switches and buttons",
+    "descriptionTR": "Oyuncaklardaki düğme, anahtar ve çevirmeli parçaları dener.",
+    "descriptionEN": "Tries to use switches, knobs, or buttons on a toy."
+  },
+  {
+    "id": "motor_19_24_runs",
+    "monthStart": 19,
+    "monthEnd": 24,
     "category": "motor",
     "titleTR": "Koşma",
-    "titleEN": "Running",
-    "descriptionTR": "Dengesini koruyarak koşmaya başlar.",
-    "descriptionEN": "Begins running while maintaining balance."
+    "titleEN": "Runs",
+    "descriptionTR": "Yürümekten daha hızlı bir tempoda koşabilir.",
+    "descriptionEN": "Runs."
   },
   {
-    "id": "motor_18_2",
-    "monthStart": 18,
+    "id": "motor_19_24_kicks_ball",
+    "monthStart": 19,
     "monthEnd": 24,
     "category": "motor",
-    "titleTR": "Top atma ve tekmeleme",
-    "titleEN": "Throwing and kicking a ball",
-    "descriptionTR": "Topu ileri doğru atar ve tekmelemeye çalışır.",
-    "descriptionEN": "Throws ball forward and attempts to kick it."
-  },
-  {
-    "id": "motor_18_3",
-    "monthStart": 18,
-    "monthEnd": 24,
-    "category": "motor",
-    "titleTR": "Kalemle çizme",
-    "titleEN": "Scribbling with crayon",
-    "descriptionTR": "Kalem veya boya kalemiyle karalama yapar.",
-    "descriptionEN": "Makes scribbles with a pencil or crayon."
-  },
-  {
-    "id": "language_18_1",
-    "monthStart": 18,
-    "monthEnd": 24,
-    "category": "language",
-    "titleTR": "İki kelimelik cümleler",
-    "titleEN": "Two-word sentences",
-    "descriptionTR": "\"Su ver\", \"baba gel\" gibi iki kelimelik ifadeler kurar.",
-    "descriptionEN": "Forms two-word phrases like \"want water\", \"daddy come\"."
-  },
-  {
-    "id": "language_18_2",
-    "monthStart": 18,
-    "monthEnd": 24,
-    "category": "language",
-    "titleTR": "Vücut parçalarını gösterme",
-    "titleEN": "Identifying body parts",
-    "descriptionTR": "\"Burnun nerede?\" diye sorulunca doğru yeri gösterir.",
-    "descriptionEN": "Points to correct body part when asked \"where is your nose?\""
-  },
-  {
-    "id": "social_18_1",
-    "monthStart": 18,
-    "monthEnd": 24,
-    "category": "social",
-    "titleTR": "Sembolik oyun",
-    "titleEN": "Pretend play",
-    "descriptionTR": "Oyuncak bebeği beslemek gibi hayal gücüne dayalı oyunlar oynar.",
-    "descriptionEN": "Engages in imaginative play like feeding a doll."
-  },
-  {
-    "id": "social_18_2",
-    "monthStart": 18,
-    "monthEnd": 24,
-    "category": "social",
-    "titleTR": "Bağımsızlık isteği",
-    "titleEN": "Desire for independence",
-    "descriptionTR": "\"Ben yapacağım\" tutumu sergiler, işleri kendi başına yapmak ister.",
-    "descriptionEN": "Shows \"I'll do it\" attitude, wants to do things independently."
+    "titleTR": "Topa tekme atma",
+    "titleEN": "Kicks a ball",
+    "descriptionTR": "Duran bir topa ayağıyla vurabilir.",
+    "descriptionEN": "Kicks a ball."
   }
 ]

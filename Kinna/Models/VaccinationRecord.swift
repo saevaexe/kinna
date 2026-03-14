@@ -10,10 +10,10 @@ final class VaccinationRecord {
     var isCompleted: Bool
     var note: String
     var createdAt: Date
-    var isManual: Bool
+    var isManual: Bool?
     var nextDoseDate: Date?
-    var doctorName: String
-    var lotNumber: String
+    var doctorName: String?
+    var lotNumber: String?
 
     /// Auto-generated from TR schedule
     init(vaccineName: String, scheduledDate: Date, note: String = "") {
@@ -23,10 +23,10 @@ final class VaccinationRecord {
         self.isCompleted = false
         self.note = note
         self.createdAt = .now
-        self.isManual = false
+        self.isManual = nil
         self.nextDoseDate = nil
-        self.doctorName = ""
-        self.lotNumber = ""
+        self.doctorName = nil
+        self.lotNumber = nil
     }
 
     /// Manual entry
@@ -40,7 +40,7 @@ final class VaccinationRecord {
         self.createdAt = .now
         self.isManual = true
         self.nextDoseDate = nextDoseDate
-        self.doctorName = doctorName
-        self.lotNumber = lotNumber
+        self.doctorName = doctorName.isEmpty ? nil : doctorName
+        self.lotNumber = lotNumber.isEmpty ? nil : lotNumber
     }
 }

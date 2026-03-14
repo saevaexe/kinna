@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("parentName") private var parentName = ""
     @Query private var babies: [Baby]
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @State private var presentedLegalPage: LegalWebPage?
 
     private var baby: Baby? { babies.first }
 
@@ -67,71 +68,70 @@ struct SettingsView: View {
 
                 // Subscription
                 settingsSection(String(localized: "settings_subscription", defaultValue: "Subscription")) {
-                    if subscriptionManager.hasFullAccess {
+                    NavigationLink {
+                        PaywallView(entryPoint: .navigation)
+                    } label: {
                         HStack(spacing: 12) {
-                            Image(systemName: "checkmark.seal.fill")
+                            Image(systemName: subscriptionManager.hasFullAccess ? "checkmark.seal.fill" : "star.fill")
                                 .font(.system(size: 18))
-                                .foregroundStyle(.kSageDark)
+                                .foregroundStyle(subscriptionManager.hasFullAccess ? .kSageDark : .kTerra)
 
                             VStack(alignment: .leading, spacing: 1) {
-                                Text("Kinna Pro")
+                                Text(subscriptionManager.hasFullAccess
+                                     ? "Kinna Premium"
+                                     : String(localized: "settings_upgrade", defaultValue: "Upgrade to Premium"))
                                     .font(.kinnaBodyMedium(13))
-                                    .foregroundStyle(.kChar)
-                                Text(String(localized: "settings_pro_active_label", defaultValue: "Active"))
+                                    .foregroundStyle(subscriptionManager.hasFullAccess ? .kChar : .kTerra)
+
+                                Text(subscriptionManager.hasFullAccess
+                                     ? String(localized: "settings_pro_active_label", defaultValue: "Active")
+                                     : String(localized: "settings_upgrade_sub", defaultValue: "Access all features"))
                                     .font(.kinnaBody(11))
-                                    .foregroundStyle(.kSageDark)
+                                    .foregroundStyle(subscriptionManager.hasFullAccess ? .kSageDark : .kMid)
                             }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.kLight)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    } else {
-                        NavigationLink {
-                            PaywallView()
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 18))
-                                    .foregroundStyle(.kTerra)
-
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(String(localized: "settings_upgrade", defaultValue: "Upgrade to Pro"))
-                                        .font(.kinnaBodyMedium(13))
-                                        .foregroundStyle(.kTerra)
-                                    Text(String(localized: "settings_upgrade_sub", defaultValue: "Access all features"))
-                                        .font(.kinnaBody(11))
-                                        .foregroundStyle(.kMid)
-                                }
-
-                                Spacer()
-
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(.kLight)
-                            }
-                        }
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                 }
                 .padding(.bottom, 10)
 
                 // Legal
                 settingsSection(String(localized: "settings_legal", defaultValue: "Legal")) {
                     VStack(spacing: 0) {
-                        NavigationLink {
-                            LegalDisclaimerView()
-                        } label: {
-                            HStack(spacing: 10) {
-                                Image(systemName: "doc.text.fill")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(.kMid)
-                                    .frame(width: 20)
-                                Text(String(localized: "settings_terms", defaultValue: "Terms of Use & Disclaimer"))
-                                    .font(.kinnaBody(13))
-                                    .foregroundStyle(.kChar)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(.kLight)
-                            }
-                        }
+                        legalWebRow(
+                            icon: "doc.text.fill",
+                            title: isEN ? "Terms of Use" : "Kullanım Koşulları",
+                            page: .terms
+                        )
+
+                        Rectangle()
+                            .fill(Color.kPale)
+                            .frame(height: 1)
+                            .padding(.vertical, 12)
+
+                        legalWebRow(
+                            icon: "hand.raised.fill",
+                            title: isEN ? "Privacy Policy" : "Gizlilik Politikası",
+                            page: .privacy
+                        )
+
+                        Rectangle()
+                            .fill(Color.kPale)
+                            .frame(height: 1)
+                            .padding(.vertical, 12)
+
+                        legalWebRow(
+                            icon: "questionmark.circle.fill",
+                            title: isEN ? "Support" : "Destek",
+                            page: .support
+                        )
                     }
                 }
                 .padding(.bottom, 10)
@@ -176,6 +176,31 @@ struct SettingsView: View {
         }
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $presentedLegalPage) { page in
+            LegalWebView(page: page)
+        }
+    }
+
+    private func legalWebRow(icon: String, title: String, page: LegalWebPage) -> some View {
+        Button {
+            presentedLegalPage = page
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundStyle(.kMid)
+                    .frame(width: 20)
+                Text(title)
+                    .font(.kinnaBody(13))
+                    .foregroundStyle(.kChar)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.kLight)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Profile Card
@@ -195,7 +220,7 @@ struct SettingsView: View {
                     Text(baby.gender == .female ? "👧" : baby.gender == .male ? "👦" : "👶")
                         .font(.system(size: 22))
                 }
-
+            
             VStack(alignment: .leading, spacing: 2) {
                 Text(baby.name)
                     .font(.kinnaBodyMedium(15))
@@ -204,7 +229,7 @@ struct SettingsView: View {
                     .font(.kinnaBody(12))
                     .foregroundStyle(.kMid)
             }
-
+            
             Spacer()
         }
         .padding(16)

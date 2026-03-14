@@ -81,7 +81,10 @@ struct HomeView: View {
 // MARK: - Home Dashboard
 
 struct HomeDashboardView: View {
+    @AppStorage("parentRole") private var parentRoleRaw = "mother"
     @Query private var babies: [Baby]
+    @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
+    @Environment(SubscriptionManager.self) private var subscriptionManager
 
     private var baby: Baby? { babies.first }
 
@@ -103,6 +106,29 @@ struct HomeDashboardView: View {
         }
     }
 
+    private var parentRoleLabel: String {
+        let role = parentRoleRaw.lowercased()
+        if isEN {
+            switch role {
+            case "father":
+                return "father"
+            case "caregiver":
+                return "caregiver"
+            default:
+                return "mother"
+            }
+        } else {
+            switch role {
+            case "father":
+                return "babası"
+            case "caregiver":
+                return "bakım vereni"
+            default:
+                return "annesi"
+            }
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -114,7 +140,7 @@ struct HomeDashboardView: View {
                             .foregroundStyle(.kLight)
                             .tracking(1)
 
-                        Text(isEN ? "\(baby.name)'s parent 👋" : "\(baby.name)'ın annesi 👋")
+                        Text(isEN ? "\(baby.name)'s \(parentRoleLabel) 👋" : "\(baby.name)'ın \(parentRoleLabel) 👋")
                             .font(.kinnaDisplay(26))
                             .foregroundStyle(.kChar)
                     }
@@ -289,26 +315,15 @@ struct HomeDashboardView: View {
     // MARK: - Daily Cards
 
     private func dailyCards(baby: Baby) -> some View {
-        let items: [(emoji: String, bg: Color, title: String, desc: String)] = isEN
-        ? [
-            ("🧠", Color(hex: 0xEAF3EF), "Month \(baby.ageInMonths) cognitive development",
-             "Tracking objects and orienting to sounds is developing."),
-            ("⚠️", .kTerraLight, "Vaccine reminder",
-             "Don\u{2019}t forget to check upcoming vaccinations."),
-            ("📖", .kPale, "Tip of the day",
-             "Talking to your baby with eye contact strengthens attachment."),
-        ]
-        : [
-            ("🧠", Color(hex: 0xEAF3EF), "\(baby.ageInMonths). ay bilişsel gelişim",
-             "Nesneleri takip etme ve seslere yönelme becerisi gelişiyor."),
-            ("⚠️", .kTerraLight, "Aşı hatırlatması",
-             "Yaklaşan aşı kontrolünü unutmayın."),
-            ("📖", .kPale, "Günün ipucu",
-             "Bebeğinizle göz teması kurarak konuşmak bağlanmayı güçlendirir."),
-        ]
+        let items = guidanceItems(for: baby)
+
+        let visibleCount = min(
+            items.count,
+            MonetizationPolicy.visibleHomeGuidanceCardCount(hasFullAccess: subscriptionManager.hasFullAccess)
+        )
 
         return VStack(spacing: 10) {
-            ForEach(items.indices, id: \.self) { i in
+            ForEach(Array(items.prefix(visibleCount).indices), id: \.self) { i in
                 HStack(spacing: 14) {
                     // Icon
                     RoundedRectangle(cornerRadius: 12)
@@ -339,11 +354,140 @@ struct HomeDashboardView: View {
                         .stroke(Color.kPale, lineWidth: 1)
                 )
             }
+
+            if !subscriptionManager.hasFullAccess && items.count > visibleCount {
+                NavigationLink {
+                    PaywallView(entryPoint: .navigation)
+                } label: {
+                    HStack(spacing: 14) {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.kTerraLight.opacity(0.35))
+                            .frame(width: 40, height: 40)
+                            .overlay {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(.kTerra)
+                            }
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(isEN ? "Unlock full monthly guidance" : "Tüm aylık rehberliği aç")
+                                .font(.kinnaBodyMedium(13))
+                                .foregroundStyle(.kChar)
+                            Text(isEN
+                                 ? "See all guidance cards and save unlimited milestones with Kinna Premium."
+                                 : "Tüm rehber kartlarını gör ve sınırsız milestone kaydetmek için Kinna Premium'a geç.")
+                                .font(.kinnaBody(11))
+                                .foregroundStyle(.kMid)
+                                .lineSpacing(2)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.kLight)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(Color.kPale, lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
         }
+    }
+
+    private func guidanceItems(for baby: Baby) -> [GuidanceCard] {
+        [
+            milestoneCard(for: baby),
+            safetyCard(for: baby),
+            vaccineCard(for: baby)
+        ]
+    }
+
+    private func milestoneCard(for baby: Baby) -> GuidanceCard {
+        let month = baby.ageInMonths
+        if let milestone = MilestoneEngine.milestonesForAge(month).first {
+            return GuidanceCard(
+                emoji: "🧠",
+                bg: Color(hex: 0xEAF3EF),
+                title: isEN ? "Month \(month) focus" : "\(month). ay odağı",
+                desc: isEN ? milestone.descriptionEN : milestone.descriptionTR
+            )
+        }
+
+        return GuidanceCard(
+            emoji: "🧠",
+            bg: Color(hex: 0xEAF3EF),
+            title: isEN ? "Development this month" : "Bu ay gelişim",
+            desc: isEN
+            ? "Watch for new social, language, and motor responses this month."
+            : "Bu ay yeni sosyal, dil ve motor tepkilere dikkat edin."
+        )
+    }
+
+    private func safetyCard(for baby: Baby) -> GuidanceCard {
+        if let alert = SafetyAlertEngine.alertsForAge(baby.ageInMonths).first {
+            return GuidanceCard(
+                emoji: "⚠️",
+                bg: .kTerraLight,
+                title: isEN ? alert.titleEN : alert.titleTR,
+                desc: isEN ? alert.descriptionEN : alert.descriptionTR
+            )
+        }
+
+        return GuidanceCard(
+            emoji: "⚠️",
+            bg: .kTerraLight,
+            title: isEN ? "Safety check" : "Güvenlik kontrolü",
+            desc: isEN
+            ? "Re-check your baby's sleep area, feeding seat, and transport setup this month."
+            : "Bu ay bebeğinizin uyku alanını, beslenme oturuşunu ve taşıma düzenini tekrar gözden geçirin."
+        )
+    }
+
+    private func vaccineCard(for baby: Baby) -> GuidanceCard {
+        let upcomingSchedule = vaccinationRecords
+            .filter { $0.isManual != true && !$0.isCompleted && $0.scheduledDate >= Calendar.current.startOfDay(for: .now) }
+            .sorted { $0.scheduledDate < $1.scheduledDate }
+            .first
+
+        if let upcomingSchedule {
+            let dateText = upcomingSchedule.scheduledDate.formatted(.dateTime.day().month(.wide))
+            return GuidanceCard(
+                emoji: "💉",
+                bg: .kPale,
+                title: isEN ? "Next vaccine" : "Sıradaki aşı",
+                desc: isEN
+                ? "\(upcomingSchedule.vaccineName) is scheduled for \(dateText)."
+                : "\(upcomingSchedule.vaccineName) için planlanan tarih \(dateText)."
+            )
+        }
+
+        return GuidanceCard(
+            emoji: "📖",
+            bg: .kPale,
+            title: isEN ? "Connection tip" : "Bağ kurma ipucu",
+            desc: isEN
+            ? "Talking to your baby with eye contact strengthens attachment."
+            : "Bebeğinizle göz teması kurarak konuşmak bağlanmayı güçlendirir."
+        )
+    }
+
+    private struct GuidanceCard {
+        let emoji: String
+        let bg: Color
+        let title: String
+        let desc: String
     }
 }
 
 #Preview {
     HomeView()
-        .modelContainer(for: [Baby.self, DailyLog.self, VaccinationRecord.self, AllergyLog.self], inMemory: true)
+        .modelContainer(for: [Baby.self, DailyLog.self, GrowthRecord.self, VaccinationRecord.self, AllergyLog.self], inMemory: true)
+        .environment(SubscriptionManager.shared)
 }

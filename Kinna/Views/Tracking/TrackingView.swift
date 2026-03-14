@@ -2,18 +2,35 @@ import SwiftUI
 import SwiftData
 
 struct TrackingView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
+    @Query(sort: \GrowthRecord.measuredAt, order: .reverse) private var growthRecords: [GrowthRecord]
     @Query private var babies: [Baby]
     @State private var showAddSheet = false
+    @State private var showAddGrowthSheet = false
+    @State private var showPaywall = false
     @State private var preselectedType: DailyLog.LogType = .feeding
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
     private var baby: Baby? { babies.first }
 
+    private var babyLogs: [DailyLog] {
+        guard let baby else { return logs }
+        return logs.filter { $0.babyID == nil || $0.babyID == baby.id }
+    }
+
     private var todayLogs: [DailyLog] {
-        logs.filter { Calendar.current.isDateInToday($0.date) }
+        babyLogs.filter { Calendar.current.isDateInToday($0.date) }
+    }
+
+    private var babyGrowthRecords: [GrowthRecord] {
+        guard let baby else { return growthRecords }
+        return growthRecords.filter { $0.babyID == nil || $0.babyID == baby.id }
+    }
+
+    private var todayGrowthRecords: [GrowthRecord] {
+        babyGrowthRecords.filter { Calendar.current.isDateInToday($0.measuredAt) }
     }
 
     private var feedingCount: Int {
@@ -30,6 +47,53 @@ struct TrackingView: View {
 
     private var diaperCount: Int {
         todayLogs.filter { $0.type == .diaper }.count
+    }
+
+    private var noteCount: Int {
+        todayLogs.filter { $0.type == .note }.count
+    }
+
+    private var latestGrowthRecord: GrowthRecord? {
+        babyGrowthRecords.first
+    }
+
+    private var recentNoteLogs: [DailyLog] {
+        babyLogs
+            .filter { $0.type == .note && !$0.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .filter { subscriptionManager.hasFullAccess || $0.date >= MonetizationPolicy.freeHistoryCutoffDate() }
+            .prefix(3)
+            .map { $0 }
+    }
+
+    private var todayTimelineItems: [TrackingTimelineItem] {
+        let items = todayLogs.map(TrackingTimelineItem.log) + todayGrowthRecords.map(TrackingTimelineItem.growth)
+        return items.sorted { $0.date > $1.date }
+    }
+
+    private var historyTimelineItems: [TrackingTimelineItem] {
+        let cutoffDate = MonetizationPolicy.freeHistoryCutoffDate()
+        let logItems = babyLogs
+            .filter { !Calendar.current.isDateInToday($0.date) && $0.type != .note }
+            .filter { subscriptionManager.hasFullAccess || $0.date >= cutoffDate }
+            .map(TrackingTimelineItem.log)
+        let growthItems = babyGrowthRecords
+            .filter { !Calendar.current.isDateInToday($0.measuredAt) }
+            .filter { subscriptionManager.hasFullAccess || $0.measuredAt >= cutoffDate }
+            .map(TrackingTimelineItem.growth)
+
+        return (logItems + growthItems).sorted { $0.date > $1.date }
+    }
+
+    private var hasLockedHistory: Bool {
+        guard !subscriptionManager.hasFullAccess else { return false }
+
+        let cutoffDate = MonetizationPolicy.freeHistoryCutoffDate()
+
+        return babyLogs.contains {
+            !Calendar.current.isDateInToday($0.date) && $0.date < cutoffDate
+        } || babyGrowthRecords.contains {
+            !Calendar.current.isDateInToday($0.measuredAt) && $0.measuredAt < cutoffDate
+        }
     }
 
     var body: some View {
@@ -79,22 +143,48 @@ struct TrackingView: View {
                     )
                     trackingTile(
                         emoji: "⚖️", label: isEN ? "LAST WEIGHT" : "SON TARTI",
-                        value: "—", unit: "kg",
-                        barColor: .kBlush, barProgress: 0.6
+                        value: measurementText(latestGrowthRecord?.weightKilograms), unit: "kg",
+                        barColor: .kBlush,
+                        barProgress: latestGrowthRecord?.weightKilograms == nil ? 0 : 1
+                    )
+                    trackingTile(
+                        emoji: "📏", label: isEN ? "LAST HEIGHT" : "SON BOY",
+                        value: measurementText(latestGrowthRecord?.heightCentimeters), unit: "cm",
+                        barColor: .kTerra,
+                        barProgress: latestGrowthRecord?.heightCentimeters == nil ? 0 : 1
+                    )
+                    trackingTile(
+                        emoji: "💭", label: isEN ? "NOTES" : "NOTLAR",
+                        value: "\(noteCount)", unit: isEN ? "today" : "bugün",
+                        barColor: .kSageDark,
+                        barProgress: min(CGFloat(noteCount) / 3.0, 1.0)
                     )
                 }
                 .padding(.bottom, 16)
 
                 // Quick-add buttons
-                HStack(spacing: 6) {
-                    quickAddButton(isEN ? "+ Feeding" : "+ Beslenme", type: .feeding)
-                    quickAddButton(isEN ? "+ Sleep" : "+ Uyku", type: .sleep)
-                    quickAddButton(isEN ? "+ Diaper" : "+ Bez", type: .diaper)
+                VStack(spacing: 6) {
+                    HStack(spacing: 6) {
+                        quickAddButton(isEN ? "+ Feeding" : "+ Beslenme", type: .feeding)
+                        quickAddButton(isEN ? "+ Sleep" : "+ Uyku", type: .sleep)
+                        quickAddButton(isEN ? "+ Diaper" : "+ Bez", type: .diaper)
+                    }
+
+                    HStack(spacing: 6) {
+                        quickAddButton(isEN ? "+ Note" : "+ Not", type: .note)
+
+                        quickActionButton(
+                            title: isEN ? "+ Growth" : "+ Tartı / Boy",
+                            systemImage: "ruler"
+                        ) {
+                            showAddGrowthSheet = true
+                        }
+                    }
                 }
                 .padding(.bottom, 16)
 
                 // Timeline
-                if !todayLogs.isEmpty {
+                if !todayTimelineItems.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(isEN ? "TIMELINE" : "ZAMAN ÇİZELGESİ")
                             .font(.kinnaBodyMedium(11))
@@ -102,11 +192,95 @@ struct TrackingView: View {
                             .tracking(1.5)
                             .padding(.bottom, 4)
 
-                        ForEach(todayLogs) { log in
-                            timelineRow(log)
+                        ForEach(todayTimelineItems) { item in
+                            timelineRow(item)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                if !recentNoteLogs.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(isEN ? "RECENT NOTES" : "SON NOTLAR")
+                            .font(.kinnaBodyMedium(11))
+                            .foregroundStyle(.kLight)
+                            .tracking(1.5)
+                            .padding(.top, todayTimelineItems.isEmpty ? 0 : 20)
+                            .padding(.bottom, 4)
+
+                        ForEach(recentNoteLogs) { noteLog in
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(noteLog.date, format: .dateTime.day().month(.wide).hour().minute())
+                                    .font(.kinnaBody(10))
+                                    .foregroundStyle(.kLight)
+                                    .textCase(.uppercase)
+
+                                Text(noteLog.note)
+                                    .font(.kinnaBody(12))
+                                    .foregroundStyle(.kMid)
+                                    .lineSpacing(3)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(14)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.kPale, lineWidth: 1)
+                            )
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, todayTimelineItems.isEmpty ? 0 : 4)
+                }
+
+                if !historyTimelineItems.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(subscriptionManager.hasFullAccess
+                             ? (isEN ? "HISTORY" : "GEÇMİŞ")
+                             : (isEN ? "LAST 7 DAYS" : "SON 7 GÜN"))
+                            .font(.kinnaBodyMedium(11))
+                            .foregroundStyle(.kLight)
+                            .tracking(1.5)
+                            .padding(.top, (todayTimelineItems.isEmpty && recentNoteLogs.isEmpty) ? 0 : 20)
+                            .padding(.bottom, 4)
+
+                        ForEach(historyTimelineItems) { item in
+                            timelineRow(item)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                if hasLockedHistory {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.kTerra)
+                            Text(isEN
+                                 ? "Free includes the last \(MonetizationPolicy.freeTrackingHistoryDays) days of tracking history."
+                                 : "Ücretsiz plan son \(MonetizationPolicy.freeTrackingHistoryDays) günlük takip geçmişini gösterir.")
+                                .font(.kinnaBody(10))
+                                .foregroundStyle(.kMid)
+                                .lineSpacing(2)
+                        }
+
+                        Button(isEN ? "Unlock full history" : "Tüm geçmişi aç") {
+                            showPaywall = true
+                        }
+                        .font(.kinnaBodyMedium(11))
+                        .foregroundStyle(.kTerra)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.kPale, lineWidth: 1)
+                    )
+                    .padding(.top, historyTimelineItems.isEmpty ? 12 : 16)
                 }
             }
             .padding(.horizontal, 24)
@@ -118,26 +292,50 @@ struct TrackingView: View {
             AddLogSheet(initialType: preselectedType)
                 .presentationDetents([.medium])
         }
+        .sheet(isPresented: $showAddGrowthSheet) {
+            AddGrowthSheet()
+                .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showPaywall) {
+            NavigationStack {
+                PaywallView()
+            }
+            .environment(subscriptionManager)
+        }
     }
 
     // MARK: - Quick Add Button
 
     private func quickAddButton(_ title: String, type: DailyLog.LogType) -> some View {
-        Button {
+        quickActionButton(title: title) {
             preselectedType = type
             showAddSheet = true
-        } label: {
-            Text(title)
-                .font(.kinnaBodyMedium(11))
-                .foregroundStyle(.kMid)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-                .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.kPale, lineWidth: 1)
-                )
+        }
+    }
+
+    private func quickActionButton(
+        title: String,
+        systemImage: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                if let systemImage {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 13, weight: .medium))
+                }
+
+                Text(title)
+                    .font(.kinnaBodyMedium(11))
+            }
+            .foregroundStyle(.kMid)
+            .frame(maxWidth: .infinity, minHeight: 42)
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.kPale, lineWidth: 1)
+            )
         }
     }
 
@@ -193,53 +391,112 @@ struct TrackingView: View {
 
     // MARK: - Timeline Row
 
-    private func timelineRow(_ log: DailyLog) -> some View {
+    private func timelineRow(_ item: TrackingTimelineItem) -> some View {
         HStack(spacing: 12) {
             // Time
-            Text(log.date, format: .dateTime.hour().minute())
+            Text(item.date, format: .dateTime.hour().minute())
                 .font(.kinnaBody(10))
                 .foregroundStyle(.kLight)
                 .frame(width: 36, alignment: .leading)
 
             // Dot
             Circle()
-                .fill(dotColor(for: log.type))
+                .fill(dotColor(for: item))
                 .frame(width: 8, height: 8)
 
             // Description
-            Text(logDescription(log))
+            Text(timelineDescription(for: item))
                 .font(.kinnaBody(12))
                 .foregroundStyle(.kMid)
         }
     }
 
-    private func dotColor(for type: DailyLog.LogType) -> Color {
-        switch type {
-        case .feeding: .kSage
-        case .sleep: Color(hex: 0x8BA7C7)
-        case .diaper: .kTerraLight
+    private func dotColor(for item: TrackingTimelineItem) -> Color {
+        switch item {
+        case .log(let log):
+            switch log.type {
+            case .feeding: .kSage
+            case .sleep: Color(hex: 0x8BA7C7)
+            case .diaper: .kTerraLight
+            case .note: .kSageDark
+            }
+        case .growth:
+            .kBlush
         }
     }
 
-    private func logDescription(_ log: DailyLog) -> String {
-        switch log.type {
-        case .feeding:
-            if let ft = log.feedingType {
-                switch ft {
-                case .breast: return isEN ? "Breast milk" : "Anne sütü"
-                case .bottle: return isEN ? "Bottle" : "Biberon"
-                case .solid: return isEN ? "Solid food" : "Ek gıda"
+    private func timelineDescription(for item: TrackingTimelineItem) -> String {
+        switch item {
+        case .log(let log):
+            switch log.type {
+            case .feeding:
+                if let ft = log.feedingType {
+                    switch ft {
+                    case .breast: return isEN ? "Breast milk" : "Anne sütü"
+                    case .bottle: return isEN ? "Bottle" : "Biberon"
+                    case .solid: return isEN ? "Solid food" : "Ek gıda"
+                    }
                 }
+                return isEN ? "Feeding" : "Beslenme"
+            case .sleep:
+                if let dur = log.sleepDuration {
+                    let mins = Int(dur / 60)
+                    return isEN ? "\(mins) min sleep" : "\(mins) dk uyku"
+                }
+                return isEN ? "Sleep" : "Uyku"
+            case .diaper:
+                return isEN ? "Diaper change" : "Bez değişimi"
+            case .note:
+                let trimmed = log.note.trimmingCharacters(in: .whitespacesAndNewlines)
+                return trimmed.isEmpty ? (isEN ? "Daily note" : "Günlük not") : trimmed
             }
-            return isEN ? "Feeding" : "Beslenme"
-        case .sleep:
-            if let dur = log.sleepDuration {
-                let mins = Int(dur / 60)
-                return isEN ? "\(mins) min sleep" : "\(mins) dk uyku"
+        case .growth(let record):
+            var parts: [String] = []
+            if let weight = record.weightKilograms {
+                parts.append("\(measurementText(weight)) kg")
             }
-            return isEN ? "Sleep" : "Uyku"
-        case .diaper:
-            return isEN ? "Diaper change" : "Bez değişimi"
+            if let height = record.heightCentimeters {
+                parts.append("\(measurementText(height)) cm")
+            }
+
+            let summary = parts.joined(separator: " • ")
+            guard !record.note.isEmpty else {
+                return isEN ? "Growth check: \(summary)" : "Büyüme ölçümü: \(summary)"
+            }
+
+            if summary.isEmpty {
+                return record.note
+            }
+
+            return "\(summary) — \(record.note)"
+        }
+    }
+
+    private func measurementText(_ value: Double?) -> String {
+        guard let value else { return "—" }
+        return value.formatted(.number.precision(.fractionLength(1)))
+    }
+
+    private enum TrackingTimelineItem: Identifiable {
+        case log(DailyLog)
+        case growth(GrowthRecord)
+
+        var id: String {
+            switch self {
+            case .log(let log):
+                "log-\(log.id.uuidString)"
+            case .growth(let record):
+                "growth-\(record.id.uuidString)"
+            }
+        }
+
+        var date: Date {
+            switch self {
+            case .log(let log):
+                log.date
+            case .growth(let record):
+                record.measuredAt
+            }
         }
     }
 }
@@ -249,6 +506,7 @@ struct TrackingView: View {
 struct AddLogSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query private var babies: [Baby]
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -260,6 +518,13 @@ struct AddLogSheet: View {
     @State private var note = ""
     @State private var logDate = Date()
 
+    private var canSave: Bool {
+        if selectedType == .note {
+            return !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        return true
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -269,6 +534,7 @@ struct AddLogSheet: View {
                         typeButton(isEN ? "Feeding" : "Beslenme", type: .feeding, emoji: "🍼")
                         typeButton(isEN ? "Sleep" : "Uyku", type: .sleep, emoji: "😴")
                         typeButton(isEN ? "Diaper" : "Bez", type: .diaper, emoji: "🧷")
+                        typeButton(isEN ? "Note" : "Not", type: .note, emoji: "💭")
                     }
                     .padding(.top, 8)
 
@@ -276,15 +542,15 @@ struct AddLogSheet: View {
                     VStack(alignment: .leading, spacing: 12) {
                         switch selectedType {
                         case .feeding:
-                            fieldLabel(isEN ? "TYPE" : "TUR")
+                            fieldLabel(isEN ? "TYPE" : "TÜR")
                             HStack(spacing: 8) {
-                                feedingButton(isEN ? "Breast milk" : "Anne sutu", type: .breast)
+                                feedingButton(isEN ? "Breast milk" : "Anne sütü", type: .breast)
                                 feedingButton(isEN ? "Bottle" : "Biberon", type: .bottle)
-                                feedingButton(isEN ? "Solid food" : "Ek gida", type: .solid)
+                                feedingButton(isEN ? "Solid food" : "Ek gıda", type: .solid)
                             }
 
                         case .sleep:
-                            fieldLabel(isEN ? "DURATION" : "SURE")
+                            fieldLabel(isEN ? "DURATION" : "SÜRE")
                             HStack(alignment: .firstTextBaseline, spacing: 4) {
                                 Text("\(Int(sleepMinutes))")
                                     .font(.kinnaDisplay(32))
@@ -297,11 +563,22 @@ struct AddLogSheet: View {
                                 .tint(.kSage)
 
                         case .diaper:
-                            fieldLabel(isEN ? "TYPE" : "TUR")
+                            fieldLabel(isEN ? "TYPE" : "TÜR")
                             HStack(spacing: 8) {
                                 diaperButton(isEN ? "Wet" : "Islak", type: .wet)
                                 diaperButton(isEN ? "Dirty" : "Kirli", type: .dirty)
-                                diaperButton(isEN ? "Both" : "Ikisi de", type: .both)
+                                diaperButton(isEN ? "Both" : "İkisi de", type: .both)
+                            }
+
+                        case .note:
+                            VStack(alignment: .leading, spacing: 6) {
+                                fieldLabel(isEN ? "ENTRY" : "KAYIT")
+                                Text(isEN
+                                     ? "Capture a doctor note, a difficult moment, or something you want to remember."
+                                     : "Doktor notu, zor bir an ya da hatırlamak istediğiniz bir gözlemi kaydedin.")
+                                    .font(.kinnaBody(12))
+                                    .foregroundStyle(.kMid)
+                                    .lineSpacing(3)
                             }
                         }
                     }
@@ -309,16 +586,16 @@ struct AddLogSheet: View {
                     // Time
                     VStack(alignment: .leading, spacing: 6) {
                         fieldLabel(isEN ? "TIME" : "SAAT")
-                        DatePicker("", selection: $logDate, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-
-                    // Note
-                    VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel(isEN ? "NOTE (optional)" : "NOT (isteğe bağlı)")
-                        TextField(isEN ? "Additional info..." : "Ek bilgi...", text: $note)
-                            .font(.kinnaBody(14))
+                        ZStack {
+                            HStack {
+                                Text(logDate.formatted(date: .omitted, time: .shortened))
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kChar)
+                                Spacer()
+                                Image(systemName: "clock")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.kTerra)
+                            }
                             .padding(12)
                             .background(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -326,6 +603,51 @@ struct AddLogSheet: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.kPale, lineWidth: 1.5)
                             )
+
+                            DatePicker("", selection: $logDate, displayedComponents: .hourAndMinute)
+                                .labelsHidden()
+                                .datePickerStyle(.compact)
+                                .blendMode(.destinationOver)
+                                .opacity(0.015)
+                                .tint(.kTerra)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    // Note
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel(selectedType == .note
+                                   ? (isEN ? "NOTE" : "NOT")
+                                   : (isEN ? "NOTE (optional)" : "NOT (isteğe bağlı)"))
+
+                        if selectedType == .note {
+                            TextEditor(text: $note)
+                                .font(.kinnaBody(14))
+                                .foregroundStyle(.kChar)
+                                .tint(.kTerra)
+                                .scrollContentBackground(.hidden)
+                                .frame(minHeight: 140)
+                                .padding(8)
+                                .background(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.kPale, lineWidth: 1.5)
+                                )
+                        } else {
+                            TextField(isEN ? "Additional info..." : "Ek bilgi...", text: $note)
+                                .font(.kinnaBody(14))
+                                .foregroundStyle(.kChar)
+                                .tint(.kTerra)
+                                .padding(12)
+                                .background(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.kPale, lineWidth: 1.5)
+                                )
+                        }
                     }
                 }
                 .padding(.horizontal, 24)
@@ -344,6 +666,7 @@ struct AddLogSheet: View {
                     Button(isEN ? "Save" : "Kaydet") { saveLog() }
                         .fontWeight(.semibold)
                         .foregroundStyle(.kTerra)
+                        .disabled(!canSave)
                 }
             }
         }
@@ -352,7 +675,12 @@ struct AddLogSheet: View {
     // MARK: - Save
 
     private func saveLog() {
-        let log = DailyLog(date: logDate, type: selectedType, note: note)
+        let log = DailyLog(
+            date: logDate,
+            type: selectedType,
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+            babyID: babies.first?.id
+        )
 
         switch selectedType {
         case .feeding:
@@ -361,6 +689,8 @@ struct AddLogSheet: View {
             log.sleepDuration = sleepMinutes * 60
         case .diaper:
             log.diaperType = diaperType
+        case .note:
+            break
         }
 
         modelContext.insert(log)
@@ -441,9 +771,172 @@ struct AddLogSheet: View {
     }
 }
 
+struct AddGrowthSheet: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @Query private var babies: [Baby]
+
+    @State private var weightText = ""
+    @State private var heightText = ""
+    @State private var note = ""
+    @State private var measuredAt = Date()
+
+    private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
+
+    private var parsedWeight: Double? {
+        parseMeasurement(weightText)
+    }
+
+    private var parsedHeight: Double? {
+        parseMeasurement(heightText)
+    }
+
+    private var canSave: Bool {
+        parsedWeight != nil || parsedHeight != nil
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    HStack(spacing: 12) {
+                        measurementField(
+                            title: isEN ? "WEIGHT" : "TARTI",
+                            placeholder: isEN ? "kg" : "kg",
+                            text: $weightText
+                        )
+                        measurementField(
+                            title: isEN ? "HEIGHT" : "BOY",
+                            placeholder: isEN ? "cm" : "cm",
+                            text: $heightText
+                        )
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel(isEN ? "MEASURED AT" : "ÖLÇÜM ZAMANI")
+                        ZStack {
+                            HStack {
+                                Text(measuredAt.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kChar)
+                                Spacer()
+                                Image(systemName: "calendar.badge.clock")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.kTerra)
+                            }
+                            .padding(12)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.kPale, lineWidth: 1.5)
+                            )
+
+                            DatePicker("", selection: $measuredAt, displayedComponents: [.date, .hourAndMinute])
+                                .labelsHidden()
+                                .datePickerStyle(.compact)
+                                .blendMode(.destinationOver)
+                                .opacity(0.015)
+                                .tint(.kTerra)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        fieldLabel(isEN ? "NOTE (optional)" : "NOT (isteğe bağlı)")
+                        TextField(isEN ? "Doctor visit, home scale, etc." : "Doktor kontrolü, ev tartısı, vb.", text: $note)
+                            .font(.kinnaBody(14))
+                            .foregroundStyle(.kChar)
+                            .tint(.kTerra)
+                            .padding(12)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.kPale, lineWidth: 1.5)
+                            )
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 20)
+            }
+            .background(Color.kCream.ignoresSafeArea())
+            .navigationTitle(isEN ? "Add Growth" : "Tartı / Boy Ekle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
+                        .foregroundStyle(.kMid)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(isEN ? "Save" : "Kaydet") { saveRecord() }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.kTerra)
+                        .disabled(!canSave)
+                }
+            }
+        }
+    }
+
+    private func saveRecord() {
+        let record = GrowthRecord(
+            measuredAt: measuredAt,
+            weightKilograms: parsedWeight,
+            heightCentimeters: parsedHeight,
+            note: note,
+            babyID: babies.first?.id
+        )
+
+        modelContext.insert(record)
+        dismiss()
+    }
+
+    private func measurementField(title: String, placeholder: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            fieldLabel(title)
+            TextField(
+                "",
+                text: text,
+                prompt: Text(placeholder)
+                    .font(.kinnaDisplay(24))
+                    .foregroundStyle(.kMuted.opacity(0.5))
+            )
+                .font(.kinnaDisplay(24))
+                .foregroundStyle(.kChar)
+                .tint(.kTerra)
+                .keyboardType(.decimalPad)
+                .padding(12)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.kPale, lineWidth: 1.5)
+                )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func fieldLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.kinnaBodyMedium(10))
+            .foregroundStyle(.kLight)
+            .tracking(1)
+    }
+
+    private func parseMeasurement(_ text: String) -> Double? {
+        let normalized = text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: ",", with: ".")
+        guard !normalized.isEmpty, let value = Double(normalized), value > 0 else { return nil }
+        return value
+    }
+}
+
 #Preview {
     NavigationStack {
         TrackingView()
     }
-    .modelContainer(for: [DailyLog.self, Baby.self], inMemory: true)
+    .modelContainer(for: [DailyLog.self, GrowthRecord.self, Baby.self], inMemory: true)
+    .environment(SubscriptionManager.shared)
 }

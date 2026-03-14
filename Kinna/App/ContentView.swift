@@ -28,5 +28,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(SubscriptionManager.shared)
-        .modelContainer(for: [Baby.self, DailyLog.self, VaccinationRecord.self, AllergyLog.self, MilestoneProgress.self], inMemory: true)
+        .modelContainer(for: [Baby.self, DailyLog.self, GrowthRecord.self, VaccinationRecord.self, AllergyLog.self, MilestoneProgress.self], inMemory: true)
 }

@@ -15,6 +15,7 @@ settings:
     DEVELOPMENT_TEAM: 5V9A3GUJ32
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     INFOPLIST_FILE: Kinna/Info.plist
+    REVENUECAT_API_KEY: "appl_yhDeZCWKWMpkpgfrQXefOaSOifU"
 
 packages:
   RevenueCat:
@@ -29,8 +30,13 @@ targets:
       - path: Kinna
         excludes:
           - "Resources/Fonts/**"
-    resources:
-      - path: Kinna/Resources/Fonts
+      - path: Kinna/Resources/Fonts/Fraunces-Variable.ttf
+        buildPhase: resources
+      - path: Kinna/Resources/Fonts/Fraunces-Italic-Variable.ttf
+        buildPhase: resources
+      - path: Kinna/Resources/Fonts/DMSans-Variable.ttf
+        buildPhase: resources
+      - path: Kinna/Resources/Fonts/DMSans-Italic-Variable.ttf
         buildPhase: resources
     dependencies:
       - package: RevenueCat

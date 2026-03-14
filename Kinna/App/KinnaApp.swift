@@ -17,6 +17,7 @@ struct KinnaApp: App {
         .modelContainer(for: [
             Baby.self,
             DailyLog.self,
+            GrowthRecord.self,
             VaccinationRecord.self,
             AllergyLog.self,
             MilestoneProgress.self
