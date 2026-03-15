@@ -8,43 +8,41 @@
 
 ## Subtitle (30 karakter)
 - **TR:** Aşı Takvimi & Uyku Takibi
-- **EN:** Milestones,Sleep,Feeding Log
+- **EN:** Vaccines, Sleep & Growth
 
 ## Category
-- **Primary:** Health & Fitness
-- **Secondary:** Lifestyle
+- **Primary:** Medical
+- **Secondary:** Health & Fitness
 
 ## Keywords (100 karakter — title+subtitle'daki kelimeler tekrarlanmaz)
 
 **TR:**
 ```
-yenidoğan,bakım,günlük,persentil,boy,kilo,basamak,baba,anne,bez,alerji,beslenme,mama,hatırlatma,WHO
+yenidoğan,bez takibi,ek gıda,persentil,uyku düzeni,bebek günlüğü,anne,baba,alerji,beslenme
 ```
 
 **EN:**
 ```
-newborn,infant,vaccine,immunization,schedule,diaper,growth,chart,WHO,percentile,development,feeding
+newborn,diaper,feeding,sleep log,growth chart,milestones,breastfeeding,percentile,allergy,WHO
 ```
 
 ## Promotional Text (170 karakter — review olmadan değiştirilebilir)
 
 **TR:**
 ```
-Bebeğinin ilk yıllarında bilimsel rehberlik. WHO ve T.C. Sağlık Bakanlığı kaynaklarına dayalı içerik. 7 gün ücretsiz dene.
+WHO referanslı gelişim rehberi, T.C. aşı takvimi ve günlük takip tek uygulamada. Verilerin cihazında kalır.
 ```
 
 **EN:**
 ```
-Science-backed guidance for your baby's first years. Based on WHO and Turkish Ministry of Health protocols. Try 7 days free.
+Calm, science-backed baby tracking for sleep, feeding, growth, and milestones. Private by design, with data stored on your device.
 ```
 
 ## Description
 
 ### TR
 ```
-Bebeğinin gelişimini takip et, aşı takvimini yönet, beslenme ve uyku kayıtlarını tut — bilimsel kaynaklara dayalı, tamamen Türkçe.
-
-WHO ve T.C. Sağlık Bakanlığı rehberlerine dayalı içerik. 7 gün ücretsiz dene.
+Bebeğinin ilk yıllarını sakin ve bilimsel bir rehberle yönet. Kinna; gelişim, T.C. aşı takvimi, uyku, beslenme ve büyüme takibini tek uygulamada toplar. Tüm veriler cihazında kalır.
 
 TEMEL ÖZELLİKLER
 
@@ -81,9 +79,9 @@ Kinna yalnızca bilgilendirme amaçlıdır ve profesyonel tıbbi tavsiyenin yeri
 
 ### EN
 ```
-Track your baby's milestones, manage vaccine schedules, log feeding & sleep — all backed by WHO guidelines. Your baby's first 24 months, covered.
+A calm, science-backed baby tracker for sleep, feeding, growth, milestones, and routines. Keep everything in one place, with data stored on your device.
 
-Privacy-first: all data stays on your device. Try 7 days free.
+Track feedings, sleep, diapers, and weight — then see your baby's progress on WHO growth charts. Follow developmental milestones month by month, log new foods with allergen tracking, and track vaccines and reminders. Kinna adapts to your role — mother, father, or caregiver — with a warm, personal tone.
 
 KEY FEATURES
 
