@@ -604,6 +604,43 @@ Aşı takvimi görüntüleme her zaman free kalmalı. Sağlık bilgisini kilitle
 | Aylık | $4.99/mo (bölgesel ayarlı) | 7 gün |
 | Yıllık | $39.99/yr (bölgesel ayarlı) | 7 gün |
 
+### Sprint 11 — Günlük İçerik Genişletme (Daily Kinna Note + Daily Guide)
+
+**Problem:** Mevcut içerik havuzu sığ — aktif kullanıcı kısa sürede tekrar görmeye başlıyor.
+
+**Mevcut envanter:**
+
+| İçerik | Adet | Rotasyon | Sorun |
+|---|---|---|---|
+| Motivasyon alıntısı | 3 × 3 rol = 9 | `.randomElement()` | 3 alıntı çok az, sık tekrar |
+| Günlük rehber kartı | 4 × 3 rol = 12 | `index % 4` (4 günlük döngü) | 4 günde tekrar başlıyor |
+| Bildirim body | 3 × 3 rol = 9 | `index % 3` | 3 günde tekrar |
+
+**Hedef:**
+
+| İçerik | Mevcut | Hedef | Rotasyon |
+|---|---|---|---|
+| Motivasyon alıntısı | 3/rol | **10/rol** (30 toplam) | Günlük tekrarsız ~10 gün |
+| Günlük rehber kartı | 4/rol | **12/rol** (36 toplam) | Ay bazlı farklılaşma (0-3, 4-6, 7-12, 13-24 ay) |
+| Bildirim body | 3/rol | **6/rol** (18 toplam) | Haftalık tekrarsız |
+
+**Ay bazlı içerik farklılaşması (en kritik iyileştirme):**
+
+Mevcut sistem her ayda aynı 4 kartı gösteriyor. Hedef:
+- **0-3 ay:** Beslenme ritmi, uyku düzeni, ten tene temas, bağlanma
+- **4-6 ay:** Ek gıdaya geçiş, motor gelişim, sesli iletişim
+- **7-12 ay:** Emekleme/yürüme, işaret dili, ayrılma kaygısı, güvenli keşif
+- **13-24 ay:** Dil patlaması, sınır koyma, bağımsızlık, sosyal oyun
+
+**Teknik yaklaşım:**
+- `dailyGuideTemplate` fonksiyonuna `babyAgeInMonths` parametresi eklenir
+- `rotationIndex % kartSayısı` yerine `ageGroup × kartSayısı + (rotationIndex % kartSayısı)`
+- Motivasyon alıntıları JSON'a taşınabilir (şu an hardcoded)
+
+**Retention etkisi:** Kişiselleştirilmiş günlük içerik, bebek uygulamalarında en güçlü DAU/MAU sürücüsü. Tekrar eden içerik → kullanıcı "bu uygulama bana yeni bir şey vermiyor" hissi → churn.
+
+**Öncelik:** App Store launch sonrası ilk güncelleme (v1.1)
+
 ## P2 Roadmap Alignment
 
 These are already present in `SPEC.md`, but not required before MVP release:
@@ -665,5 +702,5 @@ MVP should be considered ready only when:
 - ~~Tracking, vaccination, and food records are stored in a model that matches the intended user scope.~~ ✅ (MVP = single-baby)
 - ~~Critical flows are covered by basic automated tests.~~ ✅ (7 test)
 - App Store Connect subscription approval completed. **← AÇIK**
-- Bölgesel fiyat tier'ları ayarlandı (TR, EU, Hindistan). **← AÇIK**
+- ~~Bölgesel fiyat tier'ları ayarlandı (TR, EU, Hindistan).~~ ✅
 - ~~Milestone content medikal doğruluk kontrolü geçti.~~ ✅

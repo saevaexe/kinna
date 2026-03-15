@@ -41,6 +41,18 @@ final class SubscriptionManager {
 
     func configure() {
         guard !isConfigured else { return }
+
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["KINNA_SCREENSHOT_PREMIUM"] == "1" {
+            isSubscribed = true
+            isTrialActive = false
+            isRevenueCatAvailable = false
+            isConfigured = true
+            logger.info("Screenshot premium mode active — skipping RevenueCat")
+            return
+        }
+        #endif
+
         guard AppConstants.Subscription.hasValidRevenueCatAPIKey else {
             isRevenueCatAvailable = false
             lastErrorMessage = nil

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinna App Store Screenshots v1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(196, 120, 90, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(122, 158, 142, 0.12), transparent 24%),
+        linear-gradient(180deg, #f7f1ea 0%, #efe7df 100%);
+      color: #2f2a26;
+      padding: 40px 28px 60px;
+    }
+    .page {
+      max-width: 1640px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #b98a74;
+      margin-bottom: 10px;
+    }
+    h1 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: 48px;
+      line-height: 1.02;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+    }
+    h1 em {
+      font-style: italic;
+      color: #c4785a;
+    }
+    .sub {
+      margin: 12px auto 0;
+      max-width: 720px;
+      font-size: 16px;
+      line-height: 1.65;
+      color: #6f675f;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .poster {
+      background: rgba(255, 252, 247, 0.84);
+      border: 1px solid rgba(176, 159, 145, 0.22);
+      border-radius: 34px;
+      padding: 22px;
+      box-shadow:
+        0 18px 40px rgba(82, 60, 43, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+      min-height: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,255,255,0.55), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,0.25), transparent 34%);
+      pointer-events: none;
+    }
+    .poster-top {
+      position: relative;
+      z-index: 1;
+    }
+    .poster-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(196, 120, 90, 0.10);
+      color: #b06e53;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+    .poster-title {
+      margin: 16px 0 8px;
+      font-family: "Fraunces", serif;
+      font-size: 42px;
+      line-height: 1.02;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      max-width: 360px;
+    }
+    .poster-title em {
+      color: #c4785a;
+      font-style: italic;
+    }
+    .poster-copy {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #70675d;
+      max-width: 360px;
+    }
+    .frame {
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(180deg, #ffffff 0%, #fbf8f3 100%);
+      border: 1px solid rgba(182, 166, 152, 0.18);
+      border-radius: 28px;
+      box-shadow:
+        0 14px 32px rgba(85, 65, 45, 0.10),
+        inset 0 1px 0 rgba(255,255,255,0.85);
+      padding: 18px;
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .frame-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #b3a79a;
+      margin-bottom: 10px;
+    }
+    .frame-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+    .screen-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(191, 177, 164, 0.32);
+      color: #786d63;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .hero-block {
+      border-radius: 24px;
+      padding: 18px;
+      background: linear-gradient(135deg, #5b846e 0%, #7a9e8e 100%);
+      color: #fff;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+    .hero-block.terra {
+      background: linear-gradient(135deg, #c4785a 0%, #d99376 100%);
+    }
+    .hero-block.charcoal {
+      background: linear-gradient(135deg, #2d2d2d 0%, #44403d 100%);
+    }
+    .hero-block h3 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+    .hero-block p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.82);
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .row-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(188, 173, 160, 0.18);
+    }
+    .icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      background: #f6ede6;
+      flex: 0 0 auto;
+    }
+    .icon.sage { background: #e8f2ed; }
+    .icon.blue { background: #e8f0f7; }
+    .icon.soft { background: #eef1f5; }
+    .row-copy strong {
+      display: block;
+      font-size: 16px;
+      color: #2f2a26;
+      margin-bottom: 3px;
+    }
+    .row-copy span {
+      display: block;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #746b62;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .mini-tile {
+      padding: 14px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(188, 173, 160, 0.18);
+      min-height: 100px;
+    }
+    .mini-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #b1a598;
+      margin-bottom: 8px;
+    }
+    .mini-value {
+      font-family: "Fraunces", serif;
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 8px;
+      color: #2d2926;
+    }
+    .mini-meta {
+      font-size: 13px;
+      color: #756b61;
+      line-height: 1.45;
+    }
+    .chart-box {
+      border-radius: 22px;
+      border: 1px solid rgba(188, 173, 160, 0.18);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(252,248,243,0.98)),
+        linear-gradient(90deg, rgba(232,242,237,0.35), transparent);
+      min-height: 280px;
+      position: relative;
+      overflow: hidden;
+      padding: 16px;
+    }
+    .chart-grid {
+      position: absolute;
+      inset: 20px 18px 36px 18px;
+      background-image:
+        linear-gradient(to right, rgba(196, 187, 177, 0.18) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(196, 187, 177, 0.18) 1px, transparent 1px);
+      background-size: 25% 25%;
+      border-radius: 16px;
+    }
+    .chart-line,
+    .chart-mid,
+    .chart-point {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .chart-line svg,
+    .chart-mid svg,
+    .chart-point svg {
+      width: 100%;
+      height: 100%;
+    }
+    .chart-line path {
+      fill: none;
+      stroke: #7faaa0;
+      stroke-width: 4;
+      stroke-dasharray: 10 8;
+      opacity: 0.92;
+    }
+    .chart-mid path {
+      fill: none;
+      stroke: #477b6b;
+      stroke-width: 5;
+      opacity: 0.98;
+    }
+    .chart-point circle {
+      fill: #c4785a;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 12px;
+      color: #72695f;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-line {
+      width: 26px;
+      height: 0;
+      border-top: 4px solid #c4785a;
+      border-radius: 99px;
+    }
+    .legend-line.mid { border-top-color: #477b6b; }
+    .legend-line.range {
+      border-top-color: #7faaa0;
+      border-top-style: dashed;
+    }
+    .settings-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .settings-row {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(188, 173, 160, 0.18);
+      padding: 15px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .settings-row strong {
+      font-size: 15px;
+      color: #2f2a26;
+      display: block;
+    }
+    .settings-row span {
+      display: block;
+      font-size: 12px;
+      color: #7a6f64;
+      margin-top: 2px;
+    }
+    .switch {
+      width: 46px;
+      height: 28px;
+      margin-left: auto;
+      border-radius: 999px;
+      background: #89aa9b;
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .footer-copy {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #7c736a;
+    }
+    .en-bank {
+      margin-top: 32px;
+      background: rgba(255, 252, 247, 0.74);
+      border: 1px solid rgba(176, 159, 145, 0.18);
+      border-radius: 28px;
+      padding: 22px 24px;
+    }
+    .en-bank h2 {
+      margin: 0 0 16px;
+      font-family: "Fraunces", serif;
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+    .en-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+    }
+    .en-item {
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px 18px;
+      border: 1px solid rgba(188, 173, 160, 0.18);
+    }
+    .en-item strong {
+      display: block;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ba866d;
+      margin-bottom: 8px;
+    }
+    .en-item h3 {
+      margin: 0 0 6px;
+      font-family: "Fraunces", serif;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+    .en-item p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #736a61;
+    }
+    @media (max-width: 1200px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .en-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      body { padding: 24px 16px 42px; }
+      .grid { grid-template-columns: 1fr; }
+      .poster { min-height: auto; }
+      .poster-title { font-size: 34px; }
+      h1 { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="eyebrow">App Store Creative Board</div>
+      <h1>Kinna launch seti için ilk <em>6</em> screenshot</h1>
+      <p class="sub">
+        Bu board final capture sırasını, headline setini ve görsel hiyerarşiyi kilitlemek için hazırlandı.
+        Önce raw screenshot capture, sonra bu kompozisyon diline göre compositing yapılacak.
+      </p>
+    </div>
+
+    <div class="grid">
+      <section class="poster">
+        <div class="poster-top">
+          <div class="poster-label">01 · Home</div>
+          <h2 class="poster-title">Her gün sana <em>özel</em> rehber</h2>
+          <p class="poster-copy">Gelişim, aşı ve günlük rehberlik tek ekranda.</p>
+        </div>
+        <div class="frame">
+          <div class="frame-title">Capture Focus</div>
+          <div class="frame-body">
+            <div class="hero-block">
+              <h3>Bu ay için</h3>
+              <p>3/3 açık · Aşı planı · Gelişim odağı · Günün rehberi</p>
+            </div>
+            <div class="stack">
+              <div class="row-card">
+                <div class="icon sage">💉</div>
+                <div class="row-copy">
+                  <strong>Yaklaşan aşı</strong>
+                  <span>Hepatit B için sonraki doz tarihi 15 Mart.</span>
+                </div>
+              </div>
+              <div class="row-card">
+                <div class="icon soft">🧠</div>
+                <div class="row-copy">
+                  <strong>2. ay odağı</strong>
+                  <span>Konuşulduğunda veya kucağa alındığında belirgin biçimde sakinleşir.</span>
+                </div>
+              </div>
+              <div class="row-card">
+                <div class="icon">📝</div>
+                <div class="row-copy">
+                  <strong>Minik not, büyük fark</strong>
+                  <span>Kısa notlar günün ritmini fark etmeyi kolaylaştırır.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="footer-copy">Final launch headline: Her gün sana özel rehber</p>
+        </div>
+      </section>
+
+      <section class="poster">
+        <div class="poster-top">
+          <div class="poster-label">02 · Vaccination</div>
+          <h2 class="poster-title">Aşı takvimi, <em>hatırlatmalarla</em></h2>
+          <p class="poster-copy">Doğum tarihine göre planlanan dozları kolayca takip et.</p>
+        </div>
+        <div class="frame">
+          <div class="frame-title">Capture Focus</div>
+          <div class="frame-body">
+            <div class="hero-block">
+              <h3>Sıradaki doz</h3>
+              <p>Hepatit B · 15 Mart 2026 · Sonraki dozu planla</p>
+            </div>
+            <div class="stack">
+              <div class="row-card">
+                <div class="icon sage">✓</div>
+                <div class="row-copy">
+                  <strong>Tamamlananlar</strong>
+                  <span>BCG, KPA ve ilk kombinasyon dozları görünür.</span>
+                </div>
+              </div>
+              <div class="row-card">
+                <div class="icon">→</div>
+                <div class="row-copy">
+                  <strong>Yaklaşanlar</strong>
+                  <span>KPA (2. doz) ve DaBT-İPA-Hib-HepB (2. doz) aynı ekranda.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="footer-copy">Final launch headline: Aşı takvimi, hatırlatmalarla</p>
+        </div>
+      </section>
+
+      <section class="poster">
+        <div class="poster-top">
+          <div class="poster-label">03 · Tracking</div>
+          <h2 class="poster-title">Beslenme, uyku, büyüme <em>tek yerde</em></h2>
+          <p class="poster-copy">Günlük rutini bir bakışta gör, hızla kaydet.</p>
+        </div>
+        <div class="frame">
+          <div class="frame-title">Capture Focus</div>
+          <div class="frame-body">
+            <div class="mini-grid">
+              <div class="mini-tile">
+                <div class="mini-kicker">Emzirme</div>
+                <div class="mini-value">2</div>
+                <div class="mini-meta">Son emzirme 12 dk önce</div>
+              </div>
+              <div class="mini-tile">
+                <div class="mini-kicker">Uyku</div>
+                <div class="mini-value">0.5</div>
+                <div class="mini-meta">saat · bugün 1 kayıt</div>
+              </div>
+              <div class="mini-tile">
+                <div class="mini-kicker">Bez</div>
+                <div class="mini-value">1</div>
+                <div class="mini-meta">kez</div>
+              </div>
+              <div class="mini-tile">
+                <div class="mini-kicker">Son tartı</div>
+                <div class="mini-value">5.7</div>
+                <div class="mini-meta">kg</div>
+              </div>
+            </div>
+            <div class="screen-chip-row">
+              <span class="chip">+ Beslenme</span>
+              <span class="chip">+ Uyku</span>
+              <span class="chip">+ Bez</span>
+              <span class="chip">+ Not</span>
+              <span class="chip">+ Tartı / Boy</span>
+            </div>
+          </div>
+          <p class="footer-copy">Final launch headline: Beslenme, uyku, büyüme tek yerde</p>
+        </div>
+      </section>
+
+      <section class="poster">
+        <div class="poster-top">
+          <div class="poster-label">04 · Growth Charts</div>
+          <h2 class="poster-title">WHO büyüme <em>eğrileri</em></h2>
+          <p class="poster-copy">Kilo ve boyu beklenen aralıkla birlikte gör.</p>
+        </div>
+        <div class="frame">
+          <div class="frame-title">Capture Focus</div>
+          <div class="frame-body">
+            <div class="row-card">
+              <div class="icon sage">📈</div>
+              <div class="row-copy">
+                <strong>Son ölçüm</strong>
+                <span>5,7 kg · Beklenen aralıkta</span>
+              </div>
+            </div>
+            <div class="chart-box">
+              <div class="chart-grid"></div>
+              <div class="chart-line">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path d="M6 78 C18 70, 26 58, 44 42 S74 24, 94 14"></path>
+                  <path d="M6 64 C18 58, 28 48, 46 36 S76 22, 94 12"></path>
+                </svg>
+              </div>
+              <div class="chart-mid">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path d="M6 71 C18 64, 28 53, 46 41 S76 24, 94 15"></path>
+                </svg>
+              </div>
+              <div class="chart-point">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <circle cx="56" cy="48" r="1.6"></circle>
+                  <circle cx="56" cy="44" r="1.6"></circle>
+                </svg>
+              </div>
+            </div>
+            <div class="legend">
+              <span class="legend-item"><span class="legend-line"></span>Senin ölçümün</span>
+              <span class="legend-item"><span class="legend-line mid"></span>Orta çizgi</span>
+              <span class="legend-item"><span class="legend-line range"></span>Beklenen aralık</span>
+            </div>
+          </div>
+          <p class="footer-copy">Final launch headline: WHO büyüme eğrileri</p>
+        </div>
+      </section>
+
+      <section class="poster">
+        <div class="poster-top">
+          <div class="poster-label">05 · Milestones</div>
+          <h2 class="poster-title">Gelişim adımlarını <em>takip et</em></h2>
+          <p class="poster-copy">Bu ay nelerin gelişmesini bekleyebileceğini gör.</p>
+        </div>
+        <div class="frame">
+          <div class="frame-title">Capture Focus</div>
+          <div class="frame-body">
+            <div class="row-card">
+              <div class="icon soft">◔</div>
+              <div class="row-copy">
+                <strong>2. ay · 8 taştan 5’i tamamlandı</strong>
+                <span>Bağlanma ve sakinleşme temelleri, dil ve bilişsel odaklar aynı ekranda.</span>
+              </div>
+            </div>
+            <div class="screen-chip-row">
+              <span class="chip">0. ay</span>
+              <span class="chip">1. ay</span>
+              <span class="chip" style="background:#2f2a26;color:#fff;border-color:#2f2a26;">2. ay</span>
+              <span class="chip">3. ay</span>
+              <span class="chip">4. ay</span>
+            </div>
+            <div class="stack">
+              <div class="row-card">
+                <div class="icon sage">✓</div>
+                <div class="row-copy">
+                  <strong>Konuşma ve temasla sakinleşme</strong>
+                  <span>Sosyal · Konuşulduğunda ve kucağa alındığında belirgin biçimde sakinleşir.</span>
+                </div>
+              </div>
+              <div class="row-card">
+                <div class="icon soft">🧠</div>
+                <div class="row-copy">
+                  <strong>Karşılık veren gülümseme</strong>
+                  <span>Sosyal · Siz gülümsediğinizde veya onunla konuştuğunuzda size gülebilir.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="footer-copy">Final launch headline: Gelişim adımlarını takip et</p>
+        </div>
+      </section>
+
+      <section class="poster">
+        <div class="poster-top">
+          <div class="poster-label">06 · Foods / Reactions</div>
+          <h2 class="poster-title">Yeni besinleri <em>güvenle</em> takip et</h2>
+          <p class="poster-copy">Reaksiyonları not al, iyi gelenleri kolayca gör.</p>
+        </div>
+        <div class="frame">
+          <div class="frame-title">Capture Focus</div>
+          <div class="frame-body">
+            <div class="mini-grid">
+              <div class="mini-tile">
+                <div class="mini-kicker">Denenen</div>
+                <div class="mini-value">6</div>
+                <div class="mini-meta">Avokado, yumurta, muz ve daha fazlası</div>
+              </div>
+              <div class="mini-tile">
+                <div class="mini-kicker">Dikkat</div>
+                <div class="mini-value">3</div>
+                <div class="mini-meta">Kızarıklık, hafif ve ciddi notları birlikte gör</div>
+              </div>
+            </div>
+            <div class="stack">
+              <div class="row-card">
+                <div class="icon soft">🥑</div>
+                <div class="row-copy">
+                  <strong>Avokado</strong>
+                  <span>Bugün · Ciddi reaksiyon</span>
+                </div>
+              </div>
+              <div class="row-card">
+                <div class="icon">🍎</div>
+                <div class="row-copy">
+                  <strong>Elma</strong>
+                  <span>Bugün · İyi</span>
+                </div>
+              </div>
+              <div class="row-card">
+                <div class="icon sage">🥚</div>
+                <div class="row-copy">
+                  <strong>Yumurta</strong>
+                  <span>Bugün · İyi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="footer-copy">Final launch headline: Yeni besinleri güvenle takip et</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="en-bank">
+      <h2>EN Copy Bank</h2>
+      <div class="en-list">
+        <article class="en-item">
+          <strong>01 · Home</strong>
+          <h3>Daily guidance for your baby</h3>
+          <p>Milestones, vaccines, and guidance in one place.</p>
+        </article>
+        <article class="en-item">
+          <strong>02 · Vaccination</strong>
+          <h3>Vaccine tracking with reminders</h3>
+          <p>Stay on top of upcoming doses and reminder timing.</p>
+        </article>
+        <article class="en-item">
+          <strong>03 · Tracking</strong>
+          <h3>Feeding, sleep, growth in one place</h3>
+          <p>Log daily routines and see them at a glance.</p>
+        </article>
+        <article class="en-item">
+          <strong>04 · Growth Charts</strong>
+          <h3>WHO growth charts</h3>
+          <p>See growth against WHO reference ranges.</p>
+        </article>
+        <article class="en-item">
+          <strong>05 · Milestones</strong>
+          <h3>Track milestones with confidence</h3>
+          <p>See what your baby may be developing this month.</p>
+        </article>
+        <article class="en-item">
+          <strong>06 · Foods</strong>
+          <h3>Track new foods with confidence</h3>
+          <p>Log reactions and quickly see what works well.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
