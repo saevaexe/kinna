@@ -20,6 +20,12 @@ struct OnboardingView: View {
     @State private var disclaimerAccepted = false
     @State private var showCompletionPaywall = false
     @State private var showBirthDatePicker = false
+    @FocusState private var nameFieldFocused: Bool
+
+    // Cached expensive computations — updated only when birth date or step changes
+    @State private var cachedMilestoneFocus: Milestone?
+    @State private var cachedSafetyFocus: SafetyAlert?
+    @State private var cachedVaccine: (item: VaccinationItem, date: Date)?
 
     private let totalSteps = 5
     private var setupStepCount: Int { totalSteps - 1 }
@@ -89,29 +95,29 @@ struct OnboardingView: View {
         }
     }
 
-    private var milestoneFocus: Milestone? {
-        MilestoneEngine.milestonesForAge(onboardingAgeInMonths).first
-    }
+    private var milestoneFocus: Milestone? { cachedMilestoneFocus }
+    private var safetyFocus: SafetyAlert? { cachedSafetyFocus }
+    private var upcomingScheduledVaccine: (item: VaccinationItem, date: Date)? { cachedVaccine }
 
-    private var safetyFocus: SafetyAlert? {
-        SafetyAlertEngine.alertsForAge(onboardingAgeInMonths).first
-    }
+    private func refreshCachedData() {
+        let ageMonths = onboardingAgeInMonths
+        cachedMilestoneFocus = MilestoneEngine.milestonesForAge(ageMonths).first
+        cachedSafetyFocus = SafetyAlertEngine.alertsForAge(ageMonths).first
 
-    private var upcomingScheduledVaccine: (item: VaccinationItem, date: Date)? {
         let startOfToday = Calendar.current.startOfDay(for: .now)
-        let schedule = VaccinationEngine.schedule(birthDate: onboardingBirthDate)
+        let birthDate = onboardingBirthDate
+        cachedVaccine = VaccinationEngine.schedule(birthDate: birthDate)
             .map { item in
                 (
                     item: item,
                     date: VaccinationEngine.scheduledDate(
-                        birthDate: onboardingBirthDate,
+                        birthDate: birthDate,
                         monthAge: item.monthAge
                     )
                 )
             }
             .sorted { $0.date < $1.date }
-
-        return schedule.first(where: { $0.date >= startOfToday })
+            .first(where: { $0.date >= startOfToday })
     }
 
     enum ParentRole: String {
@@ -134,7 +140,21 @@ struct OnboardingView: View {
         .onAppear {
             selectedRole = ParentRole(rawValue: storedParentRole) ?? .mother
             nameInput = parentName
+            refreshCachedData()
         }
+        .onChange(of: currentStep) { _, newStep in
+            if newStep == 2 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    nameFieldFocused = true
+                }
+            }
+            if newStep == 3 || newStep == 4 {
+                refreshCachedData()
+            }
+        }
+        .onChange(of: birthDay) { _, _ in refreshCachedData() }
+        .onChange(of: birthMonth) { _, _ in refreshCachedData() }
+        .onChange(of: birthYear) { _, _ in refreshCachedData() }
         .sheet(isPresented: $showBirthDatePicker) {
             NavigationStack {
                 VStack(spacing: 0) {
@@ -174,6 +194,7 @@ struct OnboardingView: View {
             .preferredColorScheme(.light)
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
+            .presentationBackground(Color.kCream)
         }
         .fullScreenCover(isPresented: $showCompletionPaywall, onDismiss: {
             hasCompletedOnboarding = true
@@ -182,6 +203,7 @@ struct OnboardingView: View {
                 PaywallView(entryPoint: .onboarding)
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
     }
 
@@ -358,6 +380,9 @@ struct OnboardingView: View {
                         .font(.kinnaBody(14))
                         .foregroundColor(.kChar)
                         .tint(.kTerra)
+                        .focused($nameFieldFocused)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.words)
                 }
                 .padding(.bottom, 4)
 
@@ -378,6 +403,8 @@ struct OnboardingView: View {
                         .font(.kinnaBody(14))
                         .foregroundColor(.kChar)
                         .tint(.kTerra)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.words)
                 }
                 .padding(.bottom, 14)
 

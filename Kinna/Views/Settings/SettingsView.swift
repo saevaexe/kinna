@@ -16,10 +16,25 @@ struct SettingsView: View {
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Header
+                // Back button + Header
+                HStack(alignment: .top) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(.kMid)
+                            .padding(10)
+                    }
+                    .padding(.leading, -10)
+
+                    Spacer()
+                }
+                .padding(.bottom, 4)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(String(localized: "settings_eyebrow", defaultValue: "ACCOUNT & PREFERENCES"))
                         .font(.kinnaBody(9))
@@ -31,7 +46,6 @@ struct SettingsView: View {
                         .foregroundStyle(.kChar)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 12)
                 .padding(.bottom, 20)
 
                 // Baby profile card
@@ -198,7 +212,8 @@ struct SettingsView: View {
             .padding(.bottom, 20)
         }
         .background(Color.kCream.ignoresSafeArea())
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .task {
             await NotificationManager.shared.checkAuthorization()
             if notificationEnabled && NotificationManager.shared.isDenied {
@@ -218,6 +233,7 @@ struct SettingsView: View {
                 PaywallView()
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
     }
 

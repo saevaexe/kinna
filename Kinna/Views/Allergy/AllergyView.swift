@@ -167,12 +167,14 @@ struct AllergyView: View {
         .sheet(isPresented: $showAddSheet) {
             AddFoodSheet()
                 .presentationDetents([.medium])
+                .presentationBackground(Color.kCream)
         }
         .sheet(isPresented: $showPaywall) {
             NavigationStack {
                 PaywallView()
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
     }
 
@@ -376,12 +378,20 @@ struct AddFoodSheet: View {
     private var placeholderColor: Color { .kMid.opacity(0.8) }
 
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            sheetHeader(
+                title: isEN ? "New Food" : "Yeni Besin",
+                cancelLabel: isEN ? "Cancel" : "Vazgeç",
+                saveLabel: isEN ? "Save" : "Kaydet",
+                onCancel: { dismiss() },
+                onSave: { saveFood() },
+                saveDisabled: foodName.trimmingCharacters(in: .whitespaces).isEmpty
+            )
             ScrollView {
                 VStack(spacing: 20) {
                     // Food name
                     VStack(alignment: .leading, spacing: 6) {
-                        fieldLabel(isEN ? "FOOD NAME" : "BESIN ADI")
+                        fieldLabel(isEN ? "FOOD NAME" : "BESİN ADI")
                         TextField(
                             "",
                             text: $foodName,
@@ -424,6 +434,7 @@ struct AddFoodSheet: View {
                                                 .stroke(foodName == food ? Color.kTerra : Color.kPale, lineWidth: 1)
                                         )
                                 }
+                                .buttonStyle(.plain)
                             }
                         }
                     }
@@ -515,21 +526,8 @@ struct AddFoodSheet: View {
                 .padding(.bottom, 20)
             }
             .background(Color.kCream.ignoresSafeArea())
-            .navigationTitle(isEN ? "New Food" : "Yeni Besin")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
-                        .foregroundStyle(.kMid)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(isEN ? "Save" : "Kaydet") { saveFood() }
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.kTerra)
-                        .disabled(foodName.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
         }
+        .background(Color.kCream.ignoresSafeArea())
     }
 
     private func saveFood() {
@@ -570,6 +568,7 @@ struct AddFoodSheet: View {
                         .stroke(isSelected ? color : Color.kPale, lineWidth: 1.5)
                 )
         }
+        .buttonStyle(.plain)
         .foregroundStyle(isSelected ? color : .kMid)
     }
 }

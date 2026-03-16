@@ -311,6 +311,7 @@ struct MilestonesView: View {
                 PaywallView()
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
     }
 

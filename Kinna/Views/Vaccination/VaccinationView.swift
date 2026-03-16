@@ -167,12 +167,14 @@ struct VaccinationView: View {
             AddVaccineSheet()
                 .presentationDetents([.medium, .large])
                 .environment(subscriptionManager)
+                .presentationBackground(Color.kCream)
         }
         .sheet(isPresented: $showPaywall) {
             NavigationStack {
                 PaywallView()
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
         .sheet(isPresented: Binding(
             get: { recordPendingReschedule != nil },
@@ -236,6 +238,7 @@ struct VaccinationView: View {
             }
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
+            .presentationBackground(Color.kCream)
         }
     }
 
@@ -751,6 +754,31 @@ struct AddVaccineSheet: View {
 
     var body: some View {
         NavigationStack {
+            sheetBody
+                .sheet(isPresented: $showPaywall) {
+                    NavigationStack {
+                        PaywallView()
+                    }
+                    .environment(subscriptionManager)
+                    .presentationBackground(Color.kCream)
+                }
+                .sheet(item: $activeDatePicker) { picker in
+                    datePickerSheet(picker)
+                }
+                .toolbar(.hidden, for: .navigationBar)
+        }
+    }
+
+    private var sheetBody: some View {
+        VStack(spacing: 0) {
+            sheetHeader(
+                title: isEN ? "Log Vaccine" : "Aşı Kaydı",
+                cancelLabel: isEN ? "Cancel" : "Vazgeç",
+                saveLabel: isEN ? "Save" : "Kaydet",
+                onCancel: { dismiss() },
+                onSave: { saveVaccine() },
+                saveDisabled: vaccineName.trimmingCharacters(in: .whitespaces).isEmpty
+            )
             ScrollView {
                 VStack(spacing: 20) {
                     // Vaccine name
@@ -945,73 +973,8 @@ struct AddVaccineSheet: View {
                 .padding(.bottom, 20)
             }
             .background(Color.kCream.ignoresSafeArea())
-            .navigationTitle(isEN ? "Log Vaccine" : "Aşı Kaydı")
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showPaywall) {
-                NavigationStack {
-                    PaywallView()
-                }
-                .environment(subscriptionManager)
-            }
-            .sheet(item: $activeDatePicker) { picker in
-                NavigationStack {
-                    VStack(spacing: 0) {
-                        VStack(spacing: 0) {
-                            DatePicker(
-                                "",
-                                selection: dateBinding(for: picker),
-                                in: dateRange(for: picker),
-                                displayedComponents: .date
-                            )
-                            .datePickerStyle(.wheel)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 18))
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
-
-                        Button(isEN ? "Done" : "Tamam") {
-                            activeDatePicker = nil
-                        }
-                        .font(.kinnaBodyMedium(14))
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(14)
-                        .background(Color.kChar)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .padding(20)
-                    }
-                    .background(Color.kCream.ignoresSafeArea())
-                    .navigationTitle(datePickerTitle(for: picker))
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button(isEN ? "Done" : "Tamam") {
-                                activeDatePicker = nil
-                            }
-                        }
-                    }
-                }
-                .preferredColorScheme(.light)
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-            }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
-                        .foregroundStyle(.kMid)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(isEN ? "Save" : "Kaydet") { saveVaccine() }
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.kTerra)
-                        .disabled(vaccineName.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
         }
+        .background(Color.kCream.ignoresSafeArea())
     }
 
     private func saveVaccine() {
@@ -1078,6 +1041,54 @@ struct AddVaccineSheet: View {
         case .nextDose:
             return isEN ? "Next dose date" : "Sonraki doz tarihi"
         }
+    }
+
+    private func datePickerSheet(_ picker: ActiveDatePicker) -> some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                VStack(spacing: 0) {
+                    DatePicker(
+                        "",
+                        selection: dateBinding(for: picker),
+                        in: dateRange(for: picker),
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+
+                Button(isEN ? "Done" : "Tamam") {
+                    activeDatePicker = nil
+                }
+                .font(.kinnaBodyMedium(14))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(14)
+                .background(Color.kChar)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .padding(20)
+            }
+            .background(Color.kCream.ignoresSafeArea())
+            .navigationTitle(datePickerTitle(for: picker))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(isEN ? "Done" : "Tamam") {
+                        activeDatePicker = nil
+                    }
+                }
+            }
+        }
+        .preferredColorScheme(.light)
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(Color.kCream)
     }
 
     private func fieldLabel(_ text: String) -> some View {

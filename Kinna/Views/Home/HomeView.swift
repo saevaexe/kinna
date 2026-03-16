@@ -167,11 +167,7 @@ enum HomeGuidancePlanner {
 
 struct HomeView: View {
     @State private var selectedTab = 0
-    @State private var homeStackID = UUID()
-    @State private var milestonesStackID = UUID()
-    @State private var trackingStackID = UUID()
-    @State private var vaccinationStackID = UUID()
-    @State private var foodsStackID = UUID()
+    @State private var homePath = NavigationPath()
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -187,27 +183,34 @@ struct HomeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Content
-            Group {
-                switch selectedTab {
-                case 0:
-                    NavigationStack { HomeDashboardView() }
-                        .id(homeStackID)
-                case 1:
-                    NavigationStack { MilestonesView() }
-                        .id(milestonesStackID)
-                case 2:
-                    NavigationStack { TrackingView() }
-                        .id(trackingStackID)
-                case 3:
-                    NavigationStack { VaccinationView() }
-                        .id(vaccinationStackID)
-                case 4:
-                    NavigationStack { AllergyView() }
-                        .id(foodsStackID)
-                default:
-                    EmptyView()
+            // Content — all tabs rendered, only active one visible
+            ZStack {
+                Color.kCream.ignoresSafeArea()
+
+                NavigationStack(path: $homePath) {
+                    HomeDashboardView(homePath: $homePath)
+                        .navigationDestination(for: String.self) { route in
+                            if route == "settings" { SettingsView() }
+                        }
                 }
+                    .opacity(selectedTab == 0 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 0)
+
+                NavigationStack { MilestonesView() }
+                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 1)
+
+                NavigationStack { TrackingView() }
+                    .opacity(selectedTab == 2 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 2)
+
+                NavigationStack { VaccinationView() }
+                    .opacity(selectedTab == 3 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 3)
+
+                NavigationStack { AllergyView() }
+                    .opacity(selectedTab == 4 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 4)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
@@ -219,12 +222,11 @@ struct HomeView: View {
                 HStack(spacing: 0) {
                     ForEach(0..<tabs.count, id: \.self) { i in
                         Button {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                if selectedTab == i {
-                                    resetStack(for: i)
-                                } else {
-                                    selectedTab = i
-                                }
+                            if selectedTab == i {
+                                // Already on this tab — pop to root
+                                homePath = NavigationPath()
+                            } else {
+                                selectedTab = i
                             }
                         } label: {
                             VStack(spacing: 4) {
@@ -255,27 +257,12 @@ struct HomeView: View {
         .ignoresSafeArea(.keyboard)
     }
 
-    private func resetStack(for tab: Int) {
-        switch tab {
-        case 0:
-            homeStackID = UUID()
-        case 1:
-            milestonesStackID = UUID()
-        case 2:
-            trackingStackID = UUID()
-        case 3:
-            vaccinationStackID = UUID()
-        case 4:
-            foodsStackID = UUID()
-        default:
-            break
-        }
-    }
 }
 
 // MARK: - Home Dashboard
 
 struct HomeDashboardView: View {
+    @Binding var homePath: NavigationPath
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("parentRole") private var parentRoleRaw = "mother"
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
@@ -342,24 +329,33 @@ struct HomeDashboardView: View {
         ScrollView {
             VStack(spacing: 0) {
                 if let baby {
-                    // Greeting
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(greetingText.uppercased())
-                            .font(.kinnaBody(12))
-                            .foregroundStyle(.kLight)
-                            .tracking(1)
+                    // Greeting + Settings button
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(greetingText.uppercased())
+                                .font(.kinnaBody(12))
+                                .foregroundStyle(.kLight)
+                                .tracking(1)
 
-                        Text(isEN ? "\(baby.name)'s \(roleProfile.possessiveLabel(isEnglish: isEN)) 👋" : "\(baby.name)'ın \(roleProfile.possessiveLabel(isEnglish: isEN)) 👋")
-                            .font(.kinnaDisplay(26))
-                            .foregroundStyle(.kChar)
+                            Text(isEN ? "\(baby.name)'s \(roleProfile.possessiveLabel(isEnglish: isEN)) 👋" : "\(baby.name)'ın \(roleProfile.possessiveLabel(isEnglish: isEN)) 👋")
+                                .font(.kinnaDisplay(26))
+                                .foregroundStyle(.kChar)
 
-                        Text(greetingSupportLine(for: baby))
-                            .font(.kinnaBody(11))
-                            .foregroundStyle(.kMid)
-                            .lineSpacing(2)
-                            .padding(.top, 2)
+                            Text(greetingSupportLine(for: baby))
+                                .font(.kinnaBody(11))
+                                .foregroundStyle(.kMid)
+                                .lineSpacing(2)
+                                .padding(.top, 2)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Button { homePath.append("settings") } label: {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 22))
+                                .foregroundStyle(.kMid)
+                                .padding(10)
+                        }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 20)
 
                     // Age card
@@ -424,16 +420,7 @@ struct HomeDashboardView: View {
         }
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    SettingsView()
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .foregroundStyle(.kMid)
-                }
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
         .task(id: reviewPromptEvaluationKey) {
             await maybeRequestReview()
         }
@@ -660,6 +647,7 @@ struct HomeDashboardView: View {
                 PaywallView()
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
     }
 

@@ -88,3 +88,34 @@ extension Font {
             .weight(.medium)
     }
 }
+
+// MARK: - Reusable Sheet Header
+
+/// Custom sheet header that replaces NavigationStack toolbar to avoid UIKit rendering delay.
+func sheetHeader(
+    title: String,
+    cancelLabel: String,
+    saveLabel: String,
+    onCancel: @escaping () -> Void,
+    onSave: @escaping () -> Void,
+    saveDisabled: Bool = false
+) -> some View {
+    HStack {
+        Button(cancelLabel, action: onCancel)
+            .font(.kinnaBody(15))
+            .foregroundStyle(.kMid)
+        Spacer()
+        Text(title)
+            .font(.kinnaBodyMedium(16))
+            .foregroundStyle(.kChar)
+        Spacer()
+        Button(saveLabel, action: onSave)
+            .font(.kinnaBodyMedium(15))
+            .foregroundStyle(.kTerra)
+            .opacity(saveDisabled ? 0.4 : 1)
+            .disabled(saveDisabled)
+    }
+    .padding(.horizontal, 20)
+    .padding(.top, 18)
+    .padding(.bottom, 12)
+}

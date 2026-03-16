@@ -312,10 +312,12 @@ struct TrackingView: View {
         .sheet(isPresented: $showAddSheet) {
             AddLogSheet(initialType: preselectedType)
                 .presentationDetents([.medium])
+                .presentationBackground(Color.kCream)
         }
         .sheet(isPresented: $showAddGrowthSheet) {
             AddGrowthSheet()
                 .presentationDetents([.medium, .large])
+                .presentationBackground(Color.kCream)
         }
         .sheet(isPresented: $showGrowthCharts) {
             NavigationStack {
@@ -323,12 +325,14 @@ struct TrackingView: View {
                     GrowthChartsView(baby: baby, records: babyGrowthRecords)
                 }
             }
+            .presentationBackground(Color.kCream)
         }
         .sheet(isPresented: $showPaywall) {
             NavigationStack {
                 PaywallView()
             }
             .environment(subscriptionManager)
+            .presentationBackground(Color.kCream)
         }
     }
 
@@ -912,7 +916,15 @@ struct AddLogSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            sheetHeader(
+                title: isEN ? "Add Log" : "Kayıt Ekle",
+                cancelLabel: isEN ? "Cancel" : "Vazgeç",
+                saveLabel: isEN ? "Save" : "Kaydet",
+                onCancel: { dismiss() },
+                onSave: { saveLog() },
+                saveDisabled: !canSave
+            )
             ScrollView {
                 VStack(spacing: 20) {
                     // Type selector
@@ -1046,21 +1058,8 @@ struct AddLogSheet: View {
             }
             .background(Color.kCream.ignoresSafeArea())
             .onAppear { selectedType = initialType }
-            .navigationTitle(isEN ? "Add Log" : "Kayıt Ekle")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
-                        .foregroundStyle(.kMid)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(isEN ? "Save" : "Kaydet") { saveLog() }
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.kTerra)
-                        .disabled(!canSave)
-                }
-            }
         }
+        .background(Color.kCream.ignoresSafeArea())
     }
 
     // MARK: - Save
@@ -1188,7 +1187,15 @@ struct AddGrowthSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            sheetHeader(
+                title: isEN ? "Add Growth" : "Tartı / Boy Ekle",
+                cancelLabel: isEN ? "Cancel" : "Vazgeç",
+                saveLabel: isEN ? "Save" : "Kaydet",
+                onCancel: { dismiss() },
+                onSave: { saveRecord() },
+                saveDisabled: !canSave
+            )
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     HStack(spacing: 12) {
@@ -1259,21 +1266,8 @@ struct AddGrowthSheet: View {
                 .padding(.bottom, 20)
             }
             .background(Color.kCream.ignoresSafeArea())
-            .navigationTitle(isEN ? "Add Growth" : "Tartı / Boy Ekle")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(isEN ? "Cancel" : "Vazgeç") { dismiss() }
-                        .foregroundStyle(.kMid)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(isEN ? "Save" : "Kaydet") { saveRecord() }
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.kTerra)
-                        .disabled(!canSave)
-                }
-            }
         }
+        .background(Color.kCream.ignoresSafeArea())
     }
 
     private func saveRecord() {
