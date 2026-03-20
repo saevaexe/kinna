@@ -8,18 +8,33 @@ struct ContentView: View {
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
     @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
 
+    @State private var showSplash = true
+
     var body: some View {
-        Group {
-            if !hasCompletedOnboarding {
-                OnboardingView()
-            } else {
-                HomeView()
+        ZStack {
+            Group {
+                if !hasCompletedOnboarding {
+                    OnboardingView()
+                } else {
+                    HomeView()
+                }
+            }
+            .opacity(showSplash ? 0 : 1)
+
+            if showSplash {
+                splashView
+                    .transition(.opacity)
             }
         }
         .background(Color.kCream.ignoresSafeArea())
         .onAppear {
             setWindowBackground()
             if !hasCompletedOnboarding { preWarmKeyboard() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                withAnimation(.easeOut(duration: 0.5)) {
+                    showSplash = false
+                }
+            }
         }
         .task(id: vaccineReminderSyncKey) {
             await NotificationManager.shared.syncVaccineReminders(
@@ -28,6 +43,28 @@ struct ContentView: View {
                 hasFullAccess: subscriptionManager.hasFullAccess
             )
         }
+    }
+
+    // MARK: - Splash
+
+    private var splashView: some View {
+        VStack(spacing: 14) {
+            Spacer()
+
+            Image("BrandIcon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+
+            Text("Kinna")
+                .font(.kinnaDisplay(28, weight: .semibold))
+                .foregroundStyle(.kChar)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.kCream.ignoresSafeArea())
     }
 
     private var vaccineReminderSyncKey: String {
@@ -42,17 +79,14 @@ struct ContentView: View {
     }
 
     /// Pre-warms the text input infrastructure without showing the keyboard.
-    /// Creates a UITextField off-screen to force UIKit to load text input classes/fonts,
-    /// then removes it — no becomeFirstResponder, so no visible keyboard.
     private func preWarmKeyboard() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else { return }
         let field = UITextField(frame: CGRect(x: -1000, y: -1000, width: 0, height: 0))
         field.autocorrectionType = .no
         field.spellCheckingType = .no
-        field.text = " "  // trigger text layout engine
+        field.text = " "
         window.addSubview(field)
-        // Force layout so UIKit loads text input classes
         field.layoutIfNeeded()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             field.removeFromSuperview()

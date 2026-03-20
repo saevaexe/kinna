@@ -8,6 +8,7 @@ struct GrowthChartsView: View {
     let records: [GrowthRecord]
 
     @State private var selectedMetric: GrowthMetric = .weight
+    @AppStorage("useMetricUnits") private var useMetricUnits = true
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
     private var referencePoints: [GrowthReferencePoint]? {
@@ -170,11 +171,12 @@ struct GrowthChartsView: View {
                 .textCase(.uppercase)
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(summary.latestValue.formatted(.number.precision(.fractionLength(1))))
+                Text(selectedMetric.displayValue(summary.latestValue, metric: useMetricUnits)
+                    .formatted(.number.precision(.fractionLength(1))))
                     .font(.kinnaDisplay(28))
                     .foregroundStyle(.kChar)
 
-                Text(selectedMetric.unit)
+                Text(selectedMetric.unit(metric: useMetricUnits))
                     .font(.kinnaBody(12))
                     .foregroundStyle(.kMid)
             }

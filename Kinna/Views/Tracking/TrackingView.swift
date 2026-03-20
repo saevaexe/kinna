@@ -3,6 +3,7 @@ import SwiftData
 
 struct TrackingView: View {
     @AppStorage("showGrowthChartsInTracking") private var showGrowthChartsInTracking = true
+    @AppStorage("useMetricUnits") private var useMetricUnits = true
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
     @Query(sort: \GrowthRecord.measuredAt, order: .reverse) private var growthRecords: [GrowthRecord]
@@ -154,13 +155,15 @@ struct TrackingView: View {
                     )
                     trackingTile(
                         emoji: "⚖️", label: isEN ? "LAST WEIGHT" : "SON TARTI",
-                        value: measurementText(latestGrowthRecord?.weightKilograms), unit: "kg",
+                        value: displayMeasurement(latestGrowthRecord?.weightKilograms, metric: .weight),
+                        unit: GrowthMetric.weight.unit(metric: useMetricUnits),
                         barColor: .kBlush,
                         barProgress: latestGrowthRecord?.weightKilograms == nil ? 0 : 1
                     )
                     trackingTile(
                         emoji: "📏", label: isEN ? "LAST HEIGHT" : "SON BOY",
-                        value: measurementText(latestGrowthRecord?.heightCentimeters), unit: "cm",
+                        value: displayMeasurement(latestGrowthRecord?.heightCentimeters, metric: .height),
+                        unit: GrowthMetric.height.unit(metric: useMetricUnits),
                         barColor: .kTerra,
                         barProgress: latestGrowthRecord?.heightCentimeters == nil ? 0 : 1
                     )
@@ -781,10 +784,12 @@ struct TrackingView: View {
         case .growth(let record):
             var parts: [String] = []
             if let weight = record.weightKilograms {
-                parts.append("\(measurementText(weight)) kg")
+                let v = GrowthMetric.weight.displayValue(weight, metric: useMetricUnits)
+                parts.append("\(measurementText(v)) \(GrowthMetric.weight.unit(metric: useMetricUnits))")
             }
             if let height = record.heightCentimeters {
-                parts.append("\(measurementText(height)) cm")
+                let v = GrowthMetric.height.displayValue(height, metric: useMetricUnits)
+                parts.append("\(measurementText(v)) \(GrowthMetric.height.unit(metric: useMetricUnits))")
             }
 
             let summary = parts.joined(separator: " • ")
@@ -805,15 +810,23 @@ struct TrackingView: View {
         return value.formatted(.number.precision(.fractionLength(1)))
     }
 
+    private func displayMeasurement(_ metricValue: Double?, metric: GrowthMetric) -> String {
+        guard let metricValue else { return "—" }
+        let converted = metric.displayValue(metricValue, metric: useMetricUnits)
+        return converted.formatted(.number.precision(.fractionLength(1)))
+    }
+
     private func growthChartMetaText(for record: GrowthRecord) -> String {
         var parts: [String] = []
 
         if let weight = record.weightKilograms {
-            parts.append("\(measurementText(weight)) kg")
+            let v = GrowthMetric.weight.displayValue(weight, metric: useMetricUnits)
+            parts.append("\(measurementText(v)) \(GrowthMetric.weight.unit(metric: useMetricUnits))")
         }
 
         if let height = record.heightCentimeters {
-            parts.append("\(measurementText(height)) cm")
+            let v = GrowthMetric.height.displayValue(height, metric: useMetricUnits)
+            parts.append("\(measurementText(v)) \(GrowthMetric.height.unit(metric: useMetricUnits))")
         }
 
         let values = parts.joined(separator: " • ")
@@ -1165,6 +1178,7 @@ struct AddGrowthSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
+    @AppStorage("useMetricUnits") private var useMetricUnits = true
 
     @State private var weightText = ""
     @State private var heightText = ""
@@ -1201,12 +1215,12 @@ struct AddGrowthSheet: View {
                     HStack(spacing: 12) {
                         measurementField(
                             title: isEN ? "WEIGHT" : "TARTI",
-                            placeholder: isEN ? "kg" : "kg",
+                            placeholder: GrowthMetric.weight.unit(metric: useMetricUnits),
                             text: $weightText
                         )
                         measurementField(
                             title: isEN ? "HEIGHT" : "BOY",
-                            placeholder: isEN ? "cm" : "cm",
+                            placeholder: GrowthMetric.height.unit(metric: useMetricUnits),
                             text: $heightText
                         )
                     }
@@ -1271,10 +1285,12 @@ struct AddGrowthSheet: View {
     }
 
     private func saveRecord() {
+        let metricWeight = parsedWeight.map { GrowthMetric.weight.toMetric($0, metric: useMetricUnits) }
+        let metricHeight = parsedHeight.map { GrowthMetric.height.toMetric($0, metric: useMetricUnits) }
         let record = GrowthRecord(
             measuredAt: measuredAt,
-            weightKilograms: parsedWeight,
-            heightCentimeters: parsedHeight,
+            weightKilograms: metricWeight,
+            heightCentimeters: metricHeight,
             note: note,
             babyID: babies.first?.id
         )

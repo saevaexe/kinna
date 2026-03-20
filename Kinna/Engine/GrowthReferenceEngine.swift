@@ -6,10 +6,30 @@ enum GrowthMetric: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var unit: String {
+    var unit: String { unit(metric: true) }
+
+    func unit(metric: Bool) -> String {
         switch self {
-        case .weight: "kg"
-        case .height: "cm"
+        case .weight: metric ? "kg" : "lb"
+        case .height: metric ? "cm" : "in"
+        }
+    }
+
+    /// Convert a metric value (kg or cm) to the target unit system.
+    func displayValue(_ metricValue: Double, metric: Bool) -> Double {
+        guard !metric else { return metricValue }
+        switch self {
+        case .weight: return metricValue * 2.20462
+        case .height: return metricValue / 2.54
+        }
+    }
+
+    /// Convert an input value from the user's unit system back to metric (kg or cm).
+    func toMetric(_ inputValue: Double, metric: Bool) -> Double {
+        guard !metric else { return inputValue }
+        switch self {
+        case .weight: return inputValue / 2.20462
+        case .height: return inputValue * 2.54
         }
     }
 
