@@ -130,7 +130,7 @@ struct PaywallView: View {
         if hasActiveAccess {
             return isEN ? "Manage subscription" : "Aboneliği Yönet"
         }
-        return isEN ? "Try \(trialDays) Days Free" : "\(trialDays) Gün Ücretsiz Dene"
+        return isEN ? "Start \(trialDays)-Day Free Trial" : "\(trialDays) Gün Ücretsiz Dene"
     }
 
     var body: some View {
