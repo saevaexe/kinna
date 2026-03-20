@@ -55,27 +55,40 @@ final class NotificationManager {
 
     func scheduleDailyReminder(hour: Int, minute: Int) {
         let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: ["dailyReminder"])
+
+        // Remove legacy single-notification identifier and all weekday identifiers
+        var idsToRemove = ["dailyReminder"]
+        for weekday in 1...7 {
+            idsToRemove.append("dailyReminder_\(weekday)")
+        }
+        center.removePendingNotificationRequests(withIdentifiers: idsToRemove)
+
         let isEnglish = Locale.current.language.languageCode?.identifier != "tr"
         let roleProfile = ParentRoleProfile(
             storedValue: UserDefaults.standard.string(forKey: "parentRole") ?? ParentRoleProfile.mother.rawValue
         )
 
-        let rotationIndex = Calendar.current.ordinality(of: .day, in: .year, for: .now) ?? 0
+        // Schedule one notification per weekday (Sun=1 ... Sat=7) with unique body text
+        for weekday in 1...7 {
+            let content = UNMutableNotificationContent()
+            content.title = roleProfile.dailyReminderTitle(isEnglish: isEnglish)
+            content.body = roleProfile.dailyReminderBody(isEnglish: isEnglish, rotationIndex: weekday - 1)
+            content.sound = .default
 
-        let content = UNMutableNotificationContent()
-        content.title = roleProfile.dailyReminderTitle(isEnglish: isEnglish)
-        content.body = roleProfile.dailyReminderBody(isEnglish: isEnglish, rotationIndex: rotationIndex)
-        content.sound = .default
+            var dateComponents = DateComponents()
+            dateComponents.hour = hour
+            dateComponents.minute = minute
+            dateComponents.weekday = weekday
 
-        var dateComponents = DateComponents()
-        dateComponents.hour = hour
-        dateComponents.minute = minute
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+            let request = UNNotificationRequest(
+                identifier: "dailyReminder_\(weekday)",
+                content: content,
+                trigger: trigger
+            )
 
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        let request = UNNotificationRequest(identifier: "dailyReminder", content: content, trigger: trigger)
-
-        center.add(request)
+            center.add(request)
+        }
     }
 
     func scheduleVaccinationReminder(vaccineName: String, date: Date) {
@@ -95,7 +108,8 @@ final class NotificationManager {
         )
         content.sound = .default
 
-        let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour], from: date)
+        let reminderDate = Self.scheduledReminderDate(from: date, calendar: .current)
+        let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
@@ -174,8 +188,12 @@ final class NotificationManager {
     }
 
     func cancelDailyReminder() {
+        var ids = ["dailyReminder"]
+        for weekday in 1...7 {
+            ids.append("dailyReminder_\(weekday)")
+        }
         UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: ["dailyReminder"])
+            .removePendingNotificationRequests(withIdentifiers: ids)
     }
 
     static func vaccineReminderRequests(

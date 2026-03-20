@@ -441,51 +441,76 @@ enum ParentRoleProfile: String {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func dailyReminderBody(isEnglish: Bool, rotationIndex: Int) -> String {
-        let index = rotationIndex % 3
+        let index = rotationIndex % 7
 
         if isEnglish {
             switch self {
             case .mother:
-                switch index {
-                case 0: return "Open Kinna for one calm suggestion that supports your baby's rhythm today."
-                case 1: return "A small feeding connection idea is waiting for you in Kinna."
-                default: return "Kinna has a gentle sleep tip ready for tonight."
-                }
+                return [
+                    "Try a two-minute cuddle after one feed today — it strengthens your baby's rhythm.",
+                    "When you see the first sleep cue, dim the room and slow down — the window closes fast.",
+                    "Spend one minute face-to-face today — it supports early social smiles.",
+                    "Let your baby grip your finger for a minute — it builds the trust reflex.",
+                    "Hum a short melody during a diaper change — routine sounds calm the nervous system.",
+                    "Place a safe toy just out of reach today — it sparks early motor planning.",
+                    "Take one slow deep breath before picking your baby up — your calm transfers instantly."
+                ][index]
             case .father:
-                switch index {
-                case 0: return "Open Kinna for one short play idea to try today."
-                case 1: return "A skin-to-skin reminder is waiting for you in Kinna."
-                default: return "Kinna has a sound repetition idea to strengthen your bond."
-                }
+                return [
+                    "Try one minute of slow rocking today — it calms the nervous system faster than words.",
+                    "Hold your baby skin-to-skin for two minutes after a feed — oxytocin works both ways.",
+                    "Repeat one short sound near your baby today — early sound patterns build recognition.",
+                    "Carry your baby facing outward for a minute — new visual angles spark curiosity.",
+                    "Gently tap a rhythm on your baby's back — it builds early pattern awareness.",
+                    "Read one sentence aloud in a calm voice — your tone matters more than the words.",
+                    "Lie next to your baby on the floor for a minute — eye-level contact deepens the bond."
+                ][index]
             case .caregiver:
-                switch index {
-                case 0: return "Open Kinna for today's routine check-in."
-                case 1: return "A quick observation note prompt is ready in Kinna."
-                default: return "Kinna has a family summary suggestion for end of day."
-                }
+                return [
+                    "Check one routine detail this morning — small consistency builds big trust.",
+                    "Write a quick observation note about today's mood — parents notice patterns you catch.",
+                    "Prepare a short end-of-day summary for the family — it strengthens the care loop.",
+                    "Note one new thing the baby responded to today — small firsts add up fast.",
+                    "Check the nap timing against yesterday — rhythm shifts are easier to catch early.",
+                    "Observe how the baby reacts to a familiar sound — it reveals hearing development.",
+                    "Share one positive moment from today with the parents — good news builds partnership."
+                ][index]
             }
         }
 
         switch self {
         case .mother:
-            switch index {
-            case 0: return "Bugün bebeğinin ritmine iyi gelecek tek bir sakin öneri seni bekliyor."
-            case 1: return "Beslenme bağlantısını güçlendirecek küçük bir fikir Kinna'da hazır."
-            default: return "Bu akşam için yumuşak bir uyku ipucu Kinna'da seni bekliyor."
-            }
+            return [
+                "Bugün bir beslenmeden sonra iki dakika kucak teması dene — bebeğin ritmi güçlenir.",
+                "İlk uyku işaretinde ortamı karart ve sesi azalt — uyku penceresi hızla kapanır.",
+                "Bugün bir dakika yüz yüze konuş — erken sosyal gülümsemeyi destekler.",
+                "Bebeğin parmağını tutsun bir dakika — güven refleksini inşa eder.",
+                "Alt değiştirirken kısa bir melodi mırıldan — rutin sesler sinir sistemini sakinleştirir.",
+                "Güvenli bir oyuncağı erişim sınırına koy — erken motor planlamayı tetikler.",
+                "Bebeğini kucağa almadan önce bir derin nefes al — sakinliğin anında geçer."
+            ][index]
         case .father:
-            switch index {
-            case 0: return "Bugün için kısa bir oyun fikri Kinna'da seni bekliyor."
-            case 1: return "Ten tene temas hatırlatması Kinna'da hazır."
-            default: return "Bağını güçlendirecek bir ses tekrarı önerisi Kinna'da."
-            }
+            return [
+                "Bugün bir dakika yavaş sallanma dene — sinir sistemini kelimelerden hızlı sakinleştirir.",
+                "Beslenmeden sonra iki dakika ten tene temas yap — oksitosin iki yönlü çalışır.",
+                "Bugün bebeğinin yanında kısa bir ses tekrarla — erken ses kalıpları tanımayı güçlendirir.",
+                "Bebeğini bir dakika dışa bakacak şekilde taşı — yeni görsel açılar merakı tetikler.",
+                "Bebeğin sırtına hafif bir ritim vur — erken örüntü farkındalığını geliştirir.",
+                "Sakin bir sesle bir cümle oku — tonun kelimelerden daha çok önemli.",
+                "Bebeğinin yanına yere uzan bir dakika — göz hizası temas bağı derinleştirir."
+            ][index]
         case .caregiver:
-            switch index {
-            case 0: return "Bugünkü rutin check-in'i Kinna'da hazır."
-            case 1: return "Hızlı bir gözlem notu önerisi Kinna'da seni bekliyor."
-            default: return "Gün sonu aile özeti için bir öneri Kinna'da hazır."
-            }
+            return [
+                "Bu sabah bir rutin detayını kontrol et — küçük tutarlılık büyük güven inşa eder.",
+                "Bugünkü ruh hali hakkında kısa bir gözlem notu yaz — senin fark ettiğin kalıpları ebeveynler değerlendirir.",
+                "Aile için kısa bir gün sonu özeti hazırla — bakım döngüsünü güçlendirir.",
+                "Bugün bebeğin yeni tepki verdiği bir şeyi not et — küçük ilkler hızla birikir.",
+                "Uyku zamanını dünle karşılaştır — ritim kaymaları erken fark edilirse kolay düzelir.",
+                "Bebeğin tanıdık bir sese nasıl tepki verdiğini gözlemle — işitme gelişimini gösterir.",
+                "Bugünden bir olumlu anı ebeveynlerle paylaş — iyi haber ortaklığı güçlendirir."
+            ][index]
         }
     }
 
