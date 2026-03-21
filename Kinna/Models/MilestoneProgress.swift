@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class MilestoneProgress {
-    var id: UUID
-    var milestoneID: String
-    var status: Status
+    var id: UUID = UUID()
+    var milestoneID: String = ""
+    var status: Status = Status.completed
     var completedAt: Date?
 
     init(milestoneID: String, status: Status = .completed) {

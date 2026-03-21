@@ -8,7 +8,7 @@
 
 ## Mimari Kurallar
 - **MVVM:** View → ViewModel (@Observable) → Model (SwiftData)
-- **SwiftData:** Tüm veri cihazda, cloud sync yok (MVP)
+- **SwiftData:** CloudKit sync aktif (`cloudKitDatabase: .automatic`)
 - **İçerik verileri:** JSON bundle (`Resources/Data/`) — milestones, aşı takvimi, güvenlik uyarıları
 - **Lokalizasyon:** `Localizable.xcstrings` — her yeni string TR + EN birlikte eklenmeli
 - **Subscription:** RevenueCat — custom SwiftUI paywall (RevenueCat PaywallView KULLANMA)
@@ -33,7 +33,7 @@
 - 3rd party analytics SDK ekleme (PostHog, Firebase vb.) — gizlilik vaadini bozar
 - Tıbbi teşhis/tedavi önerisi verme — sadece bilgilendirme
 - "Bilinçdışı" kelimesini kullanma
-- iCloud sync ekleme (MVP scope dışı)
+- iCloud sync kaldırma — CloudKit entegrasyonu aktif ve gerekli
 
 ## Known Gotchas
 - `.fullScreenCover` / `.sheet` parent `.environment()` miras almaz — açıkça geçir

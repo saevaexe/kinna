@@ -29,11 +29,21 @@ struct ContentView: View {
         .background(Color.kCream.ignoresSafeArea())
         .onAppear {
             setWindowBackground()
+            // iCloud sync: if baby data exists but onboarding wasn't completed on this device, skip it
+            if !hasCompletedOnboarding && !babies.isEmpty {
+                hasCompletedOnboarding = true
+            }
             if !hasCompletedOnboarding { preWarmKeyboard() }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation(.easeOut(duration: 0.5)) {
                     showSplash = false
                 }
+            }
+        }
+        .onChange(of: babies.isEmpty) { _, isEmpty in
+            // iCloud sync: baby data arrived after launch — skip onboarding
+            if !hasCompletedOnboarding && !isEmpty {
+                hasCompletedOnboarding = true
             }
         }
         .task(id: vaccineReminderSyncKey) {

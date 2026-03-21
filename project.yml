@@ -10,7 +10,7 @@ settings:
   base:
     PRODUCT_NAME: "$(TARGET_NAME)"
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "2"
+    CURRENT_PROJECT_VERSION: "6"
     SWIFT_VERSION: "5.9"
     DEVELOPMENT_TEAM: 5V9A3GUJ32
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -41,12 +41,23 @@ targets:
     dependencies:
       - package: RevenueCat
         product: RevenueCat
+    entitlements:
+      path: Kinna/Kinna.entitlements
+      properties:
+        com.apple.developer.icloud-services:
+          - CloudKit
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.osmanseven.kinna
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.osmanseven.kinna
         INFOPLIST_FILE: Kinna/Info.plist
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_IDENTITY: "Apple Development"
+
+    scheme:
+      testTargets:
+        - KinnaTests
 
   KinnaTests:
     type: bundle.unit-test

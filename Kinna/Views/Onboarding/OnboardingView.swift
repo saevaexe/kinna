@@ -135,7 +135,7 @@ struct OnboardingView: View {
         }
         .onChange(of: currentStep) { _, newStep in
             if newStep == 2 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     nameFieldFocused = true
                 }
             }
@@ -319,7 +319,9 @@ struct OnboardingView: View {
 
             terraButton(isEN ? "Continue" : "Devam") {
                 storedParentRole = selectedRole.rawValue
-                currentStep = 2
+                DispatchQueue.main.async {
+                    currentStep = 2
+                }
             }
             .padding(.bottom, 32)
         }

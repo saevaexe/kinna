@@ -39,7 +39,11 @@ struct KinnaApp: App {
                     await subscriptionManager.checkSubscriptionStatus()
                 }
         }
-        .modelContainer(for: [
+        .modelContainer(container)
+    }
+
+    var container: ModelContainer {
+        let schema = Schema([
             Baby.self,
             DailyLog.self,
             GrowthRecord.self,
@@ -47,5 +51,23 @@ struct KinnaApp: App {
             AllergyLog.self,
             MilestoneProgress.self
         ])
+        do {
+            let config = ModelConfiguration(
+                cloudKitDatabase: .automatic
+            )
+            let c = try ModelContainer(for: schema, configurations: config)
+            print("☁️ CloudKit ModelContainer başarılı")
+            return c
+        } catch {
+            print("⚠️ CloudKit başarısız, local fallback: \(error)")
+            do {
+                let localConfig = ModelConfiguration(
+                    cloudKitDatabase: .none
+                )
+                return try ModelContainer(for: schema, configurations: localConfig)
+            } catch {
+                fatalError("ModelContainer oluşturulamadı: \(error)")
+            }
+        }
     }
 }

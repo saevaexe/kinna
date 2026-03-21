@@ -42,6 +42,10 @@
 	<string>Kinna sends vaccine reminders and daily parenting tips to help you track your baby's development.</string>
 	<key>RevenueCatAPIKey</key>
 	<string>$(REVENUECAT_API_KEY)</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Fraunces-Variable.ttf</string>

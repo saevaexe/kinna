@@ -3,13 +3,13 @@ import SwiftData
 
 @Model
 final class VaccinationRecord {
-    var id: UUID
-    var vaccineName: String
-    var scheduledDate: Date
+    var id: UUID = UUID()
+    var vaccineName: String = ""
+    var scheduledDate: Date = Date()
     var administeredDate: Date?
-    var isCompleted: Bool
-    var note: String
-    var createdAt: Date
+    var isCompleted: Bool = false
+    var note: String = ""
+    var createdAt: Date = Date()
     var isManual: Bool?
     var nextDoseDate: Date?
     var doctorName: String?

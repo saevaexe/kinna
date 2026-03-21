@@ -3,12 +3,12 @@ import SwiftData
 
 @Model
 final class AllergyLog {
-    var id: UUID
-    var foodName: String
-    var introducedDate: Date
-    var reaction: ReactionType
-    var reactionNote: String
-    var createdAt: Date
+    var id: UUID = UUID()
+    var foodName: String = ""
+    var introducedDate: Date = Date()
+    var reaction: ReactionType = ReactionType.none
+    var reactionNote: String = ""
+    var createdAt: Date = Date()
 
     init(foodName: String, introducedDate: Date = .now, reaction: ReactionType = .none, reactionNote: String = "") {
         self.id = UUID()

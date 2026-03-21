@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class Baby {
-    var id: UUID
-    var name: String
-    var birthDate: Date
-    var gender: Gender
-    var createdAt: Date
+    var id: UUID = UUID()
+    var name: String = ""
+    var birthDate: Date = Date()
+    var gender: Gender = Gender.other
+    var createdAt: Date = Date()
 
     init(name: String, birthDate: Date, gender: Gender) {
         self.id = UUID()

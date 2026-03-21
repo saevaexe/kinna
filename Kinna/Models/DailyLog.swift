@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class DailyLog {
-    var id: UUID
-    var date: Date
-    var type: LogType
-    var note: String
-    var createdAt: Date
+    var id: UUID = UUID()
+    var date: Date = Date()
+    var type: LogType = LogType.note
+    var note: String = ""
+    var createdAt: Date = Date()
     var babyID: UUID?
 
     // Feeding

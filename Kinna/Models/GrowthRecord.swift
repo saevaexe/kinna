@@ -3,12 +3,12 @@ import SwiftData
 
 @Model
 final class GrowthRecord {
-    var id: UUID
-    var measuredAt: Date
+    var id: UUID = UUID()
+    var measuredAt: Date = Date()
     var weightKilograms: Double?
     var heightCentimeters: Double?
-    var note: String
-    var createdAt: Date
+    var note: String = ""
+    var createdAt: Date = Date()
     var babyID: UUID?
 
     init(
