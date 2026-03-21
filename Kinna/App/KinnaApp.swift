@@ -6,6 +6,7 @@ import CoreText
 @main
 struct KinnaApp: App {
     @State private var subscriptionManager = SubscriptionManager.shared
+    let container: ModelContainer
 
     init() {
         // kCream = 0xFAF7F2
@@ -28,21 +29,8 @@ struct KinnaApp: App {
                 let _ = font.lineHeight // force font metrics to load
             }
         }
-    }
 
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(subscriptionManager)
-                .task {
-                    subscriptionManager.configure()
-                    await subscriptionManager.checkSubscriptionStatus()
-                }
-        }
-        .modelContainer(container)
-    }
-
-    var container: ModelContainer {
+        // ModelContainer — CloudKit with local fallback
         let schema = Schema([
             Baby.self,
             DailyLog.self,
@@ -55,19 +43,30 @@ struct KinnaApp: App {
             let config = ModelConfiguration(
                 cloudKitDatabase: .automatic
             )
-            let c = try ModelContainer(for: schema, configurations: config)
+            self.container = try ModelContainer(for: schema, configurations: config)
             print("☁️ CloudKit ModelContainer başarılı")
-            return c
         } catch {
             print("⚠️ CloudKit başarısız, local fallback: \(error)")
             do {
                 let localConfig = ModelConfiguration(
                     cloudKitDatabase: .none
                 )
-                return try ModelContainer(for: schema, configurations: localConfig)
+                self.container = try ModelContainer(for: schema, configurations: localConfig)
             } catch {
                 fatalError("ModelContainer oluşturulamadı: \(error)")
             }
         }
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environment(subscriptionManager)
+                .task {
+                    subscriptionManager.configure()
+                    await subscriptionManager.checkSubscriptionStatus()
+                }
+        }
+        .modelContainer(container)
     }
 }

@@ -406,18 +406,18 @@ enum ParentRoleProfile: String {
             switch self {
             case .mother:
                 return (
-                    "Unlock the full monthly plan",
+                    "Unlock all monthly guidance",
                     "See all cards, track feeding rhythm and closeness patterns with Kinna Premium."
                 )
             case .father:
                 return (
-                    "Unlock daily bonding ideas",
+                    "Unlock all daily insights",
                     "Open daily connection ideas and save unlimited milestones with Kinna Premium."
                 )
             case .caregiver:
                 return (
-                    "Unlock the full care plan",
-                    "Access the full care plan and share detailed observations with Kinna Premium."
+                    "Unlock the full care guide",
+                    "Access the full care guide and share detailed observations with Kinna Premium."
                 )
             }
         }
@@ -425,18 +425,18 @@ enum ParentRoleProfile: String {
         switch self {
         case .mother:
             return (
-                "Bu ayın tam planını aç",
+                "Aylık rehberliğin tamamını aç",
                 "Tüm kartları gör, emzirme ve yakınlık ritmini Kinna Premium ile takip et."
             )
         case .father:
             return (
-                "Günlük bağ kurma fikirlerini aç",
+                "Günlük içgörülerin tamamını aç",
                 "Günlük bağ kurma önerilerini gör ve sınırsız kilometre taşı kaydet."
             )
         case .caregiver:
             return (
-                "Tam bakım planına eriş",
-                "Detaylı bakım planını gör ve gözlemleri aileyle paylaş."
+                "Tam bakım rehberine eriş",
+                "Detaylı bakım rehberini gör ve gözlemleri aileyle paylaş."
             )
         }
     }

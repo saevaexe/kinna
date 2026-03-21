@@ -284,6 +284,11 @@ struct HomeDashboardView: View {
         roleProfile.motivationQuotes(isEnglish: isEN)
     }
 
+    private var dailyQuoteIndex: Int {
+        let day = Calendar.current.ordinality(of: .day, in: .year, for: .now) ?? 0
+        return day % max(motivationQuotes.count, 1)
+    }
+
     private var babyLogs: [DailyLog] {
         guard let baby else { return [] }
         return logs.filter { $0.babyID == nil || $0.babyID == baby.id }
@@ -418,6 +423,7 @@ struct HomeDashboardView: View {
             .padding(.top, 12)
             .padding(.bottom, 20)
         }
+        .scrollContentBackground(.hidden)
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
@@ -518,7 +524,7 @@ struct HomeDashboardView: View {
 
     private var motivationCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(motivationQuotes.randomElement() ?? motivationQuotes[0])
+            Text(motivationQuotes[dailyQuoteIndex])
                 .font(.kinnaDisplayItalic(14, weight: .light))
                 .foregroundStyle(.white)
                 .lineSpacing(5)
@@ -597,6 +603,7 @@ struct HomeDashboardView: View {
                     RoundedRectangle(cornerRadius: 18)
                         .stroke(Color.kPale, lineWidth: 1)
                 )
+                .compositingGroup()
             }
 
             if !subscriptionManager.hasFullAccess && items.count > visibleCount {

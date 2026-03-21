@@ -9,18 +9,18 @@ struct ContentView: View {
     @Query(sort: \VaccinationRecord.scheduledDate) private var vaccinationRecords: [VaccinationRecord]
 
     @State private var showSplash = true
+    @State private var onboardingStarted = false
 
     var body: some View {
         ZStack {
             Group {
                 if !hasCompletedOnboarding {
                     OnboardingView()
+                        .onAppear { onboardingStarted = true }
                 } else {
                     HomeView()
                 }
             }
-            .opacity(showSplash ? 0 : 1)
-
             if showSplash {
                 splashView
                     .transition(.opacity)
@@ -29,20 +29,19 @@ struct ContentView: View {
         .background(Color.kCream.ignoresSafeArea())
         .onAppear {
             setWindowBackground()
-            // iCloud sync: if baby data exists but onboarding wasn't completed on this device, skip it
-            if !hasCompletedOnboarding && !babies.isEmpty {
-                hasCompletedOnboarding = true
-            }
             if !hasCompletedOnboarding { preWarmKeyboard() }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                if !hasCompletedOnboarding && !babies.isEmpty {
+                    hasCompletedOnboarding = true
+                }
                 withAnimation(.easeOut(duration: 0.5)) {
                     showSplash = false
                 }
             }
         }
         .onChange(of: babies.isEmpty) { _, isEmpty in
-            // iCloud sync: baby data arrived after launch — skip onboarding
-            if !hasCompletedOnboarding && !isEmpty {
+            // iCloud sync: baby data arrived after splash — skip onboarding only if user hasn't started it
+            if !hasCompletedOnboarding && !isEmpty && !onboardingStarted {
                 hasCompletedOnboarding = true
             }
         }
