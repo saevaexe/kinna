@@ -15,8 +15,7 @@ struct ContentView: View {
         ZStack {
             Group {
                 if !hasCompletedOnboarding {
-                    OnboardingView()
-                        .onAppear { onboardingStarted = true }
+                    OnboardingView(onboardingStarted: $onboardingStarted)
                 } else {
                     HomeView()
                 }

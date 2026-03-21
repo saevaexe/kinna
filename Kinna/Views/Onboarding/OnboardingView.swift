@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct OnboardingView: View {
+    @Binding var onboardingStarted: Bool
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @AppStorage("parentName") private var parentName = ""
     @AppStorage("childOrder") private var childOrder = 1
@@ -262,6 +263,7 @@ struct OnboardingView: View {
                 Spacer(minLength: 16)
 
                 terraButton(isEN ? "Get Started" : "Başlayalım") {
+                    onboardingStarted = true
                     currentStep = 1
                 }
                 .padding(.bottom, 32)
@@ -1044,7 +1046,7 @@ struct OnboardingView: View {
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView(onboardingStarted: .constant(false))
         .environment(SubscriptionManager.shared)
         .modelContainer(for: [Baby.self, VaccinationRecord.self], inMemory: true)
 }
