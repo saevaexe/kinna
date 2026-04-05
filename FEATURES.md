@@ -1,12 +1,14 @@
 # Kinna — Feature Backlog (Post-MVP)
 
-Son güncelleme: 2026-03-21
+Son güncelleme: 2026-03-30
 
 ## Durum Özeti
 
 - **MVP:** v1.0 yayında (build 5 review'da)
 - **Mevcut:** Onboarding (5 adım + Value Summary), milestones (0-24 ay), aşı takvimi (18 kayıt, TR hibrit), günlük takip (beslenme/uyku/bez/not), güvenlik uyarıları, ek gıda günlüğü, WHO büyüme eğrileri, emzirme aralık sayacı, uyku analizi özeti, role-aware baba modu, custom paywall (7 gün trial, $4.99/mo + $39.99/yr), premium gating (7/7), TR+EN lokalizasyon, 27 test
 - **External blocker:** App Store Connect subscription approval
+- **Rakipten çıkan net strateji:** Babysfer'e breadth ile değil; günlük kullanım çekirdeği, premium netliği ve privacy/trust polish'i ile karşılık ver.
+- **Screenshot audit (Babysfer, Huckleberry, Baby+, HappyKids):** Roadmap kapsamı genel olarak doğru. En net parity açığı timer-first günlük kullanım katmanı; forum, cry analysis veya geniş community yüzeyleri kısa vadede chase edilmemeli.
 
 ---
 
@@ -16,31 +18,36 @@ Sprint 8 kalan + launch sonrası ilk stabilizasyon.
 
 | # | Özellik | Öncelik | Efor | Kaynak |
 |---|---|---|---|---|
-| 1 | `.gitignore`'a `build/` ve `design/` eklenmesi | P0 | S | BACKLOG Sprint 8 |
-| 2 | Release-risk warning cleanup (simulator/runtime gürültüsü) | P0 | S | BACKLOG Sprint 8 |
-| 3 | MVVM alignment — Home, Tracking için ViewModel çıkarma | P1 | M | BACKLOG Sprint 8 |
-| 4 | Bebek profili düzenleme (Settings'ten ad, doğum tarihi, cinsiyet) | P0 | S | ROADMAP v1.0.1 |
-| 5 | Metadata / ASO küçük iterasyonlar (subtitle, promo text) | P1 | S | ROADMAP v1.0.1 |
-| 6 | Medical category performans takibi | P1 | S | ROADMAP v1.0.1 |
+| 1 | ~~`.gitignore`'a `build/` ve `design/` eklenmesi~~ | ✅ | S | BACKLOG Sprint 8 |
+| 2 | ~~Release-risk warning cleanup (simulator/runtime gürültüsü)~~ | ✅ | S | BACKLOG Sprint 8 — sadece Xcode system warning, kod uyarısı yok |
+| 3 | ~~Bebek profili düzenleme (Settings'ten ad, doğum tarihi, cinsiyet)~~ | ✅ | S | ROADMAP v1.0.1 — EditBabyProfileSheet eklendi |
+| 4 | ~~Premium clarity pass (paywall + App Store copy + pricing/trial message)~~ | ✅ | S | Rakip analizi, 2026-03-30 |
+| 5 | ~~Privacy / trust messaging pass (cihaz içi veri, reklamsız deneyim, tutarlı dil)~~ | ✅ | S | Rakip analizi, 2026-03-30 |
+| 6 | ~~Premium / billing FAQ yüzeyi (trial, restore, Premium'da ne açılır?)~~ | ✅ | S | FAQView.swift — 6 soru, TR+EN |
+| 7 | ~~Kaynaklar / Neden Güvenilir? yüzeyi (WHO, T.C. Sağlık Bakanlığı, CDC vb.)~~ | ✅ | S | SourcesView.swift — WHO, T.C. SB, CDC, AAP, TR+EN |
+| 8 | MVVM alignment — Home, Tracking için ViewModel çıkarma | P1 | M | BACKLOG Sprint 8 |
+| 9 | ~~Metadata / ASO küçük iterasyonlar (subtitle, promo text)~~ | ✅ | S | Yapıldı — v1.2+ için tekrar elden geçirilecek |
+| 10 | Medical category performans takibi | P1 | S | ROADMAP v1.0.1 |
 
 ---
 
 ## v1.1 — Günlük Kullanım Modülleri
 
-Timer'lar ve içerik derinliği — retention için kritik. Rakip analizi: 3/3 rakipte (HappyKids, Baby+, Huckleberry) timer mevcut.
+Gerçek parity açığı timer katmanı. Growth charts ve allergy log zaten mevcut; bu sprint'in amacı günlük kullanım döngüsünü derinleştirmek.
+Not: Rakip ekranlarında widget, watch, AI, multi-device gibi convenience yüzeyleri güçlü; bunlar timer foundation oturmadan önce önceliklenmemeli.
 
 | # | Özellik | Öncelik | Efor | Detay |
 |---|---|---|---|---|
-| 1 | Emzirme timer v2 (sol/sağ meme, süre, start/stop) | P0 | M | Mevcut aralık sayacı → gerçek timer'a yükseltme |
-| 2 | Biberon takibi (miktar loglama) | P0 | M | 3/3 rakipte var |
-| 3 | Uyku takibi (başlat/durdur timer) | P0 | M | 3/3 rakipte var |
-| 4 | Bez takibi gelişmiş (pee/poo/mixed) | P1 | S | Mevcut basit log → detaylı |
-| 5 | Süt sağma (pumping) tracker | P1 | M | 3/3 rakipte var |
-| 6 | Dark mode | P0 | M | Gece emzirme için kritik |
-| 7 | Günlük içerik genişletme (Sprint 11) | P0 | M | Motivasyon 3→10/rol, rehber 4→12/rol (yaş bazlı), bildirim 3→6/rol |
-| 8 | Home kart rotasyonu optimizasyonu | P1 | S | Tekrar hissini azalt |
-| 9 | Notes / günlük içgörü derinleştirme | P1 | M | Note log'u yaş bazlı rehber bağlamına oturt |
-| 10 | Uyku özeti v2 (ortalama + trend + haftalık özet) | P1 | M | Mevcut kompakt kart → daha derin |
+| 1 | ~~Emzirme timer v2 (sol/sağ meme, süre, start/stop)~~ | ✅ | M | ActiveTimerEngine + TimerSheet, sol/sağ seçimi |
+| 2 | ~~Biberon takibi (miktar loglama)~~ | ✅ | M | feedingAmountML, FeedingType.bottle |
+| 3 | ~~Uyku takibi (başlat/durdur timer)~~ | ✅ | M | Start/stop timer + SleepInsightEngine analiz |
+| 4 | ~~Bez takibi gelişmiş (pee/poo/mixed)~~ | ✅ | S | DiaperType: wet/dirty/both |
+| 5 | Günlük içerik genişletme (Sprint 11) | P1 | M | Motivasyon 3→10/rol, rehber 4→12/rol (yaş bazlı), bildirim 3→6/rol |
+| 6 | Home kart rotasyonu optimizasyonu | P1 | S | Tekrar hissini azalt |
+| 7 | Notes / günlük içgörü derinleştirme | P1 | M | Note log'u yaş bazlı rehber bağlamına oturt |
+| 8 | Uyku özeti v2 (ortalama + trend + haftalık özet) | P1 | M | Mevcut kompakt kart → daha derin |
+| 9 | Dark mode | P1 | M | Gece kullanımı için önemli ama çekirdek parity'den sonra |
+| 10 | Süt sağma (pumping) tracker | P1 | M | 3/3 rakipte var |
 | 11 | Review prompt tuning (gerçek veriye göre) | P2 | S | — |
 
 ---
@@ -67,6 +74,7 @@ Premium derinliği artırma — retention ve sync çözüldükten sonra daha yü
 ## v1.3 — Platform Entegrasyonları
 
 Sync, paylaşım ve convenience yüzeyleri. **Önemli:** Multi-baby, sync olmadan açılmamalı.
+**Önemli 2:** Widget / Live Activities / Watch işleri, emzirme-uyku-biberon timer akışları shipping seviyesine gelmeden başlatılmamalı.
 
 | # | Özellik | Öncelik | Efor | Detay |
 |---|---|---|---|---|

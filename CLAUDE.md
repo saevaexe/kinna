@@ -12,7 +12,7 @@
 - **İçerik verileri:** JSON bundle (`Resources/Data/`) — milestones, aşı takvimi, güvenlik uyarıları
 - **Lokalizasyon:** `Localizable.xcstrings` — her yeni string TR + EN birlikte eklenmeli
 - **Subscription:** RevenueCat — custom SwiftUI paywall (RevenueCat PaywallView KULLANMA)
-- **Analytics:** Apple Analytics only — 3rd party analytics SDK ekleme
+- **Analytics:** PostHog (EU Cloud, privacy-safe) + Apple Analytics — başka 3rd party analytics SDK ekleme
 
 ## Fiyatlandırma
 - $4.99/mo, $39.99/yr, 7 gün trial
@@ -30,7 +30,8 @@
 
 ## Do NOT
 - RevenueCat PaywallView kullanma — custom SwiftUI paywall yaz
-- 3rd party analytics SDK ekleme (PostHog, Firebase vb.) — gizlilik vaadini bozar
+- Firebase, Meta SDK veya reklam SDK'sı ekleme — gizlilik vaadini bozar
+- PostHog autocapture veya session replay AÇMA — bebek verisi ekranda görünür
 - Tıbbi teşhis/tedavi önerisi verme — sadece bilgilendirme
 - "Bilinçdışı" kelimesini kullanma
 - iCloud sync kaldırma — CloudKit entegrasyonu aktif ve gerekli

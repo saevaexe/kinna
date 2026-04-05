@@ -19,7 +19,11 @@ enum BreastfeedingTimerEngine {
     }
 
     static func latestBreastfeedingLog(in logs: [DailyLog]) -> DailyLog? {
-        logs
+        // Prioritize active timer — if one is running, use its start date
+        if let activeTimer = logs.first(where: { $0.isTimerRunning && $0.type == .feeding && $0.feedingType == .breast }) {
+            return activeTimer
+        }
+        return logs
             .filter { $0.type == .feeding && $0.feedingType == .breast }
             .max(by: { $0.date < $1.date })
     }

@@ -71,7 +71,7 @@ struct LegalDisclaimerView: View {
                 }
 
                 // Last updated
-                Text(isEN ? "Last updated: March 13, 2026" : "Son güncelleme: 13 Mart 2026")
+                Text(isEN ? "Last updated: April 5, 2026" : "Son güncelleme: 5 Nisan 2026")
                     .font(.kinnaBody(9))
                     .foregroundStyle(.kMuted)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -265,10 +265,10 @@ private struct LegalSectionItem: Identifiable {
     static let analytics = LegalSectionItem(
         id: "privacy-analytics",
         number: "5",
-        titleEN: "Analytics and Data We Do Not Collect",
-        titleTR: "Analitik ve Toplamadığımız Veriler",
-        bodyEN: "Kinna does not integrate third-party advertising SDKs, analytics SDKs, or tracking frameworks in the current app code. We do not ask for location, contacts, photos, microphone access, or advertising identifiers. Kinna also does not include a separate Apple analytics SDK. Apple may still provide its own App Store or device-level analytics if you enable those settings on your Apple account or device; those services are governed by Apple's own terms.",
-        bodyTR: "Kinna'nın mevcut uygulama kodunda üçüncü taraf reklam SDK'sı, analitik SDK'sı veya takip framework'ü yer almamaktadır. Konum, kişiler, fotoğraflar, mikrofon erişimi veya reklam kimlikleri istenmez. Kinna ayrıca ayrı bir Apple analitik SDK'sı da içermez. Apple, hesabınızda veya cihazınızda bu ayarlar açıksa kendi App Store veya cihaz seviyesindeki analitiğini sağlayabilir; bu servisler Apple'ın kendi koşullarına tabidir."
+        titleEN: "Analytics",
+        titleTR: "Analitik",
+        bodyEN: "Kinna uses PostHog, hosted in the EU (Frankfurt), to collect anonymous usage statistics such as which screens are viewed and which features are used. No personal information, baby data, health records, or device identifiers are included in these analytics events. We do not use advertising SDKs or tracking frameworks. We do not ask for location, contacts, photos, microphone access, or advertising identifiers.\n\nApple may still provide its own App Store or device-level analytics if you enable those settings on your Apple account or device; those services are governed by Apple's own terms.",
+        bodyTR: "Kinna, hangi ekranların görüntülendiği ve hangi özelliklerin kullanıldığı gibi anonim kullanım istatistiklerini toplamak için AB'de (Frankfurt) barındırılan PostHog hizmetini kullanır. Bu analitik verilerine kişisel bilgi, bebek verisi, sağlık kaydı veya cihaz tanımlayıcısı dahil edilmez. Reklam SDK'sı veya takip framework'ü kullanmıyoruz. Konum, kişiler, fotoğraflar, mikrofon erişimi veya reklam kimlikleri istenmez.\n\nApple, hesabınızda veya cihazınızda bu ayarlar açıksa kendi App Store veya cihaz seviyesindeki analitiğini sağlayabilir; bu servisler Apple'ın kendi koşullarına tabidir."
     )
 
     static let deletion = LegalSectionItem(

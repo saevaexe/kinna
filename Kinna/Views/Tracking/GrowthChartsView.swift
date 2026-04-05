@@ -90,6 +90,7 @@ struct GrowthChartsView: View {
             .padding(.bottom, 24)
         }
         .background(Color.kCream.ignoresSafeArea())
+        .onAppear { AnalyticsManager.screenViewed(.growthCharts) }
         .navigationTitle(isEN ? "Growth Charts" : "Büyüme Eğrisi")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

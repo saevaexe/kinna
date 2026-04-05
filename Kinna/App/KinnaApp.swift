@@ -30,6 +30,10 @@ struct KinnaApp: App {
             }
         }
 
+        // PostHog Analytics (EU Cloud, privacy-safe)
+        AnalyticsManager.configure()
+        AnalyticsManager.trackSearchAdsAttribution()
+
         // ModelContainer — CloudKit with local fallback
         let schema = Schema([
             Baby.self,

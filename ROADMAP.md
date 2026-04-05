@@ -1,6 +1,9 @@
-# Kinna — Product Roadmap
+# Kinna — Product Roadmap — ARŞİV
 
-> Son güncelleme: 2026-03-15
+> **⚠️ Bu dosya artık güncel değil. Tüm post-MVP yapılacaklar [`FEATURES.md`](FEATURES.md) dosyasına taşındı (2026-03-21).**
+> Bu dosya stratejik analiz referansı olarak korunmaktadır.
+
+> _Orijinal:_ Son güncelleme: 2026-03-15
 > Kaynak: App Store launch hazırlığı, Apple product page kuralları, güncel rakip ürün sayfaları, TR/EN metadata ve creative analizi
 
 ---

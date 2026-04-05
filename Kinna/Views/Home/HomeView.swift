@@ -255,6 +255,15 @@ struct HomeView: View {
             .background(.white)
         }
         .ignoresSafeArea(.keyboard)
+        .onChange(of: selectedTab) { _, newTab in
+            let screens: [AnalyticsManager.Screen] = [.home, .milestones, .tracking, .vaccines, .foodIntro]
+            if newTab < screens.count {
+                AnalyticsManager.screenViewed(screens[newTab])
+            }
+        }
+        .onAppear {
+            AnalyticsManager.screenViewed(.home)
+        }
     }
 
 }

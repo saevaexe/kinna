@@ -1,6 +1,11 @@
-# Kinna Backlog
+# Kinna Backlog — ARŞİV
 
-This file consolidates product roadmap items from `SPEC.md`, implementation constraints from `CLAUDE.md`, and release risks found during code inspection and local verification.
+> **⚠️ Bu dosya artık güncel değil. Tüm post-MVP yapılacaklar [`FEATURES.md`](FEATURES.md) dosyasına taşındı (2026-03-21).**
+> Bu dosya MVP sprint geçmişi referansı olarak korunmaktadır.
+
+---
+
+_Orijinal açıklama:_ This file consolidates product roadmap items from `SPEC.md`, implementation constraints from `CLAUDE.md`, and release risks found during code inspection and local verification.
 
 ## Current State
 

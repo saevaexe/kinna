@@ -20,6 +20,14 @@ final class DailyLog {
     // Diaper
     var diaperType: DiaperType?
 
+    // Timer
+    var timerStartDate: Date?
+    var timerEndDate: Date?
+
+    // Feeding extended
+    var breastSide: BreastSide?
+    var feedingAmountML: Double?
+
     init(date: Date = .now, type: LogType, note: String = "", babyID: UUID? = nil) {
         self.id = UUID()
         self.date = date
@@ -46,5 +54,19 @@ final class DailyLog {
         case wet
         case dirty
         case both
+    }
+
+    enum BreastSide: String, Codable, CaseIterable {
+        case left
+        case right
+    }
+
+    var isTimerRunning: Bool {
+        timerStartDate != nil && timerEndDate == nil
+    }
+
+    var timerDuration: TimeInterval? {
+        guard let start = timerStartDate, let end = timerEndDate else { return nil }
+        return end.timeIntervalSince(start)
     }
 }

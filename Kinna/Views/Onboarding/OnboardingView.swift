@@ -135,6 +135,7 @@ struct OnboardingView: View {
             refreshCachedData()
         }
         .onChange(of: currentStep) { _, newStep in
+            AnalyticsManager.onboardingStep(newStep + 1, total: 5)
             if newStep == 2 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     nameFieldFocused = true
@@ -189,6 +190,7 @@ struct OnboardingView: View {
             .presentationBackground(Color.kCream)
         }
         .fullScreenCover(isPresented: $showCompletionPaywall, onDismiss: {
+            AnalyticsManager.onboardingCompleted()
             hasCompletedOnboarding = true
         }) {
             NavigationStack {

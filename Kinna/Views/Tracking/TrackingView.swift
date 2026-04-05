@@ -5,6 +5,7 @@ struct TrackingView: View {
     @AppStorage("showGrowthChartsInTracking") private var showGrowthChartsInTracking = true
     @AppStorage("useMetricUnits") private var useMetricUnits = true
     @Environment(SubscriptionManager.self) private var subscriptionManager
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \DailyLog.createdAt, order: .reverse) private var logs: [DailyLog]
     @Query(sort: \GrowthRecord.measuredAt, order: .reverse) private var growthRecords: [GrowthRecord]
     @Query(sort: \Baby.createdAt) private var babies: [Baby]
@@ -13,6 +14,8 @@ struct TrackingView: View {
     @State private var showGrowthCharts = false
     @State private var showPaywall = false
     @State private var preselectedType: DailyLog.LogType = .feeding
+    @State private var showTimerSheet = false
+    @State private var timerSheetMode: TimerSheet.Mode = .feeding
 
     private var isEN: Bool { Locale.current.language.languageCode?.identifier != "tr" }
 
@@ -57,6 +60,10 @@ struct TrackingView: View {
 
     private var breastfeedingTimerSummary: BreastfeedingTimerSummary? {
         BreastfeedingTimerEngine.summary(logs: babyLogs)
+    }
+
+    private var activeTimers: [DailyLog] {
+        ActiveTimerEngine.activeTimers(in: babyLogs)
     }
 
     private var diaperCount: Int {
@@ -135,6 +142,17 @@ struct TrackingView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 20)
 
+                // Active timer banner
+                ActiveTimerBanner(
+                    activeTimers: activeTimers,
+                    onStop: { timer in
+                        ActiveTimerEngine.stopTimer(timer)
+                    },
+                    onCancel: { timer in
+                        ActiveTimerEngine.cancelTimer(timer, context: modelContext)
+                    }
+                )
+
                 // 2x2 Grid
                 LazyVGrid(columns: [
                     GridItem(.flexible(), spacing: 10),
@@ -148,6 +166,10 @@ struct TrackingView: View {
                         value: String(format: "%.1f", sleepHours), unit: isEN ? "hours" : "saat",
                         barColor: Color(hex: 0x8BA7C7), barProgress: min(sleepHours / 14.0, 1.0)
                     )
+                    .onTapGesture {
+                        timerSheetMode = .sleep
+                        showTimerSheet = true
+                    }
                     trackingTile(
                         emoji: "🧷", label: isEN ? "DIAPER" : "BEZ",
                         value: "\(diaperCount)", unit: isEN ? "times" : "kez",
@@ -179,8 +201,14 @@ struct TrackingView: View {
                 // Quick-add buttons
                 VStack(spacing: 6) {
                     HStack(spacing: 6) {
-                        quickAddButton(isEN ? "+ Feeding" : "+ Beslenme", type: .feeding)
-                        quickAddButton(isEN ? "+ Sleep" : "+ Uyku", type: .sleep)
+                        quickActionButton(title: isEN ? "+ Feeding" : "+ Beslenme") {
+                            timerSheetMode = .feeding
+                            showTimerSheet = true
+                        }
+                        quickActionButton(title: isEN ? "+ Sleep" : "+ Uyku") {
+                            timerSheetMode = .sleep
+                            showTimerSheet = true
+                        }
                         quickAddButton(isEN ? "+ Diaper" : "+ Bez", type: .diaper)
                     }
 
@@ -336,6 +364,11 @@ struct TrackingView: View {
             }
             .environment(subscriptionManager)
             .presentationBackground(Color.kCream)
+        }
+        .sheet(isPresented: $showTimerSheet) {
+            TimerSheet(mode: timerSheetMode)
+                .presentationDetents([.medium])
+                .presentationBackground(Color.kCream)
         }
     }
 
@@ -504,8 +537,8 @@ struct TrackingView: View {
         )
         .contentShape(Rectangle())
         .onTapGesture {
-            preselectedType = .feeding
-            showAddSheet = true
+            timerSheetMode = .feeding
+            showTimerSheet = true
         }
     }
 
@@ -763,8 +796,22 @@ struct TrackingView: View {
             case .feeding:
                 if let ft = log.feedingType {
                     switch ft {
-                    case .breast: return isEN ? "Breast milk" : "Anne sütü"
-                    case .bottle: return isEN ? "Bottle" : "Biberon"
+                    case .breast:
+                        var text = isEN ? "Breast milk" : "Anne sütü"
+                        if let side = log.breastSide {
+                            let sideText = side == .left ? (isEN ? "left" : "sol") : (isEN ? "right" : "sağ")
+                            text += " (\(sideText))"
+                        }
+                        if let duration = log.timerDuration {
+                            text += " · \(ActiveTimerEngine.formattedElapsed(duration))"
+                        }
+                        return text
+                    case .bottle:
+                        var text = isEN ? "Bottle" : "Biberon"
+                        if let ml = log.feedingAmountML {
+                            text += " · \(Int(ml)) ml"
+                        }
+                        return text
                     case .solid: return isEN ? "Solid food" : "Ek gıda"
                     }
                 }
@@ -772,10 +819,22 @@ struct TrackingView: View {
             case .sleep:
                 if let dur = log.sleepDuration {
                     let mins = Int(dur / 60)
-                    return isEN ? "\(mins) min sleep" : "\(mins) dk uyku"
+                    let isTimer = log.timerStartDate != nil
+                    let suffix = isTimer ? (isEN ? " (timer)" : " (zamanlayıcı)") : ""
+                    return isEN ? "\(mins) min sleep\(suffix)" : "\(mins) dk uyku\(suffix)"
+                }
+                if log.isTimerRunning {
+                    return isEN ? "Sleep (in progress...)" : "Uyku (devam ediyor...)"
                 }
                 return isEN ? "Sleep" : "Uyku"
             case .diaper:
+                if let dt = log.diaperType {
+                    switch dt {
+                    case .wet: return isEN ? "Diaper — wet" : "Bez — ıslak"
+                    case .dirty: return isEN ? "Diaper — dirty" : "Bez — kirli"
+                    case .both: return isEN ? "Diaper — both" : "Bez — ikisi de"
+                    }
+                }
                 return isEN ? "Diaper change" : "Bez değişimi"
             case .note:
                 let trimmed = log.note.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -915,6 +974,8 @@ struct AddLogSheet: View {
     var initialType: DailyLog.LogType = .feeding
     @State private var selectedType: DailyLog.LogType = .feeding
     @State private var feedingType: DailyLog.FeedingType = .breast
+    @State private var breastSide: DailyLog.BreastSide = .left
+    @State private var bottleAmountText = ""
     @State private var sleepMinutes: Double = 30
     @State private var diaperType: DailyLog.DiaperType = .wet
     @State private var note = ""
@@ -960,8 +1021,37 @@ struct AddLogSheet: View {
                                 feedingButton(isEN ? "Solid food" : "Ek gıda", type: .solid)
                             }
 
+                            if feedingType == .breast {
+                                fieldLabel(isEN ? "SIDE" : "TARAF")
+                                HStack(spacing: 8) {
+                                    sideButton(isEN ? "Left" : "Sol", side: .left)
+                                    sideButton(isEN ? "Right" : "Sağ", side: .right)
+                                }
+                            }
+
+                            if feedingType == .bottle {
+                                fieldLabel(isEN ? "AMOUNT (ml)" : "MİKTAR (ml)")
+                                TextField(
+                                    "",
+                                    text: $bottleAmountText,
+                                    prompt: Text("ml")
+                                        .foregroundStyle(placeholderColor)
+                                )
+                                .font(.kinnaDisplay(24))
+                                .foregroundStyle(.kChar)
+                                .tint(.kTerra)
+                                .keyboardType(.numberPad)
+                                .padding(12)
+                                .background(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.kPale, lineWidth: 1.5)
+                                )
+                            }
+
                         case .sleep:
-                            fieldLabel(isEN ? "DURATION" : "SÜRE")
+                            fieldLabel(isEN ? "MANUAL DURATION" : "MANUEL SÜRE")
                             HStack(alignment: .firstTextBaseline, spacing: 4) {
                                 Text("\(Int(sleepMinutes))")
                                     .font(.kinnaDisplay(32))
@@ -972,6 +1062,13 @@ struct AddLogSheet: View {
                             }
                             Slider(value: $sleepMinutes, in: 5...240, step: 5)
                                 .tint(.kSage)
+
+                            Text(isEN
+                                 ? "💡 Tip: Use the sleep timer on the tracking screen for automatic duration."
+                                 : "💡 İpucu: Otomatik süre için takip ekranındaki uyku zamanlayıcısını kullan.")
+                                .font(.kinnaBody(10))
+                                .foregroundStyle(.kLight)
+                                .lineSpacing(2)
 
                         case .diaper:
                             fieldLabel(isEN ? "TYPE" : "TÜR")
@@ -1088,6 +1185,12 @@ struct AddLogSheet: View {
         switch selectedType {
         case .feeding:
             log.feedingType = feedingType
+            if feedingType == .breast {
+                log.breastSide = breastSide
+            }
+            if feedingType == .bottle, let amount = parsedBottleAmount {
+                log.feedingAmountML = amount
+            }
         case .sleep:
             log.sleepDuration = sleepMinutes * 60
         case .diaper:
@@ -1097,7 +1200,28 @@ struct AddLogSheet: View {
         }
 
         modelContext.insert(log)
+
+        // Analytics
+        switch selectedType {
+        case .feeding:
+            AnalyticsManager.featureUsed(feedingType == .bottle ? .bottleLog : .feedingTimer)
+        case .sleep:
+            AnalyticsManager.featureUsed(.sleepTimer)
+        case .diaper:
+            AnalyticsManager.featureUsed(.diaperLog)
+        case .note:
+            AnalyticsManager.featureUsed(.noteLog)
+        }
+
         dismiss()
+    }
+
+    private var parsedBottleAmount: Double? {
+        let normalized = bottleAmountText
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: ",", with: ".")
+        guard let value = Double(normalized), value > 0 else { return nil }
+        return value
     }
 
     // MARK: - Components
@@ -1171,6 +1295,26 @@ struct AddLogSheet: View {
                 )
         }
         .foregroundStyle(isSelected ? .kTerra : .kMid)
+    }
+
+    private func sideButton(_ title: String, side: DailyLog.BreastSide) -> some View {
+        let isSelected = breastSide == side
+        return Button {
+            breastSide = side
+        } label: {
+            Text(title)
+                .font(.kinnaBody(12))
+                .fontWeight(isSelected ? .medium : .regular)
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(isSelected ? Color.kSage.opacity(0.15) : .white)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(isSelected ? Color.kSage : Color.kPale, lineWidth: 1.5)
+                )
+        }
+        .foregroundStyle(isSelected ? .kSageDark : .kMid)
     }
 }
 

@@ -156,6 +156,7 @@ struct PaywallView: View {
             LegalWebView(page: page)
         }
         .task {
+            AnalyticsManager.paywallViewed(source: entryPoint == .onboarding ? "onboarding" : "settings")
             await subscriptionManager.checkSubscriptionStatus()
             if !subscriptionManager.hasFullAccess {
                 await loadOffering()
@@ -240,26 +241,26 @@ struct PaywallView: View {
     private var heroTextSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Headline
-            Text(isEN ? "Don't miss" : "Hiçbir anı")
+            Text(isEN ? "Move through the early years" : "İlk yıllarda")
                 .font(.kinnaDisplay(36, weight: .regular))
                 .foregroundStyle(.kChar)
 
-            Text(isEN ? "a moment." : "kaçırma.")
+            Text(isEN ? "more calmly." : "daha sakin ilerle.")
                 .font(.kinnaDisplayItalic(36, weight: .regular))
                 .foregroundStyle(.kTerra)
                 .padding(.bottom, 12)
 
-            // Subtitle with baby name
+            // Subtitle
             (
                 Text(isEN
-                    ? "Use every premium feature free for \(trialDays) days.\n"
-                    : "Tüm premium özellikleri \(trialDays) gün ücretsiz kullan.\n")
+                    ? "Kinna Premium unlocks daily guidance, growth charts, and deeper tracking tools in one place.\n"
+                    : "Kinna Premium; günlük rehberlik, büyüme eğrileri ve daha derin takip araçlarını tek yerde açar.\n")
                     .font(.kinnaBody(15))
                     .foregroundStyle(.kMid)
                 +
                 Text(isEN
-                    ? "Keep going only if it helps \(babyNameForHeadline)."
-                    : "Sadece \(babyNameForHeadline) için yardımcı olursa devam et.")
+                    ? "Try free for \(trialDays) days — only keep going if it helps \(babyNameForHeadline)."
+                    : "\(trialDays) gün ücretsiz dene — sadece \(babyNameForHeadline) için faydalıysa devam et.")
                     .font(.kinnaBodyMedium(15))
                     .foregroundStyle(.kChar)
             )
@@ -268,9 +269,11 @@ struct PaywallView: View {
 
             // Feature bullets
             VStack(alignment: .leading, spacing: 14) {
-                featureBulletCircle(isEN ? "Daily developmental activities" : "Günlük gelişimsel aktiviteler")
-                featureBulletCircle(isEN ? "Official vaccine tracking & alerts" : "Resmi aşı takibi ve uyarılar")
-                featureBulletCircle(isEN ? "Science-based parenting library" : "Bilime dayalı ebeveynlik kütüphanesi")
+                featureBulletCircle(isEN ? "Daily personalized guidance" : "Günlük kişiselleştirilmiş rehber")
+                featureBulletCircle(isEN ? "WHO growth charts" : "WHO büyüme eğrileri")
+                featureBulletCircle(isEN ? "Unlimited history & deeper tracking" : "Sınırsız geçmiş ve daha derin takip")
+                featureBulletCircle(isEN ? "Official vaccine reminders" : "Resmi aşı hatırlatmaları")
+                featureBulletCircle(isEN ? "Feeding & sleep insights" : "Beslenme ve uyku takip özetleri")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -328,9 +331,18 @@ struct PaywallView: View {
                 .padding(.bottom, 10)
 
             // No charge today
-            Text(isEN ? "No charge today" : "Bugün hiçbir ücret alınmaz")
+            Text(isEN ? "No charge today" : "Bugün ücret alınmaz")
                 .font(.kinnaBodyMedium(13))
                 .foregroundStyle(.kSageDark)
+                .padding(.bottom, 2)
+
+            Text(isEN
+                 ? "Cancel before the trial ends and you won't be charged."
+                 : "Deneme bitmeden iptal edersen ücret ödemezsin.")
+                .font(.kinnaBody(11))
+                .foregroundStyle(.kMid)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 4)
 
             // Subscription terms
@@ -557,6 +569,13 @@ struct PaywallView: View {
                 free: "—",
                 isPremiumCheck: true
             )
+            Divider().foregroundStyle(Color.kPale)
+
+            comparisonRow(
+                feature: isEN ? "Daily guidance" : "Günlük rehberlik",
+                free: isEN ? "1 card" : "1 kart",
+                isPremiumCheck: true
+            )
         }
         .background(.white.opacity(0.9))
         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -613,8 +632,19 @@ struct PaywallView: View {
                     .font(.system(size: 14))
                     .frame(width: 20)
                 Text(isEN
-                    ? "All data stays on your device — private & secure"
-                    : "Tüm veriler yalnızca cihazında kalır — özel ve güvenli")
+                    ? "Your data stays on your device — private & secure"
+                    : "Verilerin cihazında kalır — özel ve güvenli")
+                    .font(.kinnaBody(12))
+                    .foregroundStyle(.kMid)
+            }
+
+            HStack(spacing: 8) {
+                Text("✨")
+                    .font(.system(size: 14))
+                    .frame(width: 20)
+                Text(isEN
+                    ? "No ads, no distractions — a calm experience"
+                    : "Reklamsız, dikkat dağıtmayan sakin deneyim")
                     .font(.kinnaBody(12))
                     .foregroundStyle(.kMid)
             }
@@ -744,7 +774,7 @@ struct PaywallView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text(isEN ? "Explore Kinna first" : "Önce Kinna'yı keşfedeyim")
+                    Text(isEN ? "Continue with free for now" : "Şimdilik ücretsiz devam et")
                         .font(.kinnaBody(13))
                         .foregroundStyle(.kChar.opacity(0.7))
                         .underline()
@@ -847,7 +877,13 @@ struct PaywallView: View {
         errorMessage = nil
         successMessage = nil
 
+        let planType = selectedPlan.storeProduct.subscriptionPeriod?.unit == .month ? "monthly" : "yearly"
+        AnalyticsManager.paywallAction(planType == "monthly" ? .monthlyTapped : .yearlyTapped)
+
         let purchaseSucceeded = await subscriptionManager.purchase(selectedPlan)
+        if purchaseSucceeded {
+            AnalyticsManager.subscriptionStarted(plan: planType, trial: true)
+        }
         await syncVaccineReminders()
         if !purchaseSucceeded && !subscriptionManager.hasFullAccess {
             errorMessage = friendlyPaywallErrorMessage(
@@ -868,6 +904,7 @@ struct PaywallView: View {
         errorMessage = nil
         successMessage = nil
 
+        AnalyticsManager.paywallAction(.restoreTapped)
         let restoreSucceeded = await subscriptionManager.restorePurchases()
         await syncVaccineReminders()
         if restoreSucceeded && subscriptionManager.hasFullAccess {

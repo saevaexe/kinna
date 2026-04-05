@@ -12,6 +12,9 @@ struct SettingsView: View {
     @Environment(SubscriptionManager.self) private var subscriptionManager
     @State private var presentedLegalPage: LegalWebPage?
     @State private var showPaywall = false
+    @State private var showEditProfile = false
+    @State private var showFAQ = false
+    @State private var showSources = false
 
     private var baby: Baby? { babies.first }
 
@@ -63,8 +66,11 @@ struct SettingsView: View {
 
                 // Profile card
                 if let baby {
-                    profileCard(baby)
-                        .padding(.bottom, 16)
+                    Button { showEditProfile = true } label: {
+                        profileCard(baby)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 16)
                 }
 
                 // Subscription
@@ -146,6 +152,64 @@ struct SettingsView: View {
                 }
                 .padding(.bottom, 12)
 
+                // Help & Trust
+                settingsSection(isEN ? "HELP & TRUST" : "YARDIM & GÜVENİLİRLİK") {
+                    VStack(spacing: 0) {
+                        Button { showFAQ = true } label: {
+                            HStack(spacing: 12) {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.kTerraLight.opacity(0.4))
+                                    .frame(width: 30, height: 30)
+                                    .overlay {
+                                        Image(systemName: "questionmark.bubble.fill")
+                                            .font(.system(size: 13))
+                                            .foregroundStyle(.kTerra)
+                                    }
+
+                                Text(isEN ? "FAQ & Premium Help" : "SSS & Premium Yardım")
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kChar)
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(.kLight)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+
+                        sectionDivider
+
+                        Button { showSources = true } label: {
+                            HStack(spacing: 12) {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.kSage.opacity(0.15))
+                                    .frame(width: 30, height: 30)
+                                    .overlay {
+                                        Image(systemName: "checkmark.shield.fill")
+                                            .font(.system(size: 13))
+                                            .foregroundStyle(.kSageDark)
+                                    }
+
+                                Text(isEN ? "Our Sources" : "Kaynaklar & Güvenilirlik")
+                                    .font(.kinnaBody(14))
+                                    .foregroundStyle(.kChar)
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(.kLight)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.bottom, 12)
+
                 // Legal
                 settingsSection("LEGAL") {
                     VStack(spacing: 0) {
@@ -206,6 +270,7 @@ struct SettingsView: View {
         .background(Color.kCream.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear { AnalyticsManager.screenViewed(.settings) }
         .task {
             await NotificationManager.shared.checkAuthorization()
             if notificationEnabled && NotificationManager.shared.isDenied {
@@ -226,6 +291,19 @@ struct SettingsView: View {
             }
             .environment(subscriptionManager)
             .presentationBackground(Color.kCream)
+        }
+        .sheet(isPresented: $showEditProfile) {
+            if let baby {
+                EditBabyProfileSheet(baby: baby)
+                    .presentationDetents([.medium])
+                    .presentationBackground(Color.kCream)
+            }
+        }
+        .navigationDestination(isPresented: $showFAQ) {
+            FAQView()
+        }
+        .navigationDestination(isPresented: $showSources) {
+            SourcesView()
         }
     }
 
@@ -303,6 +381,10 @@ struct SettingsView: View {
             }
 
             Spacer()
+
+            Image(systemName: "pencil")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.kLight)
         }
         .padding(18)
         .background(
